@@ -28,23 +28,42 @@ public class Shingles {
 			.toArray(RIV[]::new);
 	}
 	
-	public static RIV[] rivShingles (String text, int[] shinglePoints, int offset, int size, int k) {
+	public static RIV[] rivShingles (String text, int[] shinglePoints, int width, int size, int k) {
+		int length = text.length();
 		return Arrays.stream(shinglePoints)
-					.mapToObj((point) -> Labels.generateLabel(size, k, text, point, offset))
+					.mapToObj((point) -> 
+						Labels.generateLabel(
+								size,
+								k,
+								text,
+								point,
+								(point + width < length) 
+									? width
+											: length - point))
 					.toArray(RIV[]::new);
 	}
 	
 	public static RIV rivAndSumShingles (String text, int[] shinglePoints, int width, int size, int k) {
+		int length = text.length();
 		return Arrays.stream(shinglePoints)
 			.boxed()
 			.reduce(new RIV(size),
-					(riv, point) -> riv.add(Labels.generateLabel(size, k, text, point, width)),
+					(riv, point) -> riv.add(
+							Labels.generateLabel(
+									size,
+									k,
+									text,
+									point,
+									(point + width < length) 
+										? width
+												: length - point)),
 					(rivA, rivB) -> Labels.addLabels(rivA, rivB));
 	}
 	
 	public static RIV sumRIVs (RIV[] rivs) { return Labels.addLabels(rivs); }
 	
 	public static RIV rivettizeText(String text, int width, int offset, int size, int k) {
-		return sumRIVs(rivShingles(shingleText(text, width, offset), size, k));
+		int[] points = findShinglePoints(text, offset);
+		return rivAndSumShingles(text, points, width, size, k);
 	}
 }
