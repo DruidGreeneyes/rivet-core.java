@@ -12,6 +12,10 @@ import rivet.core.arraylabels.*;
 public class Shingles {
 	
 	public static int[] findShinglePoints (String text, int offset) {
+		if (text.isEmpty() || text == null)
+			throw new RuntimeException("THIS TEXT IS NOT TEXT!");
+		if (offset == 0)
+			throw new RuntimeException("THIS OFFSET IS A VIOLATION OF THE TOS! PREPARE FOR LEGAL ACTION!");
 		return Util.range(0, text.length(), offset).toArray();
 	}
 	
