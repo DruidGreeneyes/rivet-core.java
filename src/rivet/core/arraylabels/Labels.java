@@ -82,6 +82,10 @@ public class Labels {
 		return (word) -> generateLabel(size, k, word);
 	}
 	
+	public static Function<Integer, RIV> labelGenerator (final String source, final int size, final int k, final int tokenLength) {
+		return (index) -> generateLabel(size, k, source, index, tokenLength);
+	}
+	
 	public static RIV permuteLabel (final RIV label, final Permutations permutations, final int times) {
 		return label.permute(permutations, times);
 	}

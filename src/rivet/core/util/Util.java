@@ -26,15 +26,21 @@ public class Util {
 		return new Random(seed).ints(0, bound).distinct().limit(length);
 	}
 	
-	public static LongStream range (final Long start, final Long bound) { return LongStream.range(start, bound);}
-	public static LongStream range (final Long start, final Long bound, final Long step) {
-		return range(start, bound).filter((x) -> (x - start) % step == 0L);
-	}
-	public static LongStream range(final Long bound) { return range(0L, bound); }
+	public static LongStream range (final Long start, final Long bound) 					{ return LongStream.range(start, bound);}
+	public static LongStream range (final Long bound) 										{ return range(0L, bound); }
+	public static LongStream range (final Long start, final Long bound, final Long step) 	{ return range(start, bound).filter((x) -> (x - start) % step == 0L); }
 	
-	public static IntStream range (final Integer start, final Integer bound, final Integer step) { 
-		return range(start, bound).filter((x) -> (x - start) % step == 0L);
+	public static IntStream range (final Integer start, final Integer bound) 						{ return IntStream.range(start, bound); }
+	public static IntStream range (final Integer bound) 											{ return range(0, bound); }
+	public static IntStream range (final Integer start, final Integer bound, final Integer step) 	{ return range(start, bound).filter((x) -> (x - start) % step == 0); }
+	
+	public static int[] quickRange (final int start, final int bound, final int step) {
+		int steps = (bound - start) / step;
+		int[] res = new int[steps];
+		for (int i = 1; i <= steps; i++)
+			res[i] = i * step + start;
+		return res;
 	}
-	public static IntStream range (final Integer start, final Integer bound) { return IntStream.range(start, bound); }
-	public static IntStream range (final Integer bound) {	return range(0, bound); }
+	public static int[] quickRange (final int start, final int bound) { return quickRange(start, bound, 1); }
+	public static int[] quickRange (final int bound) { return quickRange(0, bound); }
 }
