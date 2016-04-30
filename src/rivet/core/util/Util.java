@@ -37,7 +37,7 @@ public class Util {
 	public static int[] quickRange (final int start, final int bound, final int step) {
 		int steps = (bound - start) / step;
 		int[] res = new int[steps];
-		for (int i = 1; i <= steps; i++)
+		for (int i = 0; i <= steps; i++)
 			res[i] = i * step + start;
 		return res;
 	}
