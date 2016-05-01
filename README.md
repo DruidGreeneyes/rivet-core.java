@@ -22,4 +22,4 @@ The core functionality is in `rivet.core.arraylabels` and `rivet.core.hashmaplab
 
 If you want some examples for what to do with it, or if you want some basic use without having to roll your own, you can check out `rivet.core.extras`. Currently there's an implementation of text shingling and one of untrained word-by-word analysis, but the real power in RIVs is going to be in cluster- and database-backed big-data applications, and for that you'll probably want to just use `arraylabels` or `hashmaplabels` as your base library and build into Spark or MapReduce or Tez or something like that. You can see how it works in Spark by looking at my [rivet-cluster.java](https://github.com/DruidGreeneyes/rivet-cluster.java) repo.
 
-If you have any questions, let me know. If you get bugs, leave an issue; include the full stacktrace and the relevant code, or I probably won't even look.
+If you have any questions, let me know. If you get bugs, leave an issue; include the full stacktrace and the relevant code, or I probably won't even look. Or if you know me, just hit me up on skype or google-chat and I'll see what I can do.
