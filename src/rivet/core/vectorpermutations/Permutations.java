@@ -6,7 +6,7 @@ import rivet.core.util.Pair;
 
 import static rivet.core.util.Util.randInts;
 
-public class Permutations extends Pair<int[], int[]> {
+public final class Permutations extends Pair<int[], int[]> {
 	
 	private Permutations(final int[] permute, final int[] inverse) {
 		super(permute, inverse);

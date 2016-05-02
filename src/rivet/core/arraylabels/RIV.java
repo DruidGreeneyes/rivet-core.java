@@ -17,7 +17,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import rivet.core.vectorpermutations.Permutations;
 
-public class RIV implements Serializable{
+public final class RIV implements Serializable{
 	/**
 	 * 
 	 */

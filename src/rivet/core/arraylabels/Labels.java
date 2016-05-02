@@ -9,7 +9,7 @@ import rivet.core.vectorpermutations.Permutations;
 import rivet.core.util.Util;
 import rivet.core.util.Pair;
 
-public class Labels {
+public final class Labels {
 	
 	private Labels(){}
 	

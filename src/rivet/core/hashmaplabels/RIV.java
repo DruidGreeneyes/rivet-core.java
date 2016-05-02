@@ -13,7 +13,7 @@ import static java.util.Arrays.stream;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
-public class RIV extends HashMap<Integer, Double> {
+public final class RIV extends HashMap<Integer, Double> {
 	private static final long serialVersionUID = 7549131075767220565L;
 	/**
 	 * 

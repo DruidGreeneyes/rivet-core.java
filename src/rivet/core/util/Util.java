@@ -7,7 +7,9 @@ import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
-public class Util {
+public final  class Util {
+	private Util(){}
+	
 	public static <T> List<T> shuffleList(final List<T> lis, final Long seed) {
 		final int size = lis.size();
 		return randInts(size, size, seed)

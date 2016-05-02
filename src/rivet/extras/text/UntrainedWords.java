@@ -4,7 +4,8 @@ import static java.util.Arrays.stream;
 
 import rivet.core.arraylabels.*;
 
-public class UntrainedWords {
+public final class UntrainedWords {
+	private UntrainedWords(){}
 	
 	public static String[] tokenizeText (String text) {
 		return text.split("\\s+");

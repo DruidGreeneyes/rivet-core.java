@@ -15,7 +15,8 @@ import java.util.ArrayList;
 import rivet.core.util.Triple;
 
 
-public class LDA {
+public final class LDA {
+	private LDA(){}
 	
 	public static HashMap<String, String[]> gibbsSample (String[][] texts, int numTopics, int changeThreshold) {
 		HashMap<Integer, String[]> topicsA = new HashMap<>();

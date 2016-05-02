@@ -3,7 +3,7 @@
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class VectorElement implements Comparable<VectorElement> {
+public final class VectorElement implements Comparable<VectorElement> {
 	
 	//Values
 	private final int index;

@@ -1,6 +1,6 @@
 package rivet.core.util;
 
-public class Counter {
+public final class Counter {
 	private int count;
 	public Counter() { count = 0; }
 	public int get() { return count; }
