@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
 import rivet.core.util.Util;
-import scala.Tuple2;
+import rivet.core.vectorpermutations.Permutations;
 
 public class RIV extends HashMap<Integer, Double> {
 	private static final long serialVersionUID = 7549131075767220565L;
@@ -89,12 +90,12 @@ public class RIV extends HashMap<Integer, Double> {
 				this.size());
 	}
 	
-	public RIV permute (Tuple2<int[], int[]> permutations, int times) {
+	public RIV permute (Permutations permutations, int times) {
 		return (times == 0)
 				? this
 						: (times > 0)
-						? permuteLoop(permutations._1, times)
-								: permuteLoop(permutations._2, -times);
+						? permuteLoop(permutations.left, times)
+								: permuteLoop(permutations.right, -times);
 	}
 
 	public Double magnitude () {
@@ -108,6 +109,16 @@ public class RIV extends HashMap<Integer, Double> {
 	public RIV normalize () {
 		final Double mag = this.magnitude();
 		return this.divideBy(mag);
+	}
+	
+	public RIV removeZeros () {
+		Set<Integer> keys = new HashSet<>();
+		List<Double> values = new ArrayList<>();
+		this.entrySet()
+			.stream()
+			.filter((e) -> e.getValue() != 0)
+			.forEachOrdered((e) -> { keys.add(e.getKey()); values.add(e.getValue()); });
+		return new RIV(keys, values, size);
 	}
 	
 	public RIV subtract (RIV riv) {

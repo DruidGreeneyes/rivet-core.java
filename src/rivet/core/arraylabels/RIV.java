@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import scala.Tuple2;
+import rivet.core.vectorpermutations.Permutations;
 
 public class RIV implements Serializable{
 	/**
@@ -194,12 +194,12 @@ public class RIV implements Serializable{
 		return keys;
 	}
 	
-	public RIV permute (Tuple2<int[], int[]> permutations, int times) {
+	public RIV permute (Permutations permutations, int times) {
 		if (times == 0) return this;
 		int[] keys = this.keys();
 		int[] newKeys =  (times > 0)
-				? permuteKeys(keys, permutations._1, times)
-						: permuteKeys(keys, permutations._2, times);
+				? permuteKeys(keys, permutations.left, times)
+						: permuteKeys(keys, permutations.right, times);
 		return new RIV(
 				newKeys,
 				this.vals(),

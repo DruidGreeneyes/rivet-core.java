@@ -6,9 +6,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import rivet.core.vectorpermutations.Permutations;
-import rivet.core.util.Counter;
 import rivet.core.util.Util;
-import scala.Tuple2;
+import rivet.core.util.Pair;
 
 public class Labels {
 	
@@ -18,14 +17,14 @@ public class Labels {
 		return labelA.keyStream().filter(labelB::contains);
 	}
 	
-	public static Stream<Tuple2<Double, Double>> getMatchingValStream (final RIV labelA, final RIV labelB) {
+	public static Stream<Pair<Double, Double>> getMatchingValStream (final RIV labelA, final RIV labelB) {
 		return getMatchingKeyStream(labelA, labelB)
-				.mapToObj((i) -> new Tuple2<>(labelA.get(i), labelB.get(i)));
+				.mapToObj((i) -> Pair.make(labelA.get(i), labelB.get(i)));
 	}
 	
 	public static double dotProduct (final RIV labelA, final RIV labelB) {
 		return getMatchingValStream(labelA, labelB)
-				.mapToDouble((valPair) -> valPair._1 * valPair._2)
+				.mapToDouble((valPair) -> valPair.left * valPair.right)
 				.sum();
 	}
 	
@@ -59,11 +58,12 @@ public class Labels {
 	}
 	
 	private static Long makeSeed (final CharSequence word) {
-		Counter c = new Counter();
-		return word.chars()
-				.boxed()
-				.mapToLong((x) -> x.longValue() * (10 ^ c.lateInc()))
-				.sum();
+		StringBuilder sb = new StringBuilder();
+		word.chars()
+			.boxed()
+			.mapToLong(Integer::longValue)
+			.forEach(sb::append);
+		return Long.parseLong(sb.toString());
 	}
 	
 	public static RIV generateLabel (final int size, final int k, final CharSequence word) {
@@ -74,6 +74,7 @@ public class Labels {
 				makeVals(j, seed),
 				size);
 	}
+	
 	public static RIV generateLabel (final int size, final int k, final CharSequence source, final int startIndex, final int tokenLength) {
 		return generateLabel(size, k, source.subSequence(startIndex, startIndex + tokenLength));
 	}

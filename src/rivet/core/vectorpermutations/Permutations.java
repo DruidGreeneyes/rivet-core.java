@@ -2,17 +2,12 @@ package rivet.core.vectorpermutations;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import scala.Tuple2;
+import rivet.core.util.Pair;
 
 import static rivet.core.util.Util.randInts;
 
-public class Permutations extends Tuple2<int[], int[]> {
+public class Permutations extends Pair<int[], int[]> {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8713804060993130581L;
-
 	private Permutations(final int[] permute, final int[] inverse) {
 		super(permute, inverse);
 	}

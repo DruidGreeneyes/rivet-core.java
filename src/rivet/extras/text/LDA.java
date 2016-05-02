@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.TreeMap;
-import scala.Tuple2;
-import scala.Tuple3;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
@@ -14,19 +12,21 @@ import static java.util.Arrays.stream;
 
 import java.util.ArrayList;
 
+import rivet.core.util.Triple;
+
 
 public class LDA {
 	
 	public static HashMap<String, String[]> gibbsSample (String[][] texts, int numTopics, int changeThreshold) {
 		HashMap<Integer, String[]> topicsA = new HashMap<>();
-		ArrayList<Tuple3<Integer, String, Integer>> topicsB = new ArrayList<>(); 
+		ArrayList<Triple<Integer, String, Integer>> topicsB = new ArrayList<>(); 
 		Random r = new Random();
 		for (int c = 0; c < texts.length; c++) {
 			String[] text = texts[c];
 			for (int i = 0; i < text.length; i++) {
 				String word = text[i];
 				int topic = r.nextInt(numTopics);
-				topicsB.add(new Tuple3<>(c, word, topic));
+				topicsB.add(Triple.make(c, word, topic));
 				topicsA.put(topic, ArrayUtils.add(topicsA.getOrDefault(topic, new String[0]), word));
 			}
 		}
@@ -34,12 +34,12 @@ public class LDA {
 		int changes;
 		do {
 			changes = 0;
-			for (Tuple3<Integer, String, Integer> word : topicsB) {
+			for (Triple<Integer, String, Integer> word : topicsB) {
 				int[] topics = topicsA.keySet().stream().mapToInt(x -> x).toArray();
 				double[] probs = new double[numTopics];
 				topicsA.forEach((topic, words) -> {
-					double pTopicGivenDocument = topicsB.stream().filter((e) -> e._1() == word._1() && e._3() == topic).count() / (double)texts[word._1()].length;
-					double pWordGivenTopic = stream(words).filter(word._2()::equals).count() / (double)words.length;
+					double pTopicGivenDocument = topicsB.stream().filter((e) -> e.left == word.left && e.right == topic).count() / (double)texts[word.left].length;
+					double pWordGivenTopic = stream(words).filter(word.center::equals).count() / (double)words.length;
 					double prob = pTopicGivenDocument * pWordGivenTopic;
 					probs[topic] = prob;
 				});
@@ -48,11 +48,11 @@ public class LDA {
 				double[] topicProbs = stream(probs).map((p) -> p / factor).toArray();
 				
 				int newTopic = new EnumeratedIntegerDistribution(topics, topicProbs).sample();
-				if (newTopic != word._3()) {
+				if (newTopic != word.right) {
 					changes++;
-					String[] oldTopicWordList = topicsA.get(word._3());
-					topicsA.put(word._3(), ArrayUtils.remove(oldTopicWordList, ArrayUtils.indexOf(oldTopicWordList, word._2())));
-					topicsA.put(newTopic, ArrayUtils.add(topicsA.get(newTopic), word._2()));
+					String[] oldTopicWordList = topicsA.get(word.right);
+					topicsA.put(word.right, ArrayUtils.remove(oldTopicWordList, ArrayUtils.indexOf(oldTopicWordList, word.center)));
+					topicsA.put(newTopic, ArrayUtils.add(topicsA.get(newTopic), word.center));
 				}
 			}
 		} while (changes/topicsB.size() * 100 > changeThreshold);
@@ -79,7 +79,7 @@ public class LDA {
 		return topics;
 	}
 	
-//	public static HashMap<Double, Tuple2<String, String[]>> heirarchicalGibbsSample (String[][] texts, int numTopics, int changeThreshold) {
+//	public static HashMap<Double, Pair<String, String[]>> heirarchicalGibbsSample (String[][] texts, int numTopics, int changeThreshold) {
 //		
 //	}
 }

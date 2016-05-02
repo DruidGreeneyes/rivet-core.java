@@ -9,7 +9,7 @@ import java.util.stream.LongStream;
 
 public class Util {
 	public static <T> List<T> shuffleList(final List<T> lis, final Long seed) {
-		final Integer size = lis.size();
+		final int size = lis.size();
 		return randInts(size, size, seed)
 				.mapToObj(lis::get)
 				.collect(toList());
@@ -22,7 +22,7 @@ public class Util {
 				.toArray();
 	}
 	
-	public static IntStream randInts (final Integer bound, final Integer length, final Long seed) {
+	public static IntStream randInts (final int bound, final int length, final Long seed) {
 		return new Random(seed).ints(0, bound).distinct().limit(length);
 	}
 	
@@ -30,9 +30,9 @@ public class Util {
 	public static LongStream range (final Long bound) 										{ return range(0L, bound); }
 	public static LongStream range (final Long start, final Long bound, final Long step) 	{ return range(start, bound).filter((x) -> (x - start) % step == 0L); }
 	
-	public static IntStream range (final Integer start, final Integer bound) 						{ return IntStream.range(start, bound); }
-	public static IntStream range (final Integer bound) 											{ return range(0, bound); }
-	public static IntStream range (final Integer start, final Integer bound, final Integer step) 	{ return range(start, bound).filter((x) -> (x - start) % step == 0); }
+	public static IntStream range (final int start, final int bound) 						{ return IntStream.range(start, bound); }
+	public static IntStream range (final int bound) 											{ return range(0, bound); }
+	public static IntStream range (final int start, final int bound, final int step) 	{ return range(start, bound).filter((x) -> (x - start) % step == 0); }
 	
 	public static int[] quickRange (final int start, final int bound, final int step) {
 		int steps = (bound - start) / step;

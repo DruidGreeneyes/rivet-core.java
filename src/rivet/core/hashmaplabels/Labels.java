@@ -10,8 +10,9 @@ import java.util.stream.Stream;
 
 import rivet.core.vectorpermutations.Permutations;
 import rivet.core.hashmaplabels.RIV;
+import rivet.core.util.Counter;
+import rivet.core.util.Pair;
 import rivet.core.util.Util;
-import scala.Tuple2;
 
 public final class Labels {
 	
@@ -23,14 +24,14 @@ public final class Labels {
 				.filter((x) -> labelB.containsKey(x));
 	}
 	
-	public static Stream<Tuple2<Double, Double>> getMatchingValStream (final RIV labelA, final RIV labelB) {
+	public static Stream<Pair<Double, Double>> getMatchingValStream (final RIV labelA, final RIV labelB) {
 		return getMatchingKeyStream(labelA, labelB)
-				.map((i) -> new Tuple2<>(labelA.get(i), labelB.get(i)));
+				.map((i) -> Pair.make(labelA.get(i), labelB.get(i)));
 	}
 	
 	public static Double dotProduct (final RIV labelA, final RIV labelB) {
 		return getMatchingValStream(labelA, labelB)
-				.mapToDouble((x) -> x._1 * x._2)
+				.mapToDouble((x) -> x.left * x.right)
 				.sum();
 	}
 	
@@ -54,39 +55,48 @@ public final class Labels {
 				.reduce(new RIV(labels[0].size()), Labels::addLabels);
 	}
 	
-	private static List<Double> makeVals (final Integer count, final Long seed) {
+	private static List<Double> makeVals (final int count, final Long seed) {
 		final List<Double> l = new ArrayList<>();
-		for (Integer i = 0; i < count; i++) 
+		for (int i = 0; i < count; i++) 
 			l.add((i < count / 2) 
 					? 1.0 
 					: -1.0);
 		return Util.shuffleList(l, seed);
 	}
 	
-	private static Set<Integer> makeIndices (final Integer size, final Integer count, final Long seed) {
+	private static Set<Integer> makeIndices (final int size, final int count, final Long seed) {
 		return Util.randInts(size, count, seed)
 				.boxed()
 				.collect(Collectors.toSet());
 	}
 	
-	private static Long makeSeed (final String word) {
+	private static Long makeSeed (final CharSequence word) {
+		Counter c = new Counter();
 		return word.chars()
 				.boxed()
-				.mapToLong((x) -> x.longValue() * (10 ^ (word.indexOf(x))))
+				.mapToLong((x) -> x.longValue() * (10 ^ c.lateInc()))
 				.sum();
 	}
 	
-	public static RIV generateLabel (final Integer size, final Integer k, final String word) {
+	public static RIV generateLabel (final int size, final int k, final CharSequence word) {
 		final Long seed = makeSeed(word);
-		final Integer j = (k % 2 == 0) ? k : k + 1;
+		final int j = (k % 2 == 0) ? k : k + 1;
 		return new RIV(
 				makeIndices(size, j, seed),
 				makeVals(j, seed),
 				size);
 	}
 	
-	public static Function<String, RIV> labelGenerator (final int size, final int k) {
+	public static RIV generateLabel (final int size, final int k, final CharSequence source, final int tokenIndex, final int tokenLength) {
+		return generateLabel(size, k, source.subSequence(tokenIndex, tokenIndex + tokenLength));
+	}
+	
+	public static Function<CharSequence, RIV> labelGenerator (final int size, final int k) {
 		return (word) -> generateLabel(size, k, word);
+	}
+	
+	public static Function<Integer, RIV> labelGenerator (final int size, final int k, final CharSequence source, final int tokenLength) {
+		return (index) -> generateLabel(size, k, source, index, tokenLength);
 	}
 	
 	public static RIV permuteLabels (final RIV label, final Permutations permutations, final int times) {
