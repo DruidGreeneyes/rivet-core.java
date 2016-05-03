@@ -8,15 +8,16 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import rivet.core.util.Util;
 import rivet.core.arraylabels.*;
+import rivet.core.exceptions.ShingleInfection;
 
 public final class Shingles {
 	private Shingles(){}
 	
-	public static int[] findShinglePoints (String text, int offset) throws ShingleException {
+	public static int[] findShinglePoints (String text, int offset) throws ShingleInfection {
 		if (text == null || text.isEmpty())
-			throw new ShingleException("THIS TEXT IS NOT TEXT!");
+			throw new ShingleInfection("THIS TEXT IS NOT TEXT!");
 		if (offset == 0)
-			throw new ShingleException("THIS OFFSET IS A VIOLATION OF THE TOS! PREPARE FOR LEGAL ACTION!");
+			throw new ShingleInfection("THIS OFFSET IS A VIOLATION OF THE TOS! PREPARE FOR LEGAL ACTION!");
 		return Util.quickRange(0, text.length(), offset);
 	}
 	
@@ -67,21 +68,8 @@ public final class Shingles {
 	
 	public static RIV sumRIVs (RIV[] rivs) { return Labels.addLabels(rivs); }
 	
-	public static RIV rivettizeText(String text, int width, int offset, int size, int k) throws ShingleException {
+	public static RIV rivettizeText(String text, int width, int offset, int size, int k) throws ShingleInfection {
 		int[] points = findShinglePoints(text, offset);
 		return rivAndSumShingles(text, points, width, size, k);
 	}
-}
-
-class ShingleException extends Exception {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4096522140808248550L;
-
-	public ShingleException(String string) {
-		super(string);
-	}
-	
 }
