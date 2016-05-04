@@ -21,7 +21,8 @@ public final class VectorElement implements Comparable<VectorElement> {
 	public String toString() { return String.format("%d|%f", index, value);}
 	@Override
 	public int compareTo(VectorElement p) {	return Integer.compare(this.index, p.index); }
-	public boolean equals(VectorElement p) { return this.compareTo(p) == 0; }
+	public boolean equals(VectorElement p) { return index == p.index; }
+	public boolean strictEquals(VectorElement p) { return equals(p) && value == p.value; }
 	private void assertMatch(VectorElement p) {
 		if (!this.equals(p))
 			throw new IndexOutOfBoundsException(

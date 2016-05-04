@@ -13,4 +13,5 @@ public final class Counter {
 	public int lateInc(int value) {int c = count; count += value; return c; }
 	public int lateDec() { int c = count; count--; return c; }
 	public int lateDec(int value) {int c = count; count -= value; return c; }
+	public int zero() {return set(0);}
 }

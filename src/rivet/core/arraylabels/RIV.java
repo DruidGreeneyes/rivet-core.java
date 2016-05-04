@@ -46,6 +46,7 @@ public final class RIV implements Serializable{
 	
 	//Methods
 	public int size() {return this.size;}
+	public int count() {return points.length;}
 	
 	@Override
 	public String toString() {
@@ -81,6 +82,15 @@ public final class RIV implements Serializable{
 	
 	public boolean contains(int index) {
 		return ArrayUtils.contains(this.keys(), index);
+	}
+	public boolean contains(VectorElement elt) { return ArrayUtils.contains(points, elt); }
+	
+	public boolean equals(RIV other) {
+		if (count() == other.count())
+			if (size() == other.size())
+				if (stream().allMatch(other::contains))
+					return true;
+		return false;
 	}
 	
 	public VectorElement getPoint(int index) {
@@ -216,6 +226,8 @@ public final class RIV implements Serializable{
 	public RIV normalize() {
 		return this.divideBy(this.magnitude());
 	}
+	
+	public RIV negate() { return new RIV(size).subtract(this); }
 	
 	public static Function<RIV, RIV> subtractor (RIV riv) {
 			return (r) -> r.subtract(riv);
