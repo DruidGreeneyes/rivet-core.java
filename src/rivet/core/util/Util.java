@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -36,13 +37,20 @@ public final  class Util {
 	public static IntStream range (final int bound) 											{ return range(0, bound); }
 	public static IntStream range (final int start, final int bound, final int step) 	{ return range(start, bound).filter((x) -> (x - start) % step == 0); }
 	
-	public static int[] quickRange (final int start, final int bound, final int step) {
-		int steps = (bound - start) / step;
-		int[] res = new int[steps];
-		for (int i = 0; i <= steps; i++)
-			res[i] = i * step + start;
-		return res;
+//	public static int[] quickRange (final int start, final int bound, final int step) {
+//		int steps = (bound - start) / step;
+//		int[] res = new int[steps];
+//		for (int i = 0; i <= steps; i++)
+//			res[i] = i * step + start;
+//		return res;
+//	}
+//	public static int[] quickRange (final int start, final int bound) { return quickRange(start, bound, 1); }
+//	public static int[] quickRange (final int bound) { return quickRange(0, bound); }
+	
+	public static void forRange(final int start, final int bound, final int step, final Consumer<Integer> fun) {
+		for(int i = start; i < bound; i += step)
+			fun.accept(i);
 	}
-	public static int[] quickRange (final int start, final int bound) { return quickRange(start, bound, 1); }
-	public static int[] quickRange (final int bound) { return quickRange(0, bound); }
+	public static void forRange(final int start, final int bound, final Consumer<Integer> fun) {forRange(start, bound, 1, fun);}
+	public static void forRange(final int bound, final Consumer<Integer> fun) {forRange(0, bound, fun);}
 }

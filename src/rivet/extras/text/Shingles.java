@@ -18,7 +18,7 @@ public final class Shingles {
 			throw new ShingleInfection("THIS TEXT IS NOT TEXT!");
 		if (offset == 0)
 			throw new ShingleInfection("THIS OFFSET IS A VIOLATION OF THE TOS! PREPARE FOR LEGAL ACTION!");
-		return Util.quickRange(0, text.length(), offset);
+		return Util.range(0, text.length(), offset).toArray();
 	}
 	
 	public static String[] shingleText(String text, int width, int offset) {
