@@ -13,12 +13,14 @@ import rivet.core.exceptions.ShingleInfection;
 public final class Shingles {
 	private Shingles(){}
 	
-	public static int[] findShinglePoints (String text, int offset) throws ShingleInfection {
+	public static int[] findShinglePoints (String text, int offset, int width) throws ShingleInfection {
 		if (text == null || text.isEmpty())
 			throw new ShingleInfection("THIS TEXT IS NOT TEXT!");
 		if (offset == 0)
 			throw new ShingleInfection("THIS OFFSET IS A VIOLATION OF THE TOS! PREPARE FOR LEGAL ACTION!");
-		return Util.range(0, text.length(), offset).toArray();
+		return (offset == 1)
+				? Util.range(text.length()).toArray()
+						: Util.range(0, text.length() - width, offset).toArray();
 	}
 	
 	public static String[] shingleText(String text, int width, int offset) {
@@ -35,7 +37,6 @@ public final class Shingles {
 	}
 	
 	public static RIV[] rivShingles (String text, int[] shinglePoints, int width, int size, int k) {
-		int length = text.length();
 		return Arrays.stream(shinglePoints)
 					.mapToObj((point) -> 
 						Labels.generateLabel(
@@ -43,14 +44,11 @@ public final class Shingles {
 								k,
 								text,
 								point,
-								(point + width < length) 
-									? width
-											: length - point))
+								width))
 					.toArray(RIV[]::new);
 	}
 	
 	public static RIV rivAndSumShingles (String text, int[] shinglePoints, int width, int size, int k) {
-		int length = text.length();
 		return Arrays.stream(shinglePoints)
 			.boxed()
 			.reduce(new RIV(size),
@@ -60,16 +58,14 @@ public final class Shingles {
 									k,
 									text,
 									point,
-									(point + width < length) 
-										? width
-												: length - point)),
+									width)),
 					(rivA, rivB) -> Labels.addLabels(rivA, rivB));
 	}
 	
 	public static RIV sumRIVs (RIV[] rivs) { return Labels.addLabels(rivs); }
 	
 	public static RIV rivettizeText(String text, int width, int offset, int size, int k) throws ShingleInfection {
-		int[] points = findShinglePoints(text, offset);
+		int[] points = findShinglePoints(text, offset, width);
 		return rivAndSumShingles(text, points, width, size, k);
 	}
 }

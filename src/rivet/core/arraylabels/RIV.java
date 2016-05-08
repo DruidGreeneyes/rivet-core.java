@@ -45,7 +45,7 @@ public final class RIV implements Serializable{
 	}
 	
 	//Methods
-	public int size() {return this.size;}
+	public int size()  {return this.size;}
 	public int count() {return points.length;}
 	
 	@Override
