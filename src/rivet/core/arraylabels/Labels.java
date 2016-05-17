@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import rivet.core.vectorpermutations.Permutations;
 import rivet.core.util.Util;
+import rivet.core.util.Counter;
 import rivet.core.util.Pair;
 
 public final class Labels {
@@ -57,13 +58,11 @@ public final class Labels {
         return Util.randInts(size, count, seed).toArray();
     }
     
-    private static Long makeSeed (final CharSequence word) {
-        StringBuilder sb = new StringBuilder();
-        word.chars()
-            .boxed()
-            .mapToLong(Integer::longValue)
-            .forEach(sb::append);
-        return Long.parseLong(sb.toString());
+    private static long makeSeed (final CharSequence word) {
+        Counter c = new Counter();
+        return word.chars()
+                .mapToLong((ch) -> ch * (long)Math.pow(10, c.inc()))
+                .sum();
     }
     
     public static RIV generateLabel (final int size, final int k, final CharSequence word) {
