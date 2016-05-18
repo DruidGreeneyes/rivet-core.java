@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -15,6 +16,10 @@ import org.apache.commons.math3.special.Gamma;
 
 public final  class Util {
     private Util(){}
+    
+    public static <T> List<T> copyList(final List<T> lis) {
+        return lis.stream().collect(Collectors.toList());
+    }
     
     public static <T> List<T> shuffleList(final List<T> lis, final Long seed) {
         final int size = lis.size();

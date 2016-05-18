@@ -181,14 +181,16 @@ public final class RIV implements Serializable{
                 .engage(this::add);
     }
     
-    public RIV divideBy(double num) {
+    public RIV multiply(double scalar) {
         return new RIV(
                 this.keys(),
                 this.valStream()
-                    .map((v) -> v / num)
+                    .map((v) -> v * scalar)
                     .toArray(),
                 this.size);
     }
+
+    public RIV divideBy(double scalar) { return this.multiply(1 / scalar); }
     
     private RIV removeZeros () {
         for (int i = this.points.length - 1; i >= 0; i--)
@@ -209,7 +211,7 @@ public final class RIV implements Serializable{
         int[] keys = this.keys();
         int[] newKeys =  (times > 0)
                 ? permuteKeys(keys, permutations.left, times)
-                        : permuteKeys(keys, permutations.right, times);
+                        : permuteKeys(keys, permutations.right, -times);
         return new RIV(
                 newKeys,
                 this.vals(),
