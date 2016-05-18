@@ -22,10 +22,10 @@ public interface RandomIndexVector {
     IntStream keyStream();
     DoubleStream valStream();
     
-    boolean contains(int index);
+    boolean contains(int index) throws IndexOutOfBoundsException;
     boolean equals(RandomIndexVector other);
     
-    double get(int index);
+    double get(int index) throws IndexOutOfBoundsException;
     
     RandomIndexVector copy();
     
