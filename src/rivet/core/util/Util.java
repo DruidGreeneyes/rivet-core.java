@@ -84,4 +84,9 @@ public final  class Util {
     
     public static DoubleBinaryOperator multiplier = (x, y) -> x * y;
     public static DoubleUnaryOperator multiplier(double mult) { return x -> multiplier.applyAsDouble(x, mult); }
+    
+    public static CharSequence safeSubSequence(CharSequence seq, int start, int end) {
+        int l = seq.length() - 1;
+        return seq.subSequence(start, (end > l) ? l : end);
+    }
 } 

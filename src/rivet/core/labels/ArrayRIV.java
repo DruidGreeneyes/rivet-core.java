@@ -257,7 +257,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
 
     public static ArrayRIV generateLabel(final int size, final int k, final CharSequence source, final int startIndex,
             final int tokenLength) {
-        return generateLabel(size, k, source.subSequence(startIndex, startIndex + tokenLength));
+        return generateLabel(size, k, Util.safeSubSequence(source, startIndex, startIndex + tokenLength));
     }
 
     public static Function<String, ArrayRIV> labelGenerator(final int size, final int k) {
