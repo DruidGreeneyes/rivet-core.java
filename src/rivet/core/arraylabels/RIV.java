@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.IntUnaryOperator;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -52,10 +53,8 @@ public final class RIV implements Serializable{
     public String toString() {
         //"(0|1) (1|3) (4|2) 5"
         //"(I|V) (I|V) (I|V) Size"
-        StringBuilder s = new StringBuilder();
-        for (VectorElement p : this.points) 
-            s.append(p.toString() + " ");
-        return s.append(this.size).toString();
+        return stream().map(VectorElement::toString)
+                    .collect(Collectors.joining(" ", "", String.valueOf(size)));
     }
     
     public <T> T engage(Function<RIV, T> fun) {return fun.apply(this);} 

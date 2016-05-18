@@ -6,6 +6,7 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -73,10 +74,8 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     public String toString() {
         //"0|1 1|3 4|2 5"
         //"I|V I|V I|V Size"
-        StringBuilder s = new StringBuilder();
-        stream().map(VectorElement::toString)
-            .forEach(p -> s.append(p + " "));
-        return s.append(size).toString();
+        return stream().map(VectorElement::toString)
+                    .collect(Collectors.joining(" ", "", String.valueOf(size)));
     }
 
     @Override

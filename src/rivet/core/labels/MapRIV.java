@@ -79,10 +79,8 @@ public class MapRIV implements Serializable, RandomIndexVector {
     public String toString() {
         //"0|1 1|3 4|2 5"
         //"I|V I|V I|V Size"
-        StringBuilder s = new StringBuilder();
-        stream().map(e -> String.format("%d|%d ", e.getKey(), e.getValue()))
-            .forEach((p) -> s.append(p));
-        return s.append(size).toString();
+        return stream().map((e) -> String.format("%d|%f%", e.getKey(), e.getValue()))
+                    .collect(Collectors.joining(" ", "", String.valueOf(size)));
     }
 
     @Override
