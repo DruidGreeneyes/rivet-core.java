@@ -105,10 +105,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
 
     @Override
     public boolean equals(final RandomIndexVector other) {
-        if (count() == other.count() && size() == other.size() && sameKeys(other) && sameVals(other))
-            return true;
-        else
-            return false;
+        return count() == other.count() && size() == other.size() && sameKeys(other) && sameVals(other);
     }
 
     private boolean validIndex(final int index) {
@@ -138,9 +135,12 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
 
     private void destructiveSet(final int index, final double value) throws IndexOutOfBoundsException {
         if (validIndex(index)) {
+            VectorElement point = VectorElement.elt(index, value);
             final int i = binarySearch(index);
-            final int a = i < 0 ? ~i : i;
-            points[a] = VectorElement.elt(index, value);
+            if (i < 0)
+                ArrayUtils.add(points, ~i, point);
+            else
+                points[i] = VectorElement.elt(index, value);
         } else
             throw new IndexOutOfBoundsException("Index " + index + " is outside the bounds of this vector.");
     }

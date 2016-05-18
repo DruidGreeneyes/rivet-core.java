@@ -2,11 +2,7 @@ package rivet.core.arraylabels;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.DoubleConsumer;
 import java.util.function.DoubleUnaryOperator;
-import java.util.function.Function;
-import java.util.function.IntConsumer;
 import java.util.function.IntUnaryOperator;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -16,39 +12,186 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
 
 public final class RIV implements Serializable{
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7570655472298563946L;
     //Values
-    private VectorElement[] points;
+    private final VectorElement[] points;
     private final int size;
-    
+
     //Constructors
     public RIV(final RIV riv) {
-        this.points = riv.points;
-        this.size = riv.size;
+        points = riv.points;
+        size = riv.size;
     }
-    public RIV(final int size) {this.points = new VectorElement[0]; this.size = size;}
+    public RIV(final int size) {points = new VectorElement[0]; this.size = size;}
     public RIV(final VectorElement[] points, final int size) { this.points = points; this.size = size;}
     public RIV(final int[] keys, final double[] vals, final int size) {
         this.size = size;
-        int l = keys.length;
+        final int l = keys.length;
         if (l != vals.length) throw new IndexOutOfBoundsException("Different quantity keys than values!");
-        VectorElement[] elts = new VectorElement[l];
+        final VectorElement[] elts = new VectorElement[l];
         for (int i = 0; i < l; i++)
             elts[i] = VectorElement.elt(keys[i], vals[i]);
         Arrays.sort(elts, VectorElement::compare);
-        this.points = elts;
+        points = elts;
     }
-    
+
     //Methods
-    public int size()  {return this.size;}
+    public int size()  {return size;}
     public int count() {return points.length;}
-    
+
+    public Stream<VectorElement> stream() {return Arrays.stream(points);}
+    public IntStream keyStream() {return stream().mapToInt(VectorElement::index);}
+    public DoubleStream valStream() {return stream().mapToDouble(VectorElement::value);}
+
+    public RIV map(final UnaryOperator<VectorElement> fun) {
+        return new RIV(
+                stream().map(fun)
+                    .filter(ve -> !ve.contains(0))
+                    .toArray(VectorElement[]::new),
+                size);
+    }
+    public RIV mapKeys(final IntUnaryOperator fun) {
+        return map((ve) -> VectorElement.elt(
+                            fun.applyAsInt(ve.index()),
+                            ve.value()));
+    }
+    public RIV mapVals(final DoubleUnaryOperator fun) {
+        return map((ve) -> VectorElement.elt(
+                            ve.index(),
+                            fun.applyAsDouble(ve.value())));
+    }
+
+    public int[] keys() {return keyStream().toArray();}
+    public double[] vals() {return valStream().toArray();}
+
+    public boolean contains (final int index) {return keyStream().anyMatch((k) -> k == index);}
+
+    private boolean sameKeys(final RIV other) {
+        final int[] keys = keys();
+        return other.keyStream().allMatch((v) -> ArrayUtils.contains(keys, v));
+    }
+
+    private boolean sameVals(final RIV other) {
+        final double[] vals = vals();
+        return other.valStream().allMatch((v) -> ArrayUtils.contains(vals, v));
+    }
+
+    public boolean equals(final RIV other) {
+        return count() == other.count() &&
+                size() == other.size() &&
+                sameKeys(other) &&
+                sameVals(other);
+    }
+
+    private boolean validIndex(final int index) {return 0 <= index && index < size;}
+
+    private int binarySearch(final VectorElement elt) {
+        return Arrays.binarySearch(points,  elt, VectorElement::compare);
+    }
+
+    private int binarySearch(final int index) {
+        return binarySearch(VectorElement.partial(index));
+    }
+
+    private VectorElement getPoint(final int index) throws IndexOutOfBoundsException {
+        if (validIndex(index)) {
+            final int i = binarySearch(index);
+            return i < 0 ? VectorElement.partial(index) : points[i];
+        } else
+            throw new IndexOutOfBoundsException("Index " + index + " is outside the bounds of this vector.");
+    }
+
+    public double get(final int index) throws IndexOutOfBoundsException {
+        return getPoint(index).value();
+    }
+
+    private void destructiveSet(final int index, final double value) throws IndexOutOfBoundsException {
+        if (validIndex(index)) {
+            final VectorElement point = VectorElement.elt(index, value);
+            final int i = binarySearch(index);
+            if (i < 0)
+                ArrayUtils.add(points, ~i, point);
+            else
+                points[i] = point;
+        } else
+            throw new IndexOutOfBoundsException("Index " + index + " is outside the bounds of this vector.");
+    }
+
+    private RIV removeZeros() {
+        final VectorElement[] zeros = stream()
+                .filter(ve -> ve.contains(0))
+                .toArray(VectorElement[]::new);
+        return zeros.length == 0
+                ? this
+                : new RIV(
+                        ArrayUtils.removeElements(points, zeros),
+                        size);
+    }
+
+    public RIV add(final RIV other) throws SizeMismatchException {
+        if (size == other.size()) {
+            final RIV res = new RIV(this);
+            other.keyStream()
+                    .forEach((k) -> res.destructiveSet(k, res.contains(k)
+                                                            ? res.get(k) + other.get(k)
+                                                            : other.get(k)));
+            return res.removeZeros();
+        } else
+            throw new SizeMismatchException("Target RIV is the wrong size!");
+    }
+
+    public RIV subtract(final RIV other) throws SizeMismatchException {
+        if (size == other.size()) {
+            final RIV res = new RIV(this);
+            other.keyStream()
+                    .forEach((k) -> res.destructiveSet(k, res.contains(k)
+                                                            ? res.get(k) - other.get(k)
+                                                            : -other.get(k)));
+            return res.removeZeros();
+        } else
+            throw new SizeMismatchException("Target RIV is the wrong size!");
+    }
+
+    public RIV multiply(final double scalar) {return mapVals((v) -> v * scalar);}
+    public RIV divideBy(final double scalar) {return mapVals((v) -> v / scalar);}
+
+    public double magnitude() {
+        return Math.sqrt(
+                valStream()
+                    .map((v) -> v * v)
+                    .sum());
+    }
+
+    public RIV normalize() {
+        return divideBy(magnitude());
+    }
+
+    private static int[] permuteKeys(IntStream keys, final int[] permutation, final int times) {
+        for (int i = 0; i < times; i++)
+            keys = keys.map((k) -> permutation[k]);
+        return keys.toArray();
+    }
+
+
+    public RIV permute(final Permutations permutations, final int times) {
+        if (times == 0)
+            return this;
+        else
+            return new RIV(
+                    times > 0
+                        ? permuteKeys(keyStream(), permutations.left, times)
+                        : permuteKeys(keyStream(), permutations.right, -times),
+                    vals(),
+                    size);
+    }
+
     @Override
     public String toString() {
         //"(0|1) (1|3) (4|2) 5"
@@ -56,191 +199,15 @@ public final class RIV implements Serializable{
         return stream().map(VectorElement::toString)
                     .collect(Collectors.joining(" ", "", String.valueOf(size)));
     }
-    
-    public <T> T engage(Function<RIV, T> fun) {return fun.apply(this);} 
-    
-    public Stream<VectorElement> stream() {return Arrays.stream(this.points); }
-    public IntStream keyStream() {return this.stream().mapToInt(VectorElement::index); }
-    public DoubleStream valStream() {return this.stream().mapToDouble(VectorElement::value); }
-    public int[] keys() { return this.keyStream().toArray(); }
-    public double[] vals() { return this.valStream().toArray(); }
-    
-    private void assertValidIndex (int index) {        
-        if (index < 0 || index >= this.size) 
-            throw new IndexOutOfBoundsException(
-                    String.format("Requested index is < 0 or > %d: %d", 
-                            this.size, index));
-    }
-    
-    private int binarySearch(VectorElement elt) {
-        return Arrays.binarySearch(this.points, elt, VectorElement::compare);
-    }
-    private int binarySearch(int index) {
-        return this.binarySearch(VectorElement.partial(index)); 
-    }
-    
-    public boolean contains(int index) {
-        return ArrayUtils.contains(this.keys(), index);
-    }
-    public boolean contains(VectorElement elt) { return ArrayUtils.contains(points, elt); }
-    
-    public boolean equals(RIV other) {
-        if (count() == other.count())
-            if (size() == other.size())
-                if (stream().allMatch(other::contains))
-                    return true;
-        return false;
-    }
-    
-    public VectorElement getPoint(int index) {
-        this.assertValidIndex(index);
-        int i = this.binarySearch(index);
-        return (i < 0)
-                ? VectorElement.partial(index)
-                        : this.points[i];
-    }
-    public double get(int index) {
-        return this.getPoint(index).value();
-    }
-    
-    private RIV validSet(int i, VectorElement elt) {
-        if (this.points.length == 0)
-            ArrayUtils.add(this.points, 0, elt);
-        else
-            if (this.points[i].equals(elt))
-                this.points[i] = elt;
-            else
-                ArrayUtils.add(this.points, i, elt);
-        return this;
-    }
-    private RIV validSet(VectorElement elt) {
-        final int i = this.binarySearch(elt);
-        return this.validSet(
-                (i > 0) ? i : ~i,
-                elt);
-    }
-    public RIV set(VectorElement elt) {
-        this.assertValidIndex(elt.index());
-        return this.validSet(elt);
-    }
-    public RIV set(int index, double value) { return this.set(VectorElement.elt(index, value)); }
-    
-    private VectorElement addPoint(VectorElement elt) {
-        this.assertValidIndex(elt.index());
-        return this.getPoint(elt.index()).add(elt);
-    }
-    public RIV add(VectorElement elt) {
-        return this.addPoint(elt)
-                .engage(this::validSet);
-    }
-    private VectorElement subtractPoint(VectorElement elt) {
-        this.assertValidIndex(elt.index());
-        return this.getPoint(elt.index()).subtract(elt);
-    }
-    public RIV subtract(VectorElement elt) {
-        return this.subtractPoint(elt)
-                .engage(this::validSet);
-    }
-    
-    public RIV forEach(Consumer<VectorElement> c) { 
-        this.stream().forEach(c); 
-        return this; 
-    }
-    public RIV forEachIndex(IntConsumer c) {
-        this.keyStream().forEach(c);
-        return this;
-    }
-    public RIV forEachValue(DoubleConsumer c) {
-        this.valStream().forEach(c);
-        return this;
-    }
-    public RIV map(UnaryOperator<VectorElement> o) {
-        VectorElement[] elts = (VectorElement[]) this.stream().map(o).toArray();
-        return new RIV(elts, this.size);
-    }
-    public RIV mapKeys(IntUnaryOperator o) {
-        return new RIV(
-                this.keyStream().map(o).sorted().toArray(),
-                this.vals(),
-                this.size);
-    }
-    public RIV mapVals(DoubleUnaryOperator o) {
-        return new RIV(
-                this.keys(),
-                this.valStream().map(o).sorted().toArray(),
-                this.size);
-    }
-    
-    public RIV add(RIV riv) {
-        riv.forEach(this::add);
-        return this.removeZeros();
-    }
-    public RIV subtract(RIV riv) {
-        return riv.mapVals(x -> -x)
-                .engage(this::add);
-    }
-    
-    public RIV multiply(double scalar) {
-        return new RIV(
-                this.keys(),
-                this.valStream()
-                    .map((v) -> v * scalar)
-                    .toArray(),
-                this.size);
-    }
 
-    public RIV divideBy(double scalar) { return this.multiply(1 / scalar); }
-    
-    private RIV removeZeros () {
-        for (int i = this.points.length - 1; i >= 0; i--)
-            if (points[i].contains(0))
-                ArrayUtils.remove(this.points, i);
-        return this;
-    }
-    
-    private static int[] permuteKeys (int[] keys, int[] permutation, int times) {
-        for (int i = 0; i < times; i++)
-            for (int c = 0; c < keys.length; c++)
-                keys[c] = permutation[keys[c]];
-        return keys;
-    }
-    
-    public RIV permute (Permutations permutations, int times) {
-        if (times == 0) return this;
-        int[] keys = this.keys();
-        int[] newKeys =  (times > 0)
-                ? permuteKeys(keys, permutations.left, times)
-                        : permuteKeys(keys, permutations.right, -times);
-        return new RIV(
-                newKeys,
-                this.vals(),
-                this.size);
-    }
-    
-    public Double magnitude() {
-        return Math.sqrt(
-                this.valStream()
-                .map((v) -> v * v)
-                .sum());
-    }
-    
-    public RIV normalize() {
-        return this.divideBy(this.magnitude());
-    }
-    
-    public RIV negate() { return new RIV(size).subtract(this); }
-    
-    public static Function<RIV, RIV> subtractor (RIV riv) {
-            return (r) -> r.subtract(riv);
-    }
-    
+
     //Static methods
-    public static RIV fromString(String rivString) {
-        String[] r = rivString.split(" ");
-        int l = r.length - 1;
-        int size = Integer.parseInt(r[l]);
-        VectorElement[] elts = new VectorElement[0];
-        for (String s : r)
+    public static RIV fromString(final String rivString) {
+        final String[] r = rivString.split(" ");
+        final int l = r.length - 1;
+        final int size = Integer.parseInt(r[l]);
+        final VectorElement[] elts = new VectorElement[0];
+        for (final String s : r)
             if (s.contains("(") && s.contains("|") && s.contains(")"))
                 ArrayUtils.add(elts, VectorElement.fromString(s));
         return new RIV(elts, size);
