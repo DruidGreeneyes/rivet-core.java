@@ -30,8 +30,8 @@ public final class Labels {
     }
     
     public static Double similarity (final RIV labelA, final RIV labelB) {
-        final RIV a = labelA.normalize();
-        final RIV b = labelB.normalize();
+        final RIV a = labelA;//.normalize();
+        final RIV b = labelB;//.normalize();
         final Double mag = a.magnitude() * b.magnitude();
         return (mag == 0)
                 ? 0
