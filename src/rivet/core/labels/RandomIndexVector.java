@@ -27,8 +27,6 @@ public interface RandomIndexVector {
     
     double get(int index);
     
-    RandomIndexVector normalize();
-    
     RandomIndexVector copy();
     
     RandomIndexVector mapKeys(IntUnaryOperator fun);
@@ -38,6 +36,8 @@ public interface RandomIndexVector {
     RandomIndexVector subtract(RandomIndexVector other) throws SizeMismatchException;
     RandomIndexVector multiply(double scalar);
     RandomIndexVector divide(double scalar);
+    
+    RandomIndexVector normalize();
     
     RandomIndexVector permute(Permutations permutations, int times);
     
@@ -69,12 +69,10 @@ public interface RandomIndexVector {
     }
     
     public static double similarity (final RandomIndexVector rivA, final RandomIndexVector rivB) {
-        final RandomIndexVector a = rivA.normalize();
-        final RandomIndexVector b = rivB.normalize();
-        final double mag = a.magnitude() * b.magnitude();
+        final double mag = rivA.magnitude() * rivB.magnitude();
         return (mag == 0)
                 ? 0
-                : dotProduct(a, b) / mag;
+                : dotProduct(rivA, rivB) / mag;
     }
     
     public static RandomIndexVector addRIVs(final RandomIndexVector rivA, final RandomIndexVector rivB) throws SizeMismatchException {

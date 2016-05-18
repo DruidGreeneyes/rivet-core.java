@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import rivet.core.arraylabels.VectorElement;
+import rivet.core.labels.VectorElement;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Counter;
 import rivet.core.util.Util;
@@ -25,11 +25,11 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
      *
      */
     private static final long serialVersionUID = -1176979873718129432L;
-    private final VectorElement[] points;
+    private VectorElement[] points;
     private final int size;
 
     public ArrayRIV(final ArrayRIV riv) {
-        points = riv.points;
+        points = ArrayUtils.clone(riv.points);
         size = riv.size;
     }
 
@@ -39,18 +39,19 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     }
 
     public ArrayRIV(final VectorElement[] points, final int size) {
-        this.points = points;
+        this.points = ArrayUtils.clone(points);
+        Arrays.sort(points);
         this.size = size;
     }
 
-    public ArrayRIV(final int[] keys, final double[] vals, final int size) {
+    public ArrayRIV(final int[] keys, final double[] ds, final int size) {
         this.size = size;
         final int l = keys.length;
-        if (l != vals.length)
+        if (l != ds.length)
             throw new IndexOutOfBoundsException("Different quantity keys than values!");
         final VectorElement[] elts = new VectorElement[l];
         for (int i = 0; i < l; i++)
-            elts[i] = VectorElement.elt(keys[i], vals[i]);
+            elts[i] = VectorElement.elt(keys[i], ds[i]);
         Arrays.sort(elts, VectorElement::compare);
         points = elts;
         this.removeZeros();
@@ -75,7 +76,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         //"0|1 1|3 4|2 5"
         //"I|V I|V I|V Size"
         return stream().map(VectorElement::toString)
-                    .collect(Collectors.joining(" ", "", String.valueOf(size)));
+                    .collect(Collectors.joining(" ", "", " " + String.valueOf(size)));
     }
 
     @Override
@@ -92,15 +93,14 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     public boolean contains(final int index) {
         return keyStream().anyMatch((k) -> k == index);
     }
-
-    private boolean sameKeys(final RandomIndexVector other) {
-        final int[] keys = keys();
-        return other.keyStream().allMatch((k) -> ArrayUtils.contains(keys, k));
+    
+    private boolean sameKeys(RandomIndexVector other) {
+        return keyStream().allMatch(other::contains);
     }
-
-    private boolean sameVals(final RandomIndexVector other) {
-        final double[] vals = vals();
-        return other.valStream().allMatch((v) -> ArrayUtils.contains(vals, v));
+    
+    private boolean sameVals(RandomIndexVector other) {
+        return keyStream().mapToObj((k) -> get(k) == other.get(k))
+                .noneMatch(b -> b == false);
     }
 
     @Override
@@ -117,13 +117,13 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     }
 
     private int binarySearch(final int index) {
-        return binarySearch(VectorElement.partial(index));
+        return binarySearch(VectorElement.fromIndex(index));
     }
 
     private VectorElement getPoint(final int index) throws IndexOutOfBoundsException {
         if (validIndex(index)) {
             final int i = binarySearch(index);
-            return i < 0 ? VectorElement.partial(index) : points[i];
+            return i < 0 ? VectorElement.fromIndex(index) : points[i];
         } else
             throw new IndexOutOfBoundsException("Index " + index + " is outside the bounds of this vector.");
     }
@@ -138,29 +138,29 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
             VectorElement point = VectorElement.elt(index, value);
             final int i = binarySearch(index);
             if (i < 0)
-                ArrayUtils.add(points, ~i, point);
+                points = ArrayUtils.add(points, ~i, point);
             else
-                points[i] = VectorElement.elt(index, value);
+                points[i] = point;
         } else
             throw new IndexOutOfBoundsException("Index " + index + " is outside the bounds of this vector.");
     }
     
     private ArrayRIV removeZeros() {
-        VectorElement[] zeros = stream().filter(ve -> ve.contains(0)).toArray(VectorElement[]::new);
-        if (zeros.length == 0)
+        VectorElement[] elts = stream().filter(ve -> !ve.contains(0)).toArray(VectorElement[]::new);
+        if (elts.length == count())
             return this;
         else
             return new ArrayRIV(
-                    ArrayUtils.removeElements(points, zeros),
+                    elts,
                     size);
     }
 
     @Override
     public ArrayRIV add(final RandomIndexVector other) throws SizeMismatchException {
         if (size == other.size()) {
-            final ArrayRIV res = copy();
+            final ArrayRIV res = this.copy();
             other.keyStream()
-                    .forEach((k) -> res.destructiveSet(k, res.contains(k) ? res.get(k) + other.get(k) : other.get(k)));
+                .forEach((k) -> res.destructiveSet(k, res.get(k) + other.get(k)));
             return res.removeZeros();
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
@@ -171,7 +171,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         if (size == other.size()) {
             final ArrayRIV res = copy();
             other.keyStream()
-                    .forEach((k) -> res.destructiveSet(k, res.contains(k) ? res.get(k) - other.get(k) : -other.get(k)));
+                .forEach((k) -> res.destructiveSet(k, res.get(k) - other.get(k)));
             return res.removeZeros();
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
@@ -181,12 +181,12 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     public ArrayRIV multiply(final double scalar) {
         return mapVals((v) -> v * scalar);
     }
-
+    
     @Override
     public ArrayRIV divide(final double scalar) {
         return mapVals((v) -> v / scalar);
     }
-
+    
     @Override
     public ArrayRIV normalize() {
         return divide(magnitude());
@@ -231,7 +231,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
                 vals(), size);
     }
 
-    private static double[] makeVals(final int count, final long seed) {
+    static double[] makeVals(final int count, final long seed) {
         final double[] l = new double[count];
         for (int i = 0; i < count; i += 2) {
             l[i] = 1;
@@ -240,11 +240,11 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         return Util.shuffleDoubleArray(l, seed);
     }
 
-    private static int[] makeIndices(final int size, final int count, final long seed) {
+    static int[] makeIndices(final int size, final int count, final long seed) {
         return Util.randInts(size, count, seed).toArray();
     }
 
-    private static long makeSeed(final CharSequence word) {
+    static long makeSeed(final CharSequence word) {
         final Counter c = new Counter();
         return word.chars().mapToLong((ch) -> ch * (long) Math.pow(10, c.inc())).sum();
     }
@@ -270,13 +270,13 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     }
 
     public static ArrayRIV fromString(final String rivString) {
-        final String[] r = rivString.split(" ");
+        String[] r = rivString.split(" ");
         final int l = r.length - 1;
         final int size = Integer.parseInt(r[l]);
-        final VectorElement[] elts = new VectorElement[0];
-        for (final String s : r)
-            if (s.contains("|"))
-                ArrayUtils.add(elts, VectorElement.fromString(s));
+        r = ArrayUtils.remove(r, l);
+        VectorElement[] elts = new VectorElement[l];
+        for (int i = 0; i < l; i++)
+            elts[i] = VectorElement.fromString(r[i]);
         return new ArrayRIV(elts, size);
     }
 }

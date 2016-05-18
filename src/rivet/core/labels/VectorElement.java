@@ -3,6 +3,8 @@
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import rivet.core.util.Util;
+
 public final class VectorElement implements Comparable<VectorElement> {
     
     //Values
@@ -10,10 +12,7 @@ public final class VectorElement implements Comparable<VectorElement> {
     private final double value;
     
     //Constructors
-    private VectorElement() { this.index = 0; this.value = 0; }
-    private VectorElement(int index, double value) { this.index = index; this.value = value; }
-    private VectorElement(int index) {this.index = index; this.value = 0;}
-    private VectorElement(double value) {this.index = 0; this.value = value;}
+    public VectorElement(int index, double value) { this.index = index; this.value = value; }
     
     //Core Methods
     public int index() { return this.index; }
@@ -22,7 +21,7 @@ public final class VectorElement implements Comparable<VectorElement> {
     @Override
     public int compareTo(VectorElement p) {    return Integer.compare(this.index, p.index); }
     public boolean equals(VectorElement p) { return index == p.index; }
-    public boolean strictEquals(VectorElement p) { return equals(p) && value == p.value; }
+    public boolean strictEquals(VectorElement p) { return equals(p) && Util.doubleEquals(value, p.value()); }
     private void assertMatch(VectorElement p) {
         if (!this.equals(p))
             throw new IndexOutOfBoundsException(
@@ -34,10 +33,10 @@ public final class VectorElement implements Comparable<VectorElement> {
         this.assertMatch(p);
         return this.add(p.value);
     }
-    public VectorElement subtract(double v) { return this.add(-v); }
+    public VectorElement subtract(int v) { return this.add(-v); }
     public VectorElement subtract(VectorElement p) { return this.add(-p.value); }
     
-    public boolean contains(double v) {return Double.compare(v, this.value) == 0;}
+    public boolean contains(int value) {return this.value == value;}
     
     //Convenience Methods
     public <T> T engage (Function<VectorElement, T> fun) { return fun.apply(this); }
@@ -45,9 +44,9 @@ public final class VectorElement implements Comparable<VectorElement> {
     
     
     //Static Methods
-    public static VectorElement zero() { return new VectorElement(); }
-    public static VectorElement partial(int index) { return new VectorElement(index); }
-    public static VectorElement partial(double value) { return new VectorElement(value); }
+    public static VectorElement zero() { return new VectorElement(0, 0); }
+    public static VectorElement fromIndex(int index) { return new VectorElement(index, 0); }
+    public static VectorElement fromValue(double value) { return new VectorElement(0, value); }
     public static VectorElement elt(int index, double value) { return new VectorElement(index, value); }
     public static VectorElement fromString(String eltString) {
         String[] elt = eltString.split("\\|");

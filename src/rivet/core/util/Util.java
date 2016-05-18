@@ -17,6 +17,12 @@ import org.apache.commons.math3.special.Gamma;
 public final  class Util {
     private Util(){}
     
+    public static double roundingError = 0.0000001;
+    public static boolean doubleEquals(double a, double b, double epsilon) {
+        return Math.abs(a - b) <= epsilon;
+    }
+    public static boolean doubleEquals(double a, double b) {return doubleEquals(a, b, roundingError);}
+    
     public static <T> List<T> copyList(final List<T> lis) {
         return lis.stream().collect(Collectors.toList());
     }
@@ -32,6 +38,12 @@ public final  class Util {
         final int size = arr.length;
         return randInts(size, size, seed)
                 .mapToDouble((i) -> arr[i])
+                .toArray();
+    }
+    public static int[] shuffleIntArray(final int[] arr, final Long seed) {
+        final int size = arr.length;
+        return randInts(size, size, seed)
+                .map((i) -> arr[i])
                 .toArray();
     }
     
