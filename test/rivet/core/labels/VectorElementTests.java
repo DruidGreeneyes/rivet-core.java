@@ -2,7 +2,6 @@ package rivet.core.labels;
 
 import static org.junit.Assert.*;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import rivet.core.util.Util;

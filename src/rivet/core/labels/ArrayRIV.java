@@ -158,16 +158,31 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
                     elts,
                     size);
     }
+    
+    private ArrayRIV destructiveAdd(final RandomIndexVector other) throws SizeMismatchException {
+        if (size == other.size()) {
+            other.keyStream()
+                .forEach((k) -> this.destructiveSet(k, this.get(k) + other.get(k)));
+            return this;
+        } else
+            throw new SizeMismatchException("Target RIV is the wrong size!");
+    }
 
     @Override
     public ArrayRIV add(final RandomIndexVector other) throws SizeMismatchException {
-        if (size == other.size()) {
-            final ArrayRIV res = this.copy();
-            other.keyStream()
-                .forEach((k) -> res.destructiveSet(k, res.get(k) + other.get(k)));
-            return res.removeZeros();
-        } else
-            throw new SizeMismatchException("Target RIV is the wrong size!");
+        return this.copy()
+                .destructiveAdd(other)
+                .removeZeros();
+    }
+    
+    public ArrayRIV add(final Stream<RandomIndexVector> rivs) throws SizeMismatchException {
+        final ArrayRIV res = this.copy();
+        rivs.forEach(res::destructiveAdd);
+        return res.removeZeros();
+    }
+    
+    public ArrayRIV add(final RandomIndexVector...rivs) throws SizeMismatchException {
+        return add(Arrays.stream(rivs));
     }
 
     @Override
