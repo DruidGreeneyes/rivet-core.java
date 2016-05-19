@@ -1,5 +1,6 @@
  package rivet.core.labels;
 
+import java.util.Map.Entry;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -48,6 +49,7 @@ public final class VectorElement implements Comparable<VectorElement> {
     public static VectorElement fromIndex(int index) { return new VectorElement(index, 0); }
     public static VectorElement fromValue(double value) { return new VectorElement(0, value); }
     public static VectorElement elt(int index, double value) { return new VectorElement(index, value); }
+    public static VectorElement elt(Entry<Integer, Double> entry) { return new VectorElement(entry.getKey(), entry.getValue()); }
     public static VectorElement fromString(String eltString) {
         String[] elt = eltString.split("\\|");
         if (elt.length != 2) throw new IndexOutOfBoundsException("Wrong number of partitions: " + eltString);

@@ -14,6 +14,7 @@ import rivet.core.vectorpermutations.Permutations;
 
 public interface RandomIndexVector {
     
+    VectorElement[] points();
     int size();
     int count();
     

@@ -27,6 +27,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     private static final long serialVersionUID = -1176979873718129432L;
     private VectorElement[] points;
     private final int size;
+    
 
     public ArrayRIV(final ArrayRIV riv) {
         points = ArrayUtils.clone(riv.points);
@@ -56,6 +57,9 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         points = elts;
         this.removeZeros();
     }
+    
+    @Override
+    public VectorElement[] points() {return points;}
 
     @Override
     public int size() {
@@ -99,7 +103,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     }
     
     private boolean sameVals(RandomIndexVector other) {
-        return keyStream().mapToObj((k) -> get(k) == other.get(k))
+        return keyStream().mapToObj((k) -> Util.doubleEquals(get(k), other.get(k)))
                 .noneMatch(b -> b == false);
     }
 

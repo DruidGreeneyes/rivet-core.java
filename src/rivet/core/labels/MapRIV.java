@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,8 +28,8 @@ public class MapRIV implements Serializable, RandomIndexVector {
      * 
      */
     private static final long serialVersionUID = 350977843775988038L;
-    private int size;
-    private HashMap<Integer, Double> points;
+    private final int size;
+    private final HashMap<Integer, Double> points;
     
     public MapRIV(MapRIV riv) {
         size = riv.size;
@@ -51,6 +52,12 @@ public class MapRIV implements Serializable, RandomIndexVector {
         this.size = size;
     }
     
+    private MapRIV(VectorElement[] points, int size) {
+        this.points = new HashMap<>();
+        Arrays.stream(points).forEach(p -> this.points.put(p.index(), p.value()));
+        this.size = size;
+    }
+    
     public MapRIV(int[] keys, double[] vals, int size) {
         this.size = size;
         int l = keys.length;
@@ -70,17 +77,25 @@ public class MapRIV implements Serializable, RandomIndexVector {
     public int count() {
         return points.size();
     }
-    
+
     public Stream<Entry<Integer, Double>> stream() {
         return points.entrySet().stream();
+    }
+    
+    public VectorElement[] points() {
+        return stream().map(VectorElement::elt)
+                    .sorted(VectorElement::compare)
+                    .toArray(VectorElement[]::new);
     }
     
     @Override
     public String toString() {
         //"0|1 1|3 4|2 5"
         //"I|V I|V I|V Size"
-        return stream().map((e) -> String.format("%d|%f%", e.getKey(), e.getValue()))
-                    .collect(Collectors.joining(" ", "", String.valueOf(size)));
+        return stream()
+                .sorted((e1, e2) -> Integer.compare(e1.getKey(), e2.getKey()))
+                .map((e) -> String.format("%d|%f", e.getKey(), e.getValue()))
+                .collect(Collectors.joining(" ", "", " " + String.valueOf(size)));
     }
 
     @Override
@@ -97,13 +112,24 @@ public class MapRIV implements Serializable, RandomIndexVector {
     public boolean contains(int index) {
         return points.containsKey(index);
     }
+    
+    private boolean sameKeys(RandomIndexVector other) {
+        
+        return count() == other.count() &&
+               keyStream().allMatch(other::contains);
+    }
+    
+    private boolean sameVals(RandomIndexVector other) {
+        return keyStream().mapToObj((k) -> Util.doubleEquals(get(k), other.get(k)))
+                .noneMatch(b -> b == false);
+    }
 
     @Override
     public boolean equals(RandomIndexVector other) {
         return size == other.size() &&
-               count() == other.count() &&
-               keys().equals(other.keys()) &&
-               vals().equals(other.vals());
+               sameKeys(other) &&
+               sameVals(other);
+               
     }
     
     private boolean validIndex(int index) {
@@ -129,19 +155,20 @@ public class MapRIV implements Serializable, RandomIndexVector {
     }
     
     private MapRIV removeZeros() {
-        keyStream().forEach((k) -> {
-            if (get(k) == 0)
-                points.remove(k);
-        });
-        return this;
-    }
-    
-    public MapRIV map(UnaryOperator<Entry<Integer, Double>> fun) {
         return new MapRIV(
                 stream()
-                    .map(fun)
-                    .filter(e -> e.getValue() != 0)
-                    .collect(Collectors.toSet()),
+                .filter((e) -> !Util.doubleEquals(0, e.getValue()))
+                .collect(Collectors.toSet()),
+                size);
+    }
+    
+    public MapRIV map(UnaryOperator<VectorElement> fun) {
+        return new MapRIV(
+                stream()
+                .map(VectorElement::elt)
+                .map(fun)
+                .filter(e -> e.value() != 0)
+                .toArray(VectorElement[]::new),
                 size);
     }
 
@@ -212,7 +239,7 @@ public class MapRIV implements Serializable, RandomIndexVector {
         }
     }
     
-    private static double[] makeVals(final int count, final long seed) {
+    static double[] makeVals(final int count, final long seed) {
         final double[] l = new double[count];
         for (int i = 0; i < count; i += 2) {
             l[i] = 1;
@@ -221,11 +248,11 @@ public class MapRIV implements Serializable, RandomIndexVector {
         return Util.shuffleDoubleArray(l, seed);
     }
 
-    private static int[] makeIndices(final int size, final int count, final long seed) {
+    static int[] makeIndices(final int size, final int count, final long seed) {
         return Util.randInts(size, count, seed).toArray();
     }
 
-    private static long makeSeed(final CharSequence word) {
+    static long makeSeed(final CharSequence word) {
         final Counter c = new Counter();
         return word.chars().mapToLong((ch) -> ch * (long) Math.pow(10, c.inc())).sum();
     }
@@ -238,7 +265,7 @@ public class MapRIV implements Serializable, RandomIndexVector {
 
     public static MapRIV generateLabel(final int size, final int k, final CharSequence source, final int startIndex,
             final int tokenLength) {
-        return generateLabel(size, k, source.subSequence(startIndex, startIndex + tokenLength));
+        return generateLabel(size, k, Util.safeSubSequence(source, startIndex, startIndex + tokenLength));
     }
 
     public static Function<String, MapRIV> labelGenerator(final int size, final int k) {
