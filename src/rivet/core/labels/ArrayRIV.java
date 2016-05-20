@@ -27,22 +27,26 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     private static final long serialVersionUID = -1176979873718129432L;
     private VectorElement[] points;
     private final int size;
+    private final double magnitude;
     
 
     public ArrayRIV(final ArrayRIV riv) {
         points = ArrayUtils.clone(riv.points);
         size = riv.size;
+        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV(final int size) {
         points = new VectorElement[0];
         this.size = size;
+        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV(final VectorElement[] points, final int size) {
         this.points = ArrayUtils.clone(points);
         Arrays.sort(points);
         this.size = size;
+        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV(final int[] keys, final double[] ds, final int size) {
@@ -56,6 +60,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         Arrays.sort(elts, VectorElement::compare);
         points = elts;
         this.removeZeros();
+        magnitude = calculateMagnitude();
     }
     
     @Override
@@ -175,25 +180,40 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
                 .removeZeros();
     }
     
-    public ArrayRIV add(final Stream<RandomIndexVector> rivs) throws SizeMismatchException {
+    public ArrayRIV add(final Stream<ArrayRIV> rivs) throws SizeMismatchException {
         final ArrayRIV res = this.copy();
         rivs.forEach(res::destructiveAdd);
         return res.removeZeros();
     }
     
-    public ArrayRIV add(final RandomIndexVector...rivs) throws SizeMismatchException {
+    public ArrayRIV add(final ArrayRIV...rivs) throws SizeMismatchException {
         return add(Arrays.stream(rivs));
     }
 
-    @Override
-    public ArrayRIV subtract(final RandomIndexVector other) throws SizeMismatchException {
+    private ArrayRIV destructiveSubtract(final RandomIndexVector other) throws SizeMismatchException {
         if (size == other.size()) {
-            final ArrayRIV res = copy();
             other.keyStream()
-                .forEach((k) -> res.destructiveSet(k, res.get(k) - other.get(k)));
-            return res.removeZeros();
+                .forEach((k) -> this.destructiveSet(k, this.get(k) - other.get(k)));
+            return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
+    }
+    
+    @Override
+    public ArrayRIV subtract(final RandomIndexVector other) throws SizeMismatchException {
+        return this.copy()
+                .destructiveSubtract(other)
+                .removeZeros();
+    }
+    
+    public ArrayRIV subtract(final Stream<RandomIndexVector> rivs) throws SizeMismatchException {
+        final ArrayRIV res = this.copy();
+        rivs.forEach(res::destructiveSubtract);
+        return res.removeZeros();
+    }
+    
+    public ArrayRIV subtract(final RandomIndexVector...rivs) throws SizeMismatchException {
+        return subtract(Arrays.stream(rivs));
     }
 
     @Override
@@ -249,6 +269,16 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
                 times > 0 ? permuteKeys(keys, permutations.left, times) : permuteKeys(keys, permutations.right, -times),
                 vals(), size);
     }
+    
+    private double calculateMagnitude() {
+        return Math.sqrt(
+                this.valStream()
+                .map((v) -> v * v)
+                .sum());
+    }
+    
+    @Override
+    public double magnitude() {return magnitude;}
 
     static double[] makeVals(final int count, final long seed) {
         final double[] l = new double[count];
