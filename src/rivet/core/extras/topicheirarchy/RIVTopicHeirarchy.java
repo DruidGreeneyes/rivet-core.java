@@ -3,6 +3,7 @@ package rivet.core.extras.topicheirarchy;
 import rivet.core.labels.ArrayRIV;
 
 import java.util.ArrayList;
+
 import rivet.core.labels.RandomIndexVector;
 
 public class RIVTopicHeirarchy {
@@ -21,7 +22,8 @@ public class RIVTopicHeirarchy {
     private RIVTopicHeirarchy (NamedRIVMap t, RIVTopicHeirarchy p, double s) { this(t, p, new ArrayList<>(), s); }
     private RIVTopicHeirarchy (NamedRIVMap t, double s) { this(t, null, s); }
     
-    private void update (NamedRIVMap topicBag) { topic = topicBag; }
+    @SuppressWarnings("unused")
+    private void updateTopic (NamedRIVMap topicBag) { topic = topicBag; }
     private void updateParent (RIVTopicHeirarchy newParent) { 
         parent.orphan(this);
         newParent.adopt(this); 
@@ -68,13 +70,17 @@ public class RIVTopicHeirarchy {
         find(riv.riv()).subtract(riv);
     }
     
-    public void graft (NamedRIV riv) {
-        prune(riv);
+    public void graftNew (NamedRIV riv) {
         RIVTopicHeirarchy point = find(riv.riv());
         if (RandomIndexVector.similarity(point.topic.meanVector(), riv.riv()) >= similarityThreshold)
             point.add(riv);
         else
             point.adopt(riv);
+    }
+    
+    public void reGraft (NamedRIV riv) {
+        prune(riv);
+        graftNew(riv);
     }
     
     public ArrayList<RIVTopicHeirarchy> children() { return new ArrayList<>(children); }
@@ -91,11 +97,19 @@ public class RIVTopicHeirarchy {
     
     public static RIVTopicHeirarchy findRoot(RIVTopicHeirarchy point) { return (point.isRoot()) ? point : findRoot(point.parent); }
     
+    public static final String[] assignTopics(RIVTopicHeirarchy point, ArrayRIV riv) {
+        ArrayList<RIVTopicHeirarchy> nodes = _find(findRoot(point), riv, new ArrayList<>());
+        return nodes.stream().map(RIVTopicHeirarchy::name).toArray(String[]::new);
+    }
     
-    public static final RIVTopicHeirarchy find(RIVTopicHeirarchy point, ArrayRIV riv) { return _find(findRoot(point), riv); }
-    private static final RIVTopicHeirarchy _find(RIVTopicHeirarchy point, ArrayRIV riv) {
+    public static final RIVTopicHeirarchy find(RIVTopicHeirarchy point, ArrayRIV riv) { 
+        ArrayList<RIVTopicHeirarchy> nodes = _find(findRoot(point), riv, new ArrayList<>());
+        return nodes.get(nodes.size() - 1);
+    }
+    private static final ArrayList<RIVTopicHeirarchy> _find(RIVTopicHeirarchy point, ArrayRIV riv, ArrayList<RIVTopicHeirarchy> nodes) {
+        nodes.add(point);
         if (!point.hasChildren())
-            return point;
+            return nodes;
         else {
             RIVTopicHeirarchy next =
                     point.children.stream()
@@ -104,9 +118,9 @@ public class RIVTopicHeirarchy {
                                 ? i
                                 : node);
             if (next == point) 
-                return point;
+                return nodes;
             else 
-                return _find(next, riv);
+                return _find(next, riv, nodes);
         }
     }
 

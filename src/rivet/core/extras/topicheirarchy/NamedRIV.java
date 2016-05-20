@@ -19,4 +19,8 @@ public final class NamedRIV {
     }
     
     public double magnitude() {return magnitude;}
+    
+    public static NamedRIV make(String name, ArrayRIV riv) {
+        return new NamedRIV(name, riv);
+    }
 }

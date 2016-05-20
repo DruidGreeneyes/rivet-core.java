@@ -4,7 +4,7 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import rivet.core.labels.ArrayRIV;
 
-public abstract class WordLexicon {
+public class WordLexicon {
     private final int size;
     private final int nnz;
     
@@ -32,16 +32,28 @@ public abstract class WordLexicon {
                 RIVTopicHeirarchy.makeRoot(new NamedRIVMap(size), simThreshold));
     }
     
-    public abstract WordLexicon clear();
+    public WordLexicon clear() {
+        return new WordLexicon(size, nnz, topics);
+    }
     
     public int count() {return lexicon.size();}
     public int size() {return size;}
     
-    public ArrayRIV get(String key) {
-        return lexicon.getOrDefault(key, new ArrayRIV(size));
+    public boolean contains(String word) {
+        return lexicon.containsKey(word);
     }
     
+    public ArrayRIV get(String word) {
+        return lexicon.getOrDefault(word, ArrayRIV.generateLabel(size, nnz, word));
+    }
     
+    public void set (String word, ArrayRIV riv) {
+        if (contains(word))
+            topics.reGraft(NamedRIV.make(word, riv));
+        else
+            topics.graftNew(NamedRIV.make(word, riv));
+        lexicon.put(word, riv);
+    }
     
     public ArrayRIV meanVector() {
         return lexicon.values().stream()
@@ -49,10 +61,7 @@ public abstract class WordLexicon {
                 .divide((double)lexicon.size());
     }
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -8893148657223464815L;
-    
-        
+    public String[] assignTopicsToDocument(ArrayRIV docRIV) {
+        return RIVTopicHeirarchy.assignTopics(topics, docRIV);
+    }
 }
