@@ -40,14 +40,14 @@ public class NamedRIVMap extends HashMap<String, ArrayRIV>{
     
     public Stream<ArrayRIV> stream() {return values().stream();}
     
-    public ArrayRIV meanVector() { 
+    public ArrayRIV meanVector() {
         return new ArrayRIV(size).add(stream()).divide(count());
     }
     public double magnitude() {
         return meanVector().magnitude();
     }
     
-    public String name() { 
+    public String name() {
         int numNames = Math.max(1, (int) Math.round(count() * NAMING_THRESHOLD));
         return entrySet()
                 .stream()

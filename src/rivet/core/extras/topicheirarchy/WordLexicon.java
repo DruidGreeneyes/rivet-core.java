@@ -1,8 +1,13 @@
 package rivet.core.extras.topicheirarchy;
 
+import java.util.Arrays;
+import java.util.function.BiFunction;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import rivet.core.labels.ArrayRIV;
+import rivet.core.labels.RandomIndexVector;
+import rivet.core.util.Util;
+import rivet.core.vectorpermutations.Permutations;
 
 public class WordLexicon {
     private final int size;
@@ -10,6 +15,7 @@ public class WordLexicon {
     
     private final RIVTopicHeirarchy topics;
     private final DualHashBidiMap<String, ArrayRIV> lexicon;
+    private final Permutations permutations;
     
     public WordLexicon(int size, int nnz, RIVTopicHeirarchy topics, DualHashBidiMap<String, ArrayRIV> lexicon) {
         super();
@@ -17,6 +23,7 @@ public class WordLexicon {
         this.nnz = nnz;
         this.topics = topics;
         this.lexicon = lexicon;
+        this.permutations = Permutations.generate(size);
     }
     
     public WordLexicon(int size, int nnz, RIVTopicHeirarchy topics) {
@@ -41,6 +48,28 @@ public class WordLexicon {
     
     public boolean contains(String word) {
         return lexicon.containsKey(word);
+    }
+    
+    private double[][] nSquaredSimilarity (ArrayRIV[] rivs, boolean permute) {
+        BiFunction<Integer, Integer, Double> sim = permute
+                ? (i, c) -> RandomIndexVector.similarity(rivs[i], rivs[c].permute(permutations, c - i))
+                        : (i, c) -> RandomIndexVector.similarity(rivs[i], rivs[c]);
+        return Util.range(rivs.length)
+                .mapToObj(
+                        (i) -> Util.range(rivs.length)
+                        .mapToDouble(
+                                (c) -> sim.apply(i, c))
+                        .toArray())
+                .toArray(double[][]::new);
+    }
+    
+    public double nGramTest(String[] parts) {
+        ArrayRIV[] rivs = Arrays.stream(parts).map(this::get).toArray(ArrayRIV[]::new);
+        double[][] sims = nSquaredSimilarity(rivs, true);
+        return Arrays.stream(sims)
+            .flatMapToDouble(Arrays::stream)
+            .average()
+            .orElseGet(() -> 0);
     }
     
     public ArrayRIV get(String word) {
