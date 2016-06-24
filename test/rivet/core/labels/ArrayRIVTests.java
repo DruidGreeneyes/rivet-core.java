@@ -4,7 +4,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
@@ -28,28 +27,18 @@ public class ArrayRIVTests {
     static String testString = "0|1.000000 1|-1.000000 2|1.000000 3|-1.000000 4|1.000000 5|-1.000000 6|1.000000 7|-1.000000 8|1.000000 9|-1.000000 10|1.000000 11|-1.000000 12|1.000000 13|-1.000000 14|1.000000 15|-1.000000 16|1.000000 17|-1.000000 18|1.000000 19|-1.000000 20|1.000000 21|-1.000000 22|1.000000 23|-1.000000 24|1.000000 25|-1.000000 26|1.000000 27|-1.000000 28|1.000000 29|-1.000000 30|1.000000 31|-1.000000 32|1.000000 33|-1.000000 34|1.000000 35|-1.000000 36|1.000000 37|-1.000000 38|1.000000 39|-1.000000 40|1.000000 41|-1.000000 42|1.000000 43|-1.000000 44|1.000000 45|-1.000000 46|1.000000 47|-1.000000 16000";
     static double e = Util.roundingError;
 
-    public static void assertEqual(final ArrayRIV rivA, final ArrayRIV rivB) {
-        assertEquals(rivA.size(), rivB.size());
-        assertEquals(rivA.count(), rivB.count());
-        final VectorElement[] pointsA = rivA.points();
-        final VectorElement[] pointsB = rivB.points();
-        for (int i = 0; i < pointsA.length; i++)
-            assertEqual(pointsA[i], pointsB[i]);
-        assertTrue(rivA.equals(rivB));
-    }
-
-    public static void assertEqual(final VectorElement vecA, final VectorElement vecB) {
-        assertEquals(vecA.index(), vecB.index());
-        assertEquals(vecA.value(), vecB.value(), e);
-    }
-
-    public static <T> void assertError(final Function<T, ?> fun, final T arg) {
+    public static <T> void assertThrows(final Class<?> exceptionClass,
+            final Function<T, ?> fun, final T arg) {
         try {
             fun.apply(arg);
             fail("Expected error, recieved none.");
-        } catch(final Exception e) {}
+        } catch (final Exception e) {
+            if (!e.getClass().equals(exceptionClass))
+                fail(String.format(
+                        "Expected Exception of type %s, recieved type %e",
+                        exceptionClass.getName(), e.getClass().getName()));
+        }
     }
-
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
@@ -73,14 +62,15 @@ public class ArrayRIVTests {
         final ArrayRIV testRIV8 = testRIV4.add(testRIV4);
         assertEquals(-2, testRIV8.get(9), e);
         assertEquals(testK, testRIV8.count());
-        assertEqual(testRIV4, testRIV);
+        assertEquals(testRIV4, testRIV);
     }
 
     @Test
     public final void testArrayRIVArrayRIV() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK, "testRIV1");
+        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV1");
         final ArrayRIV testRIV = new ArrayRIV(testRIV1);
-        assertEqual(testRIV1, testRIV);
+        assertEquals(testRIV1, testRIV);
     }
 
     @Test
@@ -116,9 +106,20 @@ public class ArrayRIVTests {
         assertEquals(testK, testRIV4.count());
         final VectorElement[] points = testRIV4.points();
         for (int i = 0; i < testK; i++)
-            assertEqual(points[i], testPoints[i]);
+            assertEquals(points[i], testPoints[i]);
     }
 
+    @Test
+    public final void testDestructiveAdd() {
+        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final ArrayRIV testRIV = new ArrayRIV(testSize)
+                .destructiveAdd(testRIV4);
+        assertEquals(-1, testRIV4.get(9), e);
+        assertEquals(-1, testRIV.get(9), e);
+        assertEquals(testRIV4, testRIV);
+    }
+
+    @Test
     public final void testDivide() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final ArrayRIV testRIV = testRIV4.divide(2);
@@ -127,22 +128,26 @@ public class ArrayRIVTests {
 
     @Test
     public final void testEqualsRandomIndexVector() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK, "testRIV1");
-        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK, "testRIV2");
-        assertEqual(testRIV1, testRIV1);
-        assertFalse(testRIV1.equals(testRIV2));
+        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV1");
+        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV2");
+        assertEquals(testRIV1, testRIV1);
+        assertNotEquals(testRIV1, testRIV2);
     }
 
     @Test
     public final void testFromString() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        assertEqual(testRIV4, ArrayRIV.fromString(testString));
+        assertEquals(testRIV4, ArrayRIV.fromString(testString));
     }
 
     @Test
     public final void testGenerateLabelIntIntCharSequence() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK, "testRIV1");
-        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK, "testRIV2");
+        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV1");
+        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV2");
         assertEquals(testSize, testRIV2.size());
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
@@ -151,8 +156,10 @@ public class ArrayRIVTests {
 
     @Test
     public final void testGenerateLabelIntIntCharSequenceIntInt() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK, "testRIV1", 0, 5);
-        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK, "testRIV2", 5, 10);
+        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV1", 0, 5);
+        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK,
+                "testRIV2", 5, 10);
         assertEquals(testSize, testRIV2.size());
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
@@ -164,16 +171,19 @@ public class ArrayRIVTests {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         assertEquals(-1, testRIV4.get(9), e);
         assertEquals(0, testRIV4.get(4053), e);
-        assertError((x) -> testRIV4.get(x), 1000000);
+        assertThrows(IndexOutOfBoundsException.class, testRIV4::get, 1000000);
     }
 
     @Test
     public final void testMakeIndices() {
         assertEquals(testK, testKeys.length);
         assertEquals(testK, Arrays.stream(testKeys).distinct().count());
-        assertEquals(testK, Arrays.stream(testKeys).filter((x) -> 0 < x && x < testSize).count());
-        final int[] test2 = ArrayRIV.makeIndices(testSize, testK, ArrayRIV.makeSeed("not seed"));
-        assertFalse(Arrays.stream(test2).allMatch((x) -> ArrayUtils.contains(testKeys, x)));
+        assertEquals(testK, Arrays.stream(testKeys)
+                .filter((x) -> 0 < x && x < testSize).count());
+        final int[] test2 = ArrayRIV.makeIndices(testSize, testK,
+                ArrayRIV.makeSeed("not seed"));
+        assertFalse(Arrays.stream(test2)
+                .allMatch((x) -> ArrayUtils.contains(testKeys, x)));
     }
 
     @Test
@@ -187,7 +197,8 @@ public class ArrayRIVTests {
     @Test
     public final void testMakeValues() {
         assertEquals(testK, testVals.length);
-        assertEquals(testK, Arrays.stream(testVals).filter((x) -> x == 1 || x == -1).count());
+        assertEquals(testK, Arrays.stream(testVals)
+                .filter((x) -> x == 1 || x == -1).count());
         assertEquals(0, Arrays.stream(testVals).sum(), e);
     }
 
@@ -228,9 +239,12 @@ public class ArrayRIVTests {
         final ArrayRIV testRIVA = testRIV4.multiply(2);
         final ArrayRIV testRIVB = testRIV4.mapVals((v) -> v + 2);
         assertFalse(testRIV4.equals(testRIVB));
-        assertEquals(testRIV4.normalize().magnitude(), testRIVA.normalize().magnitude(), e);
-        assertEquals(testRIV4.normalize().magnitude(), testRIVB.normalize().magnitude(), e);
-        assertEquals(testRIVA.normalize().magnitude(), testRIVB.normalize().magnitude(), e);
+        assertEquals(testRIV4.normalize().magnitude(),
+                testRIVA.normalize().magnitude(), e);
+        assertEquals(testRIV4.normalize().magnitude(),
+                testRIVB.normalize().magnitude(), e);
+        assertEquals(testRIVA.normalize().magnitude(),
+                testRIVB.normalize().magnitude(), e);
     }
 
     @Test
@@ -244,8 +258,8 @@ public class ArrayRIVTests {
         assertFalse(testRIV4.equals(testRIVB));
         assertEquals(testK, testRIVB.count());
         assertEquals(testK, testRIVA.count());
-        assertEqual(testRIVB.permute(p, 1), testRIV4);
-        assertEqual(testRIVA.permute(p, -1), testRIV4);
+        assertEquals(testRIVB.permute(p, 1), testRIV4);
+        assertEquals(testRIVA.permute(p, -1), testRIV4);
     }
 
     @Test

@@ -92,18 +92,14 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
 
     private final int size;
 
-    private final double magnitude;
-
     public ArrayRIV(final ArrayRIV riv) {
         points = ArrayUtils.clone(riv.points);
         size = riv.size;
-        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV(final int size) {
         points = new VectorElement[0];
         this.size = size;
-        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV(final int[] keys, final double[] ds, final int size) {
@@ -118,14 +114,12 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         Arrays.sort(elts, VectorElement::compare);
         points = elts;
         removeZeros();
-        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV(final VectorElement[] points, final int size) {
         this.points = ArrayUtils.clone(points);
         Arrays.sort(points);
         this.size = size;
-        magnitude = calculateMagnitude();
     }
 
     public ArrayRIV add(final ArrayRIV... rivs) throws SizeMismatchException {
@@ -151,10 +145,6 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
 
     private int binarySearch(final VectorElement elt) {
         return Arrays.binarySearch(points, elt, VectorElement::compare);
-    }
-
-    private double calculateMagnitude() {
-        return Math.sqrt(valStream().map((v) -> v * v).sum());
     }
 
     @Override
@@ -212,9 +202,18 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     }
 
     @Override
-    public boolean equals(final RandomIndexVector other) {
-        return count() == other.count() && size() == other.size()
-                && sameKeys(other) && sameVals(other);
+    public boolean equals(final Object other) {
+        if (this == other)
+            return true;
+        else if (!ArrayUtils.contains(other.getClass().getInterfaces(),
+                RandomIndexVector.class))
+            return false;
+        else
+            return equalsRIV((RandomIndexVector) other);
+    }
+
+    public boolean equalsRIV(final RandomIndexVector other) {
+        return size() == other.size() && Arrays.equals(points, other.points());
     }
 
     @Override
@@ -239,7 +238,7 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
 
     @Override
     public double magnitude() {
-        return magnitude;
+        return Math.sqrt(valStream().map((v) -> v * v).sum());
     }
 
     public ArrayRIV map(final UnaryOperator<VectorElement> fun) {
@@ -292,16 +291,6 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
             return this;
         else
             return new ArrayRIV(elts, size);
-    }
-
-    private boolean sameKeys(final RandomIndexVector other) {
-        return keyStream().allMatch(other::contains);
-    }
-
-    private boolean sameVals(final RandomIndexVector other) {
-        return keyStream()
-                .mapToObj((k) -> Util.doubleEquals(get(k), other.get(k)))
-                .noneMatch(b -> b == false);
     }
 
     @Override

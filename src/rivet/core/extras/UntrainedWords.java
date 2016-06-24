@@ -2,15 +2,21 @@ package rivet.core.extras;
 
 import static java.util.Arrays.stream;
 
+import java.util.stream.Stream;
+
 import rivet.core.labels.ArrayRIV;
 
 public final class UntrainedWords {
     public static ArrayRIV rivAndSumWords(final String[] words, final int size,
             final int k) {
-        return stream(words).reduce(new ArrayRIV(size),
-                (identity, word) -> identity
-                        .destructiveAdd(ArrayRIV.generateLabel(size, k, word)),
+        final Stream<String> s = stream(words);
+        final Stream<ArrayRIV> rivs = s
+                .map((w) -> ArrayRIV.generateLabel(size, k, w));
+        final ArrayRIV res = rivs.reduce(new ArrayRIV(size),
                 ArrayRIV::destructiveAdd);
+        return res;
+        // return stream(words).map((w) -> ArrayRIV.generateLabel(size, k, w))
+        // .reduce(new ArrayRIV(size), (i, r) -> i.destructiveAdd(r));
     }
 
     public static ArrayRIV rivAndSumWords_2(final String[] words,

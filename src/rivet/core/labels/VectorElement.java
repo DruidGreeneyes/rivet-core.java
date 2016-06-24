@@ -68,7 +68,7 @@ public final class VectorElement
     }
 
     private void assertMatch(final VectorElement p) {
-        if (!this.equals(p))
+        if (!equals(p))
             throw new IndexOutOfBoundsException(
                     String.format("Point indices do not match! %s != %s",
                             toString(), p.toString()));
@@ -93,8 +93,15 @@ public final class VectorElement
         return fun.apply(this);
     }
 
-    public boolean equals(final VectorElement p) {
-        return index == p.index;
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other)
+            return true;
+        else if (!(other instanceof VectorElement))
+            return false;
+        else
+            return strictEquals((VectorElement) other);
+
     }
 
     // Core Methods
@@ -103,7 +110,7 @@ public final class VectorElement
     }
 
     public boolean strictEquals(final VectorElement p) {
-        return equals(p) && Util.doubleEquals(value, p.value());
+        return index == p.index && Util.doubleEquals(value, p.value);
     }
 
     public VectorElement subtract(final int v) {
