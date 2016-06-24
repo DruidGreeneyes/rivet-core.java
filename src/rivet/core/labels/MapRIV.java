@@ -32,7 +32,7 @@ public class MapRIV implements Serializable, RandomIndexVector {
         String[] pointStrings = rivString.split(" ");
         final int last = pointStrings.length - 1;
         final int size = Integer.parseInt(pointStrings[last]);
-        pointStrings = ArrayUtils.remove(pointStrings, last);
+        pointStrings = Arrays.copyOf(pointStrings, last);
         final HashMap<Integer, Double> elts = new HashMap<>();
         for (final String s : pointStrings) {
             final String[] elt = s.split("\\|");
@@ -142,8 +142,8 @@ public class MapRIV implements Serializable, RandomIndexVector {
     public MapRIV add(final RandomIndexVector other)
             throws SizeMismatchException {
         final MapRIV res = copy();
-        other.keyStream().forEach((k) -> res.points.put(k,
-                res.contains(k) ? res.get(k) + other.get(k) : other.get(k)));
+        other.keyStream()
+                .forEach((k) -> res.points.put(k, res.get(k) + other.get(k)));
         return res.removeZeros();
     }
 
@@ -160,6 +160,18 @@ public class MapRIV implements Serializable, RandomIndexVector {
     @Override
     public int count() {
         return points.size();
+    }
+
+    public MapRIV destructiveAdd(final RandomIndexVector other)
+            throws SizeMismatchException {
+        other.keyStream().forEach((k) -> points.put(k, get(k) + other.get(k)));
+        return this;
+    }
+
+    public MapRIV destructiveSubtract(final RandomIndexVector other)
+            throws SizeMismatchException {
+        other.keyStream().forEach((k) -> points.put(k, get(k) - other.get(k)));
+        return this;
     }
 
     @Override
@@ -264,8 +276,8 @@ public class MapRIV implements Serializable, RandomIndexVector {
     public MapRIV subtract(final RandomIndexVector other)
             throws SizeMismatchException {
         final MapRIV res = copy();
-        other.keyStream().forEach((k) -> res.points.put(k,
-                res.contains(k) ? res.get(k) - other.get(k) : -other.get(k)));
+        other.keyStream()
+                .forEach((k) -> res.points.put(k, res.get(k) - other.get(k)));
         return res.removeZeros();
     }
 
@@ -288,5 +300,4 @@ public class MapRIV implements Serializable, RandomIndexVector {
     public DoubleStream valStream() {
         return points.values().stream().mapToDouble(x -> x);
     }
-
 }
