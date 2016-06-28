@@ -1,8 +1,8 @@
 package rivet.core.labels;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -17,8 +17,7 @@ import rivet.core.util.Counter;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
-public class MapRIV extends HashMap<Integer, Double>
-        implements RIV, Serializable {
+public class MapRIV extends HashMap<Integer, Double> implements RIV {
 
     /**
      *
@@ -39,7 +38,7 @@ public class MapRIV extends HashMap<Integer, Double>
             else
                 elts.put(Integer.parseInt(elt[0]), Double.parseDouble(elt[1]));
         }
-        return new MapRIV(elts, size).removeZeros();
+        return new MapRIV(elts, size).destructiveRemoveZeros();
     }
 
     public static MapRIV generateLabel(final int size, final int k,
@@ -128,13 +127,13 @@ public class MapRIV extends HashMap<Integer, Double>
 
     public MapRIV add(final MapRIV other) throws SizeMismatchException {
         assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
-        return copy().destructiveAdd(other).removeZeros();
+        return copy().destructiveAdd(other).destructiveRemoveZeros();
     }
 
     @Override
     public MapRIV add(final RIV other) throws SizeMismatchException {
         assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
-        return copy().destructiveAdd(other).removeZeros();
+        return copy().destructiveAdd(other).destructiveRemoveZeros();
     }
 
     private void addPoint(final int index, final double value) {
@@ -188,10 +187,16 @@ public class MapRIV extends HashMap<Integer, Double>
         return this;
     }
 
+    private MapRIV destructiveRemoveZeros() {
+        for (final int i : new HashSet<>(keySet()))
+            compute(i, (k, v) -> Util.doubleEquals(v, 0) ? null : v);
+        return this;
+    }
+
     public MapRIV destructiveSub(final MapRIV other)
             throws SizeMismatchException {
         assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
-        other.forEach((i, v) -> merge(i, v, (a, b) -> a + b));
+        other.forEach((i, v) -> subtractPoint(i, v));
         return this;
     }
 
@@ -199,7 +204,7 @@ public class MapRIV extends HashMap<Integer, Double>
     public MapRIV destructiveSub(final RIV other) throws SizeMismatchException {
         assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
         for (final VectorElement point : other.points())
-            addPoint(point.index(), -point.value());
+            subtractPoint(point.index(), point.value());
         return this;
     }
 
@@ -226,8 +231,7 @@ public class MapRIV extends HashMap<Integer, Double>
     @Override
     public double get(final int index) throws IndexOutOfBoundsException {
         assertValidIndex(index);
-        compute(index, (i, v) -> v == null ? 0.0 : v);
-        return super.get(index);
+        return super.getOrDefault(index, 0.0);
     }
 
     @Override
@@ -269,13 +273,6 @@ public class MapRIV extends HashMap<Integer, Double>
                 .toArray(VectorElement[]::new);
     }
 
-    private MapRIV removeZeros() {
-        return new MapRIV(
-                stream().filter((e) -> !Util.doubleEquals(0, e.getValue()))
-                        .collect(Collectors.toSet()),
-                size);
-    }
-
     @Override
     public int size() {
         return size;
@@ -286,12 +283,16 @@ public class MapRIV extends HashMap<Integer, Double>
     }
 
     public MapRIV subtract(final MapRIV other) {
-        return copy().destructiveSub(other);
+        return copy().destructiveSub(other).destructiveRemoveZeros();
     }
 
     @Override
     public MapRIV subtract(final RIV other) throws SizeMismatchException {
-        return copy().destructiveSub(other);
+        return copy().destructiveSub(other).destructiveRemoveZeros();
+    }
+
+    private void subtractPoint(final int index, final double value) {
+        merge(index, value, (a, b) -> a - b);
     }
 
     @Override

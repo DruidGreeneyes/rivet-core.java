@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import rivet.core.util.Util;
@@ -22,30 +22,14 @@ import rivet.core.vectorpermutations.Permutations;
 
 public class MapRIVTests {
 
-    static int[] testKeys;
-    static double[] testVals;
-    static HashMap<Integer, Double> testPointMap;
-    static Set<Entry<Integer, Double>> testPointSet;
-    static int testSize;
-    static int testK;
-    static long testSeed;
-    static String testString = "0|1.000000 1|-1.000000 2|1.000000 3|-1.000000 4|1.000000 5|-1.000000 6|1.000000 7|-1.000000 8|1.000000 9|-1.000000 10|1.000000 11|-1.000000 12|1.000000 13|-1.000000 14|1.000000 15|-1.000000 16|1.000000 17|-1.000000 18|1.000000 19|-1.000000 20|1.000000 21|-1.000000 22|1.000000 23|-1.000000 24|1.000000 25|-1.000000 26|1.000000 27|-1.000000 28|1.000000 29|-1.000000 30|1.000000 31|-1.000000 32|1.000000 33|-1.000000 34|1.000000 35|-1.000000 36|1.000000 37|-1.000000 38|1.000000 39|-1.000000 40|1.000000 41|-1.000000 42|1.000000 43|-1.000000 44|1.000000 45|-1.000000 46|1.000000 47|-1.000000 16000";
-    static double e = Util.roundingError;
-
     public static void assertEqual(final MapRIV rivA, final MapRIV rivB) {
         assertEquals(rivA.size(), rivB.size());
         assertEquals(rivA.count(), rivB.count());
         final VectorElement[] pointsA = rivA.points();
         final VectorElement[] pointsB = rivB.points();
         for (int i = 0; i < pointsA.length; i++)
-            assertEqual(pointsA[i], pointsB[i]);
+            assertEquals(pointsA[i], pointsB[i]);
         assertTrue(rivA.equals(rivB));
-    }
-
-    public static void assertEqual(final VectorElement a,
-            final VectorElement b) {
-        assertEquals(a.index(), b.index());
-        assertEquals(a.value(), b.value(), e);
     }
 
     public static <T> void assertError(final Function<T, ?> fun, final T arg) {
@@ -56,8 +40,21 @@ public class MapRIVTests {
         }
     }
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    int[] testKeys;
+    double[] testVals;
+    HashMap<Integer, Double> testPointMap;
+    Set<Entry<Integer, Double>> testPointSet;
+    int testSize;
+    int testK;
+
+    long testSeed;
+
+    String testString = "0|1.000000 1|-1.000000 2|1.000000 3|-1.000000 4|1.000000 5|-1.000000 6|1.000000 7|-1.000000 8|1.000000 9|-1.000000 10|1.000000 11|-1.000000 12|1.000000 13|-1.000000 14|1.000000 15|-1.000000 16|1.000000 17|-1.000000 18|1.000000 19|-1.000000 20|1.000000 21|-1.000000 22|1.000000 23|-1.000000 24|1.000000 25|-1.000000 26|1.000000 27|-1.000000 28|1.000000 29|-1.000000 30|1.000000 31|-1.000000 32|1.000000 33|-1.000000 34|1.000000 35|-1.000000 36|1.000000 37|-1.000000 38|1.000000 39|-1.000000 40|1.000000 41|-1.000000 42|1.000000 43|-1.000000 44|1.000000 45|-1.000000 46|1.000000 47|-1.000000 16000";
+
+    double e = Util.roundingError;
+
+    @Before
+    public void setUp() throws Exception {
         testK = 48;
         testSize = 16000;
         testSeed = MapRIV.makeSeed("seed");
@@ -127,14 +124,6 @@ public class MapRIVTests {
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
         assertEquals(testK, testRIV1.count());
-    }
-
-    @Test
-    public final void testGet() {
-        final MapRIV testRIV = new MapRIV(testPointMap, testSize);
-        assertEquals(-1, testRIV.get(9), e);
-        assertEquals(0, testRIV.get(4053), e);
-        assertError((x) -> testRIV.get(x), 1000000);
     }
 
     @Test

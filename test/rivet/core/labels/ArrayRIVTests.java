@@ -10,22 +10,13 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
 public class ArrayRIVTests {
-
-    static int[] testKeys;
-    static double[] testVals;
-    static VectorElement[] testPoints;
-    static int testSize;
-    static int testK;
-    static long testSeed;
-    static String testString = "0|1.000000 1|-1.000000 2|1.000000 3|-1.000000 4|1.000000 5|-1.000000 6|1.000000 7|-1.000000 8|1.000000 9|-1.000000 10|1.000000 11|-1.000000 12|1.000000 13|-1.000000 14|1.000000 15|-1.000000 16|1.000000 17|-1.000000 18|1.000000 19|-1.000000 20|1.000000 21|-1.000000 22|1.000000 23|-1.000000 24|1.000000 25|-1.000000 26|1.000000 27|-1.000000 28|1.000000 29|-1.000000 30|1.000000 31|-1.000000 32|1.000000 33|-1.000000 34|1.000000 35|-1.000000 36|1.000000 37|-1.000000 38|1.000000 39|-1.000000 40|1.000000 41|-1.000000 42|1.000000 43|-1.000000 44|1.000000 45|-1.000000 46|1.000000 47|-1.000000 16000";
-    static double e = Util.roundingError;
 
     public static <T> void assertThrows(final Class<?> exceptionClass,
             final Function<T, ?> fun, final T arg) {
@@ -40,15 +31,26 @@ public class ArrayRIVTests {
         }
     }
 
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        testK = 48;
-        testSize = 16000;
+    int[] testKeys;
+    double[] testVals;
+    VectorElement[] testPoints;
+    int testSize;
+    int testK;
+    long testSeed;
+    String testString;
+
+    double e = Util.roundingError;
+
+    @Before
+    public void setUp() throws Exception {
+        testK = 2;
+        testSize = 10;
         testSeed = ArrayRIV.makeSeed("seed");
         testKeys = ArrayRIV.makeIndices(testSize, testK, testSeed);
         testVals = ArrayRIV.makeVals(testK, testSeed);
+        testString = "0|1.000000 1|-1.000000 10";
         testPoints = new VectorElement[testK];
-        for (int i = 0; i < 48; i += 2) {
+        for (int i = 0; i < testPoints.length; i += 2) {
             final int j = i + 1;
             testPoints[i] = new VectorElement(i, 1);
             testPoints[j] = new VectorElement(j, -1);
@@ -60,7 +62,9 @@ public class ArrayRIVTests {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final ArrayRIV testRIV = new ArrayRIV(testSize).add(testRIV4);
         final ArrayRIV testRIV8 = testRIV4.add(testRIV4);
-        assertEquals(-2, testRIV8.get(9), e);
+        assertEquals("0|1.000000 1|-1.000000 10", testRIV4.toString());
+        assertEquals("0|2.000000 1|-2.000000 10", testRIV8.toString());
+        assertEquals(-2, testRIV8.get(1), e);
         assertEquals(testK, testRIV8.count());
         assertEquals(testRIV4, testRIV);
     }
@@ -114,8 +118,8 @@ public class ArrayRIVTests {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final ArrayRIV testRIV = new ArrayRIV(testSize)
                 .destructiveAdd(testRIV4);
-        assertEquals(-1, testRIV4.get(9), e);
-        assertEquals(-1, testRIV.get(9), e);
+        assertEquals(-1, testRIV4.get(1), e);
+        assertEquals(-1, testRIV.get(1), e);
         assertEquals(testRIV4, testRIV);
     }
 
@@ -123,7 +127,7 @@ public class ArrayRIVTests {
     public final void testDivide() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final ArrayRIV testRIV = testRIV4.divide(2);
-        assertEquals(-0.5, testRIV.get(9), e);
+        assertEquals(-0.5, testRIV.get(1), e);
     }
 
     @Test
@@ -169,8 +173,8 @@ public class ArrayRIVTests {
     @Test
     public final void testGet() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        assertEquals(-1, testRIV4.get(9), e);
-        assertEquals(0, testRIV4.get(4053), e);
+        assertEquals(-1, testRIV4.get(1), e);
+        assertEquals(0, testRIV4.get(9), e);
         assertThrows(IndexOutOfBoundsException.class, testRIV4::get, 1000000);
     }
 
@@ -203,34 +207,10 @@ public class ArrayRIVTests {
     }
 
     @Test
-    public final void testMap() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV = testRIV4.map(ve -> ve.add(2));
-        assertEquals(1, testRIV.get(9), e);
-        assertEquals(testK, testRIV.count());
-    }
-
-    @Test
-    public final void testMapKeys() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV = testRIV4.mapKeys(k -> k * 2);
-        assertEquals(0, testRIV.get(9), e);
-        assertEquals(-1, testRIV.get(18), e);
-        assertEquals(testK, testRIV.count());
-    }
-
-    @Test
-    public final void testMapVals() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV = testRIV4.mapVals(v -> v * 5);
-        assertEquals(testRIV.get(9), -5, e);
-    }
-
-    @Test
     public final void testMultiply() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final ArrayRIV testRIV8 = testRIV4.multiply(2);
-        assertEquals(-2, testRIV8.get(9), e);
+        assertEquals(-2, testRIV8.get(1), e);
     }
 
     @Test

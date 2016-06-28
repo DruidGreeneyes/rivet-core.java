@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -93,7 +91,7 @@ public class ArrayRIV implements RIV, Serializable {
     private final int size;
 
     public ArrayRIV(final ArrayRIV riv) {
-        points = ArrayUtils.clone(riv.points);
+        points = riv.points.clone();
         size = riv.size;
     }
 
@@ -154,8 +152,8 @@ public class ArrayRIV implements RIV, Serializable {
     public ArrayRIV destructiveAdd(final RIV other)
             throws SizeMismatchException {
         if (size == other.size()) {
-            other.keyStream().forEach((k) -> destructiveSet(
-                    getPoint(k).destructiveAdd(other.get(k))));
+            other.keyStream().forEach(
+                    (k) -> destructiveSet(getPoint(k).add(other.get(k))));
             return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
@@ -163,15 +161,14 @@ public class ArrayRIV implements RIV, Serializable {
 
     private void destructiveSet(final VectorElement elt)
             throws IndexOutOfBoundsException {
-        final int index = elt.index();
-        if (validIndex(index)) {
-            final int i = binarySearch(index);
+        if (validIndex(elt.index())) {
+            final int i = binarySearch(elt);
             if (i < 0)
                 points = ArrayUtils.add(points, ~i, elt);
             else
                 points[i] = elt;
         } else
-            throw new IndexOutOfBoundsException("Index " + index
+            throw new IndexOutOfBoundsException("Index " + elt.index()
                     + " is outside the bounds of this vector.");
     }
 
@@ -179,8 +176,8 @@ public class ArrayRIV implements RIV, Serializable {
     public ArrayRIV destructiveSub(final RIV other)
             throws SizeMismatchException {
         if (size == other.size()) {
-            other.keyStream().forEach((k) -> destructiveSet(
-                    getPoint(k).destructiveSub(other.get(k))));
+            other.keyStream().forEach(
+                    (k) -> destructiveSet(getPoint(k).subtract(other.get(k))));
             return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
@@ -231,17 +228,7 @@ public class ArrayRIV implements RIV, Serializable {
         return Math.sqrt(valStream().map((v) -> v * v).sum());
     }
 
-    public ArrayRIV map(final UnaryOperator<VectorElement> fun) {
-        return new ArrayRIV(stream().map(fun).filter(ve -> !ve.contains(0))
-                .toArray(VectorElement[]::new), size);
-    }
-
-    public ArrayRIV mapKeys(final IntUnaryOperator fun) {
-        return new ArrayRIV(keyStream().map(fun).toArray(), vals(), size)
-                .removeZeros();
-    }
-
-    public ArrayRIV mapVals(final DoubleUnaryOperator fun) {
+    protected ArrayRIV mapVals(final DoubleUnaryOperator fun) {
         return new ArrayRIV(keys(), valStream().map(fun).toArray(), size)
                 .removeZeros();
     }

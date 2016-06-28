@@ -151,8 +151,8 @@ public final class VectorElement
         return index == p.index && Util.doubleEquals(value, p.value);
     }
 
-    public VectorElement subtract(final int v) {
-        return this.add(-v);
+    public VectorElement subtract(final double d) {
+        return this.add(-d);
     }
 
     public VectorElement subtract(final VectorElement p) {
