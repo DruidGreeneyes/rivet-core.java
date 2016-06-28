@@ -51,4 +51,7 @@ public class RIVs {
         return rivs.reduce(zeroValue, RIV::destructiveAdd);
     }
 
+    private RIVs() {
+    }
+
 }
