@@ -5,6 +5,7 @@ import java.util.Arrays;
 import rivet.core.labels.MapRIV;
 
 public final class UntrainedWords2 {
+
     public static MapRIV rivAndSumWords(final String[] words, final int size,
             final int k) {
         return Arrays.stream(words).reduce(new MapRIV(size),
