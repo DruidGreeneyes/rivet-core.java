@@ -7,14 +7,10 @@ import rivet.core.labels.ArrayRIV;
 public final class UntrainedWords {
     public static ArrayRIV rivAndSumWords(final String[] words, final int size,
             final int k) {
-        return stream(words).map((w) -> ArrayRIV.generateLabel(size, k, w))
-                .reduce(new ArrayRIV(size), (i, r) -> i.destructiveAdd(r));
-    }
-
-    public static ArrayRIV rivAndSumWords_2(final String[] words,
-            final int size, final int k) {
-        return new ArrayRIV(size).add(stream(words)
-                .map((word) -> ArrayRIV.generateLabel(size, k, word)));
+        return stream(words).reduce(new ArrayRIV(size),
+                (identity, word) -> identity
+                        .destructiveAdd(ArrayRIV.generateLabel(size, k, word)),
+                (a, b) -> a.destructiveAdd(b));
     }
 
     public static ArrayRIV rivettizeText(final String text, final int size,

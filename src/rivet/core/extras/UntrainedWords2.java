@@ -1,14 +1,16 @@
 package rivet.core.extras;
 
-import static java.util.Arrays.stream;
+import java.util.Arrays;
 
 import rivet.core.labels.MapRIV;
 
 public final class UntrainedWords2 {
     public static MapRIV rivAndSumWords(final String[] words, final int size,
             final int k) {
-        return stream(words).map((w) -> MapRIV.generateLabel(size, k, w))
-                .reduce(new MapRIV(size), (i, r) -> i.destructiveAdd(r));
+        return Arrays.stream(words).reduce(new MapRIV(size),
+                (identity, word) -> identity
+                        .destructiveAdd(MapRIV.generateLabel(size, k, word)),
+                (a, b) -> a.destructiveAdd(b));
     }
 
     public static MapRIV rivettizeText(final String text, final int size,
@@ -27,7 +29,7 @@ public final class UntrainedWords2 {
     }
 
     public static MapRIV sumMapRIVs(final MapRIV[] rivs) {
-        return stream(rivs).reduce(new MapRIV(rivs[0].size()),
+        return Arrays.stream(rivs).reduce(new MapRIV(rivs[0].size()),
                 (i, r) -> i.destructiveAdd(r));
     }
 

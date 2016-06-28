@@ -18,7 +18,7 @@ import rivet.core.util.Counter;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
-public class ArrayRIV implements RandomIndexVector, Serializable {
+public class ArrayRIV implements RIV, Serializable {
 
     /**
      *
@@ -122,21 +122,9 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         this.size = size;
     }
 
-    public ArrayRIV add(final ArrayRIV... rivs) throws SizeMismatchException {
-        return add(Arrays.stream(rivs));
-    }
-
     @Override
-    public ArrayRIV add(final RandomIndexVector other)
-            throws SizeMismatchException {
+    public ArrayRIV add(final RIV other) throws SizeMismatchException {
         return copy().destructiveAdd(other).removeZeros();
-    }
-
-    public ArrayRIV add(final Stream<ArrayRIV> rivs)
-            throws SizeMismatchException {
-        final ArrayRIV res = copy();
-        rivs.forEach(res::destructiveAdd);
-        return res.removeZeros();
     }
 
     private int binarySearch(final int index) {
@@ -162,35 +150,37 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         return points.length;
     }
 
-    public ArrayRIV destructiveAdd(final RandomIndexVector other)
+    @Override
+    public ArrayRIV destructiveAdd(final RIV other)
             throws SizeMismatchException {
         if (size == other.size()) {
-            other.keyStream()
-                    .forEach((k) -> destructiveSet(k, get(k) + other.get(k)));
+            other.keyStream().forEach((k) -> destructiveSet(
+                    getPoint(k).destructiveAdd(other.get(k))));
             return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
     }
 
-    private void destructiveSet(final int index, final double value)
+    private void destructiveSet(final VectorElement elt)
             throws IndexOutOfBoundsException {
+        final int index = elt.index();
         if (validIndex(index)) {
-            final VectorElement point = VectorElement.elt(index, value);
             final int i = binarySearch(index);
             if (i < 0)
-                points = ArrayUtils.add(points, ~i, point);
+                points = ArrayUtils.add(points, ~i, elt);
             else
-                points[i] = point;
+                points[i] = elt;
         } else
             throw new IndexOutOfBoundsException("Index " + index
                     + " is outside the bounds of this vector.");
     }
 
-    public ArrayRIV destructiveSubtract(final RandomIndexVector other)
+    @Override
+    public ArrayRIV destructiveSub(final RIV other)
             throws SizeMismatchException {
         if (size == other.size()) {
-            other.keyStream()
-                    .forEach((k) -> destructiveSet(k, get(k) - other.get(k)));
+            other.keyStream().forEach((k) -> destructiveSet(
+                    getPoint(k).destructiveSub(other.get(k))));
             return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
@@ -206,13 +196,13 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
         if (this == other)
             return true;
         else if (!ArrayUtils.contains(other.getClass().getInterfaces(),
-                RandomIndexVector.class))
+                RIV.class))
             return false;
         else
-            return equalsRIV((RandomIndexVector) other);
+            return equalsRIV((RIV) other);
     }
 
-    public boolean equalsRIV(final RandomIndexVector other) {
+    public boolean equalsRIV(final RIV other) {
         return size() == other.size() && Arrays.equals(points, other.points());
     }
 
@@ -246,13 +236,11 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
                 .toArray(VectorElement[]::new), size);
     }
 
-    @Override
     public ArrayRIV mapKeys(final IntUnaryOperator fun) {
         return new ArrayRIV(keyStream().map(fun).toArray(), vals(), size)
                 .removeZeros();
     }
 
-    @Override
     public ArrayRIV mapVals(final DoubleUnaryOperator fun) {
         return new ArrayRIV(keys(), valStream().map(fun).toArray(), size)
                 .removeZeros();
@@ -303,21 +291,8 @@ public class ArrayRIV implements RandomIndexVector, Serializable {
     }
 
     @Override
-    public ArrayRIV subtract(final RandomIndexVector other)
-            throws SizeMismatchException {
-        return copy().destructiveSubtract(other).removeZeros();
-    }
-
-    public ArrayRIV subtract(final RandomIndexVector... rivs)
-            throws SizeMismatchException {
-        return subtract(Arrays.stream(rivs));
-    }
-
-    public ArrayRIV subtract(final Stream<RandomIndexVector> rivs)
-            throws SizeMismatchException {
-        final ArrayRIV res = copy();
-        rivs.forEach(res::destructiveSubtract);
-        return res.removeZeros();
+    public ArrayRIV subtract(final RIV other) throws SizeMismatchException {
+        return copy().destructiveSub(other).removeZeros();
     }
 
     @Override

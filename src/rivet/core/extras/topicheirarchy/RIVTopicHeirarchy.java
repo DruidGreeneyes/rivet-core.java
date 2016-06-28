@@ -3,7 +3,7 @@ package rivet.core.extras.topicheirarchy;
 import java.util.ArrayList;
 
 import rivet.core.labels.ArrayRIV;
-import rivet.core.labels.RandomIndexVector;
+import rivet.core.labels.RIVs;
 
 public class RIVTopicHeirarchy {
 
@@ -15,11 +15,10 @@ public class RIVTopicHeirarchy {
             return nodes;
         else {
             final RIVTopicHeirarchy next = point.children.stream().reduce(point,
-                    (i, node) -> RandomIndexVector.similarity(
-                            i.topic.meanVector(), riv) > RandomIndexVector
-                                    .similarity(node.topic.meanVector(), riv)
-                                            ? i
-                                            : node);
+                    (i, node) -> RIVs.similarity(i.topic.meanVector(),
+                            riv) > RIVs.similarity(node.topic.meanVector(), riv)
+                                    ? i
+                                    : node);
             if (next == point)
                 return nodes;
             else
@@ -114,7 +113,7 @@ public class RIVTopicHeirarchy {
 
     public void graftNew(final NamedRIV riv) {
         final RIVTopicHeirarchy point = find(riv.riv());
-        if (RandomIndexVector.similarity(point.topic.meanVector(),
+        if (RIVs.similarity(point.topic.meanVector(),
                 riv.riv()) >= similarityThreshold)
             point.add(riv);
         else

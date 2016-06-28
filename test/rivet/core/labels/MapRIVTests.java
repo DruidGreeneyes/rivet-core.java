@@ -42,7 +42,8 @@ public class MapRIVTests {
         assertTrue(rivA.equals(rivB));
     }
 
-    public static void assertEqual(final VectorElement a, final VectorElement b) {
+    public static void assertEqual(final VectorElement a,
+            final VectorElement b) {
         assertEquals(a.index(), b.index());
         assertEquals(a.value(), b.value(), e);
     }
@@ -51,7 +52,8 @@ public class MapRIVTests {
         try {
             fun.apply(arg);
             fail("Expected error, recieved none.");
-        } catch(final Exception e) {}
+        } catch (final Exception e) {
+        }
     }
 
     @BeforeClass
@@ -89,8 +91,10 @@ public class MapRIVTests {
 
     @Test
     public final void testEqualsRandomIndexVector() {
-        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK, "testRIV1");
-        final MapRIV testRIV2 = MapRIV.generateLabel(testSize, testK, "testRIV2");
+        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK,
+                "testRIV1");
+        final MapRIV testRIV2 = MapRIV.generateLabel(testSize, testK,
+                "testRIV2");
         assertEqual(testRIV1, testRIV1);
         assertFalse(testRIV1.equals(testRIV2));
     }
@@ -103,8 +107,10 @@ public class MapRIVTests {
 
     @Test
     public final void testGenerateLabelIntIntCharSequence() {
-        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK, "testRIV1");
-        final MapRIV testRIV2 = MapRIV.generateLabel(testSize, testK, "testRIV2");
+        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK,
+                "testRIV1");
+        final MapRIV testRIV2 = MapRIV.generateLabel(testSize, testK,
+                "testRIV2");
         assertEquals(testSize, testRIV2.size());
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
@@ -113,8 +119,10 @@ public class MapRIVTests {
 
     @Test
     public final void testGenerateLabelIntIntCharSequenceIntInt() {
-        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK, "testRIV1", 0, 5);
-        final MapRIV testRIV2 = MapRIV.generateLabel(testSize, testK, "testRIV2", 5, 10);
+        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK,
+                "testRIV1", 0, 5);
+        final MapRIV testRIV2 = MapRIV.generateLabel(testSize, testK,
+                "testRIV2", 5, 10);
         assertEquals(testSize, testRIV2.size());
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
@@ -128,14 +136,17 @@ public class MapRIVTests {
         assertEquals(0, testRIV.get(4053), e);
         assertError((x) -> testRIV.get(x), 1000000);
     }
-    
+
     @Test
     public final void testMakeIndices() {
         assertEquals(testK, testKeys.length);
         assertEquals(testK, Arrays.stream(testKeys).distinct().count());
-        assertEquals(testK, Arrays.stream(testKeys).filter((x) -> 0 < x && x < testSize).count());
-        final int[] test2 = MapRIV.makeIndices(testSize, testK, MapRIV.makeSeed("not seed"));
-        assertFalse(Arrays.stream(test2).allMatch((x) -> ArrayUtils.contains(testKeys, x)));
+        assertEquals(testK, Arrays.stream(testKeys)
+                .filter((x) -> 0 < x && x < testSize).count());
+        final int[] test2 = MapRIV.makeIndices(testSize, testK,
+                MapRIV.makeSeed("not seed"));
+        assertFalse(Arrays.stream(test2)
+                .allMatch((x) -> ArrayUtils.contains(testKeys, x)));
     }
 
     @Test
@@ -149,25 +160,9 @@ public class MapRIVTests {
     @Test
     public final void testMakeValues() {
         assertEquals(testK, testVals.length);
-        assertEquals(testK, Arrays.stream(testVals).filter((x) -> x == 1 || x == -1).count());
+        assertEquals(testK, Arrays.stream(testVals)
+                .filter((x) -> x == 1 || x == -1).count());
         assertEquals(0, Arrays.stream(testVals).sum(), e);
-    }
-
-    @Test
-    public final void testMap() {
-        final MapRIV testRIV4 = new MapRIV(testPointMap, testSize);
-        final MapRIV testRIV = testRIV4.map(ve -> ve.add(2));
-        assertEquals(1, testRIV.get(9), e);
-        assertEquals(testK, testRIV.count());
-    }
-
-    @Test
-    public final void testMapKeys() {
-        final MapRIV testRIV4 = new MapRIV(testPointMap, testSize);
-        final MapRIV testRIV = testRIV4.mapKeys(k -> k * 2);
-        assertEquals(0, testRIV.get(9), e);
-        assertEquals(-1, testRIV.get(18), e);
-        assertEquals(testK, testRIV.count());
     }
 
     @Test
@@ -195,12 +190,13 @@ public class MapRIVTests {
         assertEquals(testSize, testRIV.size());
         assertEquals(testK, testRIV.count());
         for (int i = 0; i < testK; i++)
-            assertEquals(testVals[i], testRIV.get(testKeys[i]) , e);
+            assertEquals(testVals[i], testRIV.get(testKeys[i]), e);
     }
 
     @Test
     public final void testMapRIVMapRIV() {
-        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK, "testRIV1");
+        final MapRIV testRIV1 = MapRIV.generateLabel(testSize, testK,
+                "testRIV1");
         final MapRIV testRIV2 = new MapRIV(testRIV1);
         assertEqual(testRIV1, testRIV2);
     }
@@ -217,28 +213,24 @@ public class MapRIVTests {
     }
 
     @Test
-    public final void testMapVals() {
-        final MapRIV testRIV4 = new MapRIV(testPointMap, testSize);
-        final MapRIV testRIV = testRIV4.mapVals(v -> v * 5);
-        assertEquals(testRIV.get(9), -5, e);
-    }
-
-    @Test
     public final void testMultiply() {
         final MapRIV testRIV4 = new MapRIV(testPointMap, testSize);
         final MapRIV testRIV8 = testRIV4.multiply(2);
         assertEquals(-2, testRIV8.get(9), e);
     }
-    
+
     @Test
     public final void testNormalize() {
         final MapRIV testRIV4 = new MapRIV(testPointMap, testSize);
         final MapRIV testRIVA = testRIV4.multiply(2);
-        final MapRIV testRIVB = testRIV4.mapVals((v) -> v + 2);
+        final MapRIV testRIVB = testRIV4.multiply(5);
         assertFalse(testRIV4.equals(testRIVB));
-        assertEquals(testRIV4.normalize().magnitude(), testRIVA.normalize().magnitude(), e);
-        assertEquals(testRIV4.normalize().magnitude(), testRIVB.normalize().magnitude(), e);
-        assertEquals(testRIVA.normalize().magnitude(), testRIVB.normalize().magnitude(), e);
+        assertEquals(testRIV4.normalize().magnitude(),
+                testRIVA.normalize().magnitude(), e);
+        assertEquals(testRIV4.normalize().magnitude(),
+                testRIVB.normalize().magnitude(), e);
+        assertEquals(testRIVA.normalize().magnitude(),
+                testRIVB.normalize().magnitude(), e);
     }
 
     @Test

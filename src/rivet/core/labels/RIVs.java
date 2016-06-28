@@ -1,0 +1,54 @@
+package rivet.core.labels;
+
+import java.util.Arrays;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import rivet.core.exceptions.SizeMismatchException;
+import rivet.core.util.Pair;
+import rivet.core.vectorpermutations.Permutations;
+
+public class RIVs {
+
+    public static RIV addRIVs(final RIV rivA, final RIV rivB)
+            throws SizeMismatchException {
+        return rivA.add(rivB);
+    }
+
+    public static double dotProduct(final RIV rivA, final RIV rivB) {
+        return getMatchingValStream(rivA, rivB)
+                .mapToDouble((valPair) -> valPair.apply((a, b) -> a * b)).sum();
+    }
+
+    private static IntStream getMatchingKeyStream(final RIV rivA,
+            final RIV rivB) {
+        return rivA.keyStream().filter(rivA::contains);
+    }
+
+    private static Stream<Pair<Double, Double>> getMatchingValStream(
+            final RIV rivA, final RIV rivB) {
+        return getMatchingKeyStream(rivA, rivB)
+                .mapToObj((i) -> Pair.make(rivA.get(i), rivB.get(i)));
+    }
+
+    public static RIV permuteRIV(final RIV riv, final Permutations permutations,
+            final int times) {
+        return riv.permute(permutations, times);
+    }
+
+    public static double similarity(final RIV rivA, final RIV rivB) {
+        final double mag = rivA.magnitude() * rivB.magnitude();
+        return mag == 0 ? 0 : dotProduct(rivA, rivB) / mag;
+    }
+
+    public static RIV sumRIVs(final RIV zeroValue, final RIV... rivs)
+            throws SizeMismatchException {
+        return sumRIVs(zeroValue, Arrays.stream(rivs));
+    }
+
+    public static RIV sumRIVs(final RIV zeroValue, final Stream<RIV> rivs)
+            throws SizeMismatchException {
+        return rivs.reduce(zeroValue, RIV::destructiveAdd);
+    }
+
+}

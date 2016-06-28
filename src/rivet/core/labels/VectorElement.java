@@ -50,7 +50,7 @@ public final class VectorElement
 
     // Values
     private final int index;
-    private final double value;
+    private double value;
 
     // Constructors
     public VectorElement(final int index, final double value) {
@@ -83,6 +83,40 @@ public final class VectorElement
         return this.value == value;
     }
 
+    public VectorElement destructiveAdd(final double v) {
+        value += v;
+        return this;
+    }
+
+    public VectorElement destructiveAdd(final VectorElement p) {
+        value += p.value;
+        return this;
+    }
+
+    public VectorElement destructiveDiv(final double s) {
+        value /= s;
+        return this;
+    }
+
+    public VectorElement destructiveMult(final double s) {
+        value *= s;
+        return this;
+    }
+
+    public VectorElement destructiveSub(final double v) {
+        value -= v;
+        return this;
+    }
+
+    public VectorElement destructiveSub(final VectorElement p) {
+        value -= p.value;
+        return this;
+    }
+
+    public VectorElement divide(final double s) {
+        return VectorElement.elt(index, value / s);
+    }
+
     public <T, R> R engage(final BiFunction<VectorElement, T, R> fun,
             final T thing) {
         return fun.apply(this, thing);
@@ -107,6 +141,10 @@ public final class VectorElement
     // Core Methods
     public int index() {
         return index;
+    }
+
+    public VectorElement multiply(final double s) {
+        return VectorElement.elt(index, value * s);
     }
 
     public boolean strictEquals(final VectorElement p) {

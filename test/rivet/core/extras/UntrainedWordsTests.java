@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import rivet.core.labels.ArrayRIV;
-import rivet.core.labels.RandomIndexVector;
+import rivet.core.labels.RIVs;
 
 public class UntrainedWordsTests {
     String test_text_a;
@@ -36,12 +36,9 @@ public class UntrainedWordsTests {
                 8);
         final ArrayRIV rivb = UntrainedWords.rivettizeText(test_text_b, 1000,
                 8);
-        Assert.assertEquals(1.0, RandomIndexVector.similarity(riva, riva),
-                0.000001);
-        Assert.assertEquals(1.0, RandomIndexVector.similarity(rivb, rivb),
-                0.000001);
-        Assert.assertNotEquals(1.0, RandomIndexVector.similarity(riva, rivb),
-                0.000001);
+        Assert.assertEquals(1.0, RIVs.similarity(riva, riva), 0.000001);
+        Assert.assertEquals(1.0, RIVs.similarity(rivb, rivb), 0.000001);
+        Assert.assertNotEquals(1.0, RIVs.similarity(riva, rivb), 0.000001);
     }
 
     @Test

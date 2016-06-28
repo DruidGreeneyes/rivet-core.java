@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import rivet.core.labels.ArrayRIV;
-import rivet.core.labels.RandomIndexVector;
+import rivet.core.labels.RIVs;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
@@ -78,9 +78,9 @@ public class WordLexicon {
     private double[][] nSquaredSimilarity(final ArrayRIV[] rivs,
             final boolean permute) {
         final BiFunction<Integer, Integer, Double> sim = permute
-                ? (i, c) -> RandomIndexVector.similarity(rivs[i],
+                ? (i, c) -> RIVs.similarity(rivs[i],
                         rivs[c].permute(permutations, c - i))
-                : (i, c) -> RandomIndexVector.similarity(rivs[i], rivs[c]);
+                : (i, c) -> RIVs.similarity(rivs[i], rivs[c]);
         return Util.range(rivs.length)
                 .mapToObj((i) -> Util.range(rivs.length)
                         .mapToDouble((c) -> sim.apply(i, c)).toArray())

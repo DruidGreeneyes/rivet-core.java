@@ -3,12 +3,8 @@ package rivet.core.labels;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -21,7 +17,8 @@ import rivet.core.util.Counter;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
-public class MapRIV implements Serializable, RandomIndexVector {
+public class MapRIV extends HashMap<Integer, Double>
+        implements RIV, Serializable {
 
     /**
      *
@@ -97,59 +94,68 @@ public class MapRIV implements Serializable, RandomIndexVector {
 
     private final int size;
 
-    private final HashMap<Integer, Double> points;
-
     public MapRIV(final HashMap<Integer, Double> points, final int size) {
-        this.points = new HashMap<>(points);
+        super(points);
         this.size = size;
     }
 
     public MapRIV(final int size) {
+        super();
         this.size = size;
-        points = new HashMap<>();
     }
 
     public MapRIV(final int[] keys, final double[] vals, final int size) {
+        super();
         this.size = size;
         final int l = keys.length;
         if (l != vals.length)
             throw new SizeMismatchException(
                     "Different quantity keys than values!");
-        points = new HashMap<>();
         for (int i = 0; i < l; i++)
-            points.put(keys[i], vals[i]);
+            put(keys[i], vals[i]);
     }
 
     public MapRIV(final MapRIV riv) {
+        super(riv);
         size = riv.size;
-        points = new HashMap<>(riv.points);
     }
 
     public MapRIV(final Set<Entry<Integer, Double>> points, final int size) {
-        this.points = new HashMap<>();
-        points.forEach(p -> this.points.put(p.getKey(), p.getValue()));
+        super();
+        points.forEach(p -> put(p.getKey(), p.getValue()));
         this.size = size;
     }
 
-    private MapRIV(final VectorElement[] points, final int size) {
-        this.points = new HashMap<>();
-        Arrays.stream(points)
-                .forEach(p -> this.points.put(p.index(), p.value()));
-        this.size = size;
+    public MapRIV add(final MapRIV other) throws SizeMismatchException {
+        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        return copy().destructiveAdd(other).removeZeros();
     }
 
     @Override
-    public MapRIV add(final RandomIndexVector other)
+    public MapRIV add(final RIV other) throws SizeMismatchException {
+        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        return copy().destructiveAdd(other).removeZeros();
+    }
+
+    private void addPoint(final int index, final double value) {
+        merge(index, value, (a, b) -> a + b);
+    }
+
+    private void assertSizeMatch(final RIV other, final String message)
             throws SizeMismatchException {
-        final MapRIV res = copy();
-        other.keyStream()
-                .forEach((k) -> res.points.put(k, res.get(k) + other.get(k)));
-        return res.removeZeros();
+        if (size != other.size())
+            throw new SizeMismatchException(message);
+    }
+
+    private void assertValidIndex(final int index) {
+        if (index > size || index < 0)
+            throw new IndexOutOfBoundsException("Index " + index
+                    + " is outside the bounds of this vector.");
     }
 
     @Override
     public boolean contains(final int index) {
-        return points.containsKey(index);
+        return containsKey(index);
     }
 
     @Override
@@ -159,24 +165,47 @@ public class MapRIV implements Serializable, RandomIndexVector {
 
     @Override
     public int count() {
-        return points.size();
+        return super.size();
     }
 
-    public MapRIV destructiveAdd(final RandomIndexVector other)
+    public MapRIV destructiveAdd(final MapRIV other)
             throws SizeMismatchException {
-        other.keyStream().forEach((k) -> points.put(k, get(k) + other.get(k)));
+        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        other.forEach((i, v) -> merge(i, v, (a, b) -> a + b));
         return this;
     }
 
-    public MapRIV destructiveSubtract(final RandomIndexVector other)
+    @Override
+    public MapRIV destructiveAdd(final RIV other) throws SizeMismatchException {
+        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        for (final VectorElement point : other.points())
+            addPoint(point.index(), point.value());
+        return this;
+    }
+
+    private MapRIV destructiveMult(final double scalar) {
+        replaceAll((k, v) -> v * scalar);
+        return this;
+    }
+
+    public MapRIV destructiveSub(final MapRIV other)
             throws SizeMismatchException {
-        other.keyStream().forEach((k) -> points.put(k, get(k) - other.get(k)));
+        assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
+        other.forEach((i, v) -> merge(i, v, (a, b) -> a + b));
+        return this;
+    }
+
+    @Override
+    public MapRIV destructiveSub(final RIV other) throws SizeMismatchException {
+        assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
+        for (final VectorElement point : other.points())
+            addPoint(point.index(), -point.value());
         return this;
     }
 
     @Override
     public MapRIV divide(final double scalar) {
-        return mapVals((v) -> v / scalar);
+        return copy().destructiveMult(1 / scalar);
     }
 
     @Override
@@ -184,52 +213,36 @@ public class MapRIV implements Serializable, RandomIndexVector {
         if (this == other)
             return true;
         else if (!ArrayUtils.contains(other.getClass().getInterfaces(),
-                RandomIndexVector.class))
+                RIV.class))
             return false;
         else
-            return equalsRIV((RandomIndexVector) other);
+            return equalsRIV((RIV) other);
     }
 
-    public boolean equalsRIV(final RandomIndexVector other) {
-        return size() == other.size()
-                && Arrays.equals(points(), other.points());
+    public boolean equalsRIV(final RIV other) {
+        return size == other.size() && super.equals(other);
     }
 
     @Override
     public double get(final int index) throws IndexOutOfBoundsException {
-        if (validIndex(index))
-            return points.getOrDefault(index, 0.0);
-        else
-            throw new IndexOutOfBoundsException("Index " + index
-                    + " is outside the bounds of this vector.");
+        assertValidIndex(index);
+        compute(index, (i, v) -> v == null ? 0.0 : v);
+        return super.get(index);
     }
 
     @Override
     public IntStream keyStream() {
-        return points.keySet().stream().mapToInt(x -> x);
-    }
-
-    public MapRIV map(final UnaryOperator<VectorElement> fun) {
-        return new MapRIV(stream().map(VectorElement::elt).map(fun)
-                .filter(e -> e.value() != 0).toArray(VectorElement[]::new),
-                size);
+        return keySet().stream().mapToInt(x -> x);
     }
 
     @Override
-    public MapRIV mapKeys(final IntUnaryOperator fun) {
-        return new MapRIV(keyStream().map(fun).toArray(), vals(), size)
-                .removeZeros();
-    }
-
-    @Override
-    public MapRIV mapVals(final DoubleUnaryOperator fun) {
-        return new MapRIV(keys(), valStream().map(fun).toArray(), size)
-                .removeZeros();
+    public double magnitude() {
+        return Math.sqrt(valStream().map(x -> x * x).sum());
     }
 
     @Override
     public MapRIV multiply(final double scalar) {
-        return mapVals((v) -> v * scalar);
+        return copy().destructiveMult(scalar);
     }
 
     @Override
@@ -269,16 +282,16 @@ public class MapRIV implements Serializable, RandomIndexVector {
     }
 
     public Stream<Entry<Integer, Double>> stream() {
-        return points.entrySet().stream();
+        return entrySet().stream();
+    }
+
+    public MapRIV subtract(final MapRIV other) {
+        return copy().destructiveSub(other);
     }
 
     @Override
-    public MapRIV subtract(final RandomIndexVector other)
-            throws SizeMismatchException {
-        final MapRIV res = copy();
-        other.keyStream()
-                .forEach((k) -> res.points.put(k, res.get(k) - other.get(k)));
-        return res.removeZeros();
+    public MapRIV subtract(final RIV other) throws SizeMismatchException {
+        return copy().destructiveSub(other);
     }
 
     @Override
@@ -292,12 +305,8 @@ public class MapRIV implements Serializable, RandomIndexVector {
                         " " + String.valueOf(size)));
     }
 
-    private boolean validIndex(final int index) {
-        return index < size && index >= 0;
-    }
-
     @Override
     public DoubleStream valStream() {
-        return points.values().stream().mapToDouble(x -> x);
+        return values().stream().mapToDouble(x -> x);
     }
 }
