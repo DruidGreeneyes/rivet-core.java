@@ -3,7 +3,7 @@ package rivet.core.extras;
 import java.util.Arrays;
 
 import rivet.core.exceptions.ShingleInfection;
-import rivet.core.labels.ArrayRIV;
+import rivet.core.labels.MapRIV;
 import rivet.core.util.Util;
 
 public final class Shingles {
@@ -19,32 +19,32 @@ public final class Shingles {
                         .toArray();
     }
 
-    public static ArrayRIV rivAndSumShingles(final String text,
+    public static MapRIV rivAndSumShingles(final String text,
             final int[] shinglePoints, final int width, final int size,
             final int k) {
-        return Arrays.stream(shinglePoints).boxed().reduce(new ArrayRIV(size),
-                (riv, point) -> riv.add(
-                        ArrayRIV.generateLabel(size, k, text, point, width)),
+        return Arrays.stream(shinglePoints).boxed().reduce(new MapRIV(size),
+                (riv, point) -> riv
+                        .add(MapRIV.generateLabel(size, k, text, point, width)),
                 (rivA, rivB) -> rivA.add(rivB));
     }
 
-    public static ArrayRIV rivettizeText(final String text, final int width,
+    public static MapRIV rivettizeText(final String text, final int width,
             final int offset, final int size, final int k)
             throws ShingleInfection {
         final int[] points = findShinglePoints(text, offset, width);
         return rivAndSumShingles(text, points, width, size, k);
     }
 
-    public static ArrayRIV[] rivShingles(final String text,
+    public static MapRIV[] rivShingles(final String text,
             final int[] shinglePoints, final int width, final int size,
             final int k) {
         return Arrays.stream(shinglePoints).mapToObj(
-                (point) -> ArrayRIV.generateLabel(size, k, text, point, width))
-                .toArray(ArrayRIV[]::new);
+                (point) -> MapRIV.generateLabel(size, k, text, point, width))
+                .toArray(MapRIV[]::new);
     }
 
-    public static ArrayRIV sumRIVs(final ArrayRIV[] rivs) {
-        return Arrays.stream(rivs).reduce(new ArrayRIV(rivs[0].size()),
+    public static MapRIV sumRIVs(final MapRIV[] rivs) {
+        return Arrays.stream(rivs).reduce(new MapRIV(rivs[0].size()),
                 (i, r) -> i.add(r));
     }
 

@@ -97,8 +97,8 @@ public class ArrayRIVTests {
         final ArrayRIV testRIV3 = new ArrayRIV(testKeys, testVals, testSize);
         assertEquals(testSize, testRIV3.size());
         assertEquals(testK, testRIV3.count());
-        assertArrayEquals(testRIV3.keys(), sortedTestKeys);
-        final double[] vals = testRIV3.vals();
+        assertArrayEquals(testRIV3.keyStream().toArray(), sortedTestKeys);
+        final double[] vals = testRIV3.valStream().toArray();
         for (int i = 0; i < testK; i++)
             assertEquals(vals[i], sortedTestVals[i], e);
     }

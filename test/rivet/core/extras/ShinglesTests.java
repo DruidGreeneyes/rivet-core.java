@@ -10,7 +10,7 @@ import java.util.function.Function;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import rivet.core.labels.ArrayRIV;
+import rivet.core.labels.MapRIV;
 import rivet.core.labels.RIVs;
 
 public class ShinglesTests {
@@ -54,13 +54,13 @@ public class ShinglesTests {
         final int offset = 1;
         final int size = 16000;
         final int nnz = 48;
-        final ArrayRIV riv1 = Shingles.rivettizeText(text1, width, offset, size,
+        final MapRIV riv1 = Shingles.rivettizeText(text1, width, offset, size,
                 nnz);
-        final ArrayRIV riv2 = Shingles.rivettizeText(text2, width, offset, size,
+        final MapRIV riv2 = Shingles.rivettizeText(text2, width, offset, size,
                 nnz);
-        final ArrayRIV riv3 = Shingles.rivettizeText(text3, width, offset, size,
+        final MapRIV riv3 = Shingles.rivettizeText(text3, width, offset, size,
                 nnz);
-        final ArrayRIV riv4 = Shingles.rivettizeText(text4, width, offset, size,
+        final MapRIV riv4 = Shingles.rivettizeText(text4, width, offset, size,
                 nnz);
         final double sim12 = RIVs.similarity(riv1, riv2);
         final double sim34 = RIVs.similarity(riv3, riv4);

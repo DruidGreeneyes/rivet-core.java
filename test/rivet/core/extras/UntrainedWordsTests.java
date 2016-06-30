@@ -32,9 +32,9 @@ public class UntrainedWordsTests {
 
     @Test
     public final void testRivettizeText() {
-        final ArrayRIV riva = UntrainedWords.rivettizeText(test_text_a, 1000,
+        final ArrayRIV riva = UntrainedWordsArray.rivettizeText(test_text_a, 1000,
                 8);
-        final ArrayRIV rivb = UntrainedWords.rivettizeText(test_text_b, 1000,
+        final ArrayRIV rivb = UntrainedWordsArray.rivettizeText(test_text_b, 1000,
                 8);
         Assert.assertEquals(1.0, RIVs.similarity(riva, riva), 0.000001);
         Assert.assertEquals(1.0, RIVs.similarity(rivb, rivb), 0.000001);

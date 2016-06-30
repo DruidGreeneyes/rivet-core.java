@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import rivet.core.labels.MapRIV;
 
-public final class UntrainedWords2 {
+public final class UntrainedWordsMap {
 
     public static MapRIV rivAndSumWords(final String[] words, final int size,
             final int k) {
@@ -38,6 +38,6 @@ public final class UntrainedWords2 {
         return text.split("\\s+");
     }
 
-    private UntrainedWords2() {
+    private UntrainedWordsMap() {
     }
 }

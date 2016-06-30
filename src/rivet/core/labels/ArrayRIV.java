@@ -229,8 +229,8 @@ public class ArrayRIV implements RIV, Serializable {
     }
 
     protected ArrayRIV mapVals(final DoubleUnaryOperator fun) {
-        return new ArrayRIV(keys(), valStream().map(fun).toArray(), size)
-                .removeZeros();
+        return new ArrayRIV(keyStream().toArray(),
+                valStream().map(fun).toArray(), size).removeZeros();
     }
 
     @Override
@@ -251,7 +251,7 @@ public class ArrayRIV implements RIV, Serializable {
         return new ArrayRIV(
                 times > 0 ? permuteKeys(keys, permutations.left, times)
                         : permuteKeys(keys, permutations.right, -times),
-                vals(), size);
+                valStream().toArray(), size);
     }
 
     @Override

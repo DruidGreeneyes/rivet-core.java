@@ -7,10 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -42,8 +39,7 @@ public class MapRIVTests {
 
     int[] testKeys;
     double[] testVals;
-    HashMap<Integer, Double> testPointMap;
-    Set<Entry<Integer, Double>> testPointSet;
+    ConcurrentHashMap<Integer, Double> testPointMap;
     int testSize;
     int testK;
 
@@ -60,13 +56,12 @@ public class MapRIVTests {
         testSeed = MapRIV.makeSeed("seed");
         testKeys = MapRIV.makeIndices(testSize, testK, testSeed);
         testVals = MapRIV.makeVals(testK, testSeed);
-        testPointMap = new HashMap<>();
+        testPointMap = new ConcurrentHashMap<>();
         for (int i = 0; i < 48; i += 2) {
             final int j = i + 1;
             testPointMap.put(i, 1.0);
             testPointMap.put(j, -1.0);
         }
-        testPointSet = new HashSet<>(testPointMap.entrySet());
     }
 
     @Test
@@ -188,17 +183,6 @@ public class MapRIVTests {
                 "testRIV1");
         final MapRIV testRIV2 = new MapRIV(testRIV1);
         assertEqual(testRIV1, testRIV2);
-    }
-
-    @Test
-    public final void testMapRIVSetOfEntryOfIntegerDoubleInt() {
-        final MapRIV testRIV = new MapRIV(testPointSet, testSize);
-        assertEquals(testSize, testRIV.size());
-        assertEquals(testK, testRIV.count());
-        final VectorElement[] points = testRIV.points();
-        assertEquals(testK, points.length);
-        for (final VectorElement point : points)
-            assertEquals(point.value(), testPointMap.get(point.index()), e);
     }
 
     @Test

@@ -1,9 +1,8 @@
 package rivet.core.labels;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -17,7 +16,7 @@ import rivet.core.util.Counter;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
-public class MapRIV extends HashMap<Integer, Double> implements RIV {
+public class MapRIV extends ConcurrentHashMap<Integer, Double> implements RIV {
 
     /**
      *
@@ -29,7 +28,7 @@ public class MapRIV extends HashMap<Integer, Double> implements RIV {
         final int last = pointStrings.length - 1;
         final int size = Integer.parseInt(pointStrings[last]);
         pointStrings = Arrays.copyOf(pointStrings, last);
-        final HashMap<Integer, Double> elts = new HashMap<>();
+        final ConcurrentHashMap<Integer, Double> elts = new ConcurrentHashMap<>();
         for (final String s : pointStrings) {
             final String[] elt = s.split("\\|");
             if (elt.length != 2)
@@ -93,7 +92,8 @@ public class MapRIV extends HashMap<Integer, Double> implements RIV {
 
     private final int size;
 
-    public MapRIV(final HashMap<Integer, Double> points, final int size) {
+    public MapRIV(final ConcurrentHashMap<Integer, Double> points,
+            final int size) {
         super(points);
         this.size = size;
     }
@@ -117,12 +117,6 @@ public class MapRIV extends HashMap<Integer, Double> implements RIV {
     public MapRIV(final MapRIV riv) {
         super(riv);
         size = riv.size;
-    }
-
-    public MapRIV(final Set<Entry<Integer, Double>> points, final int size) {
-        super();
-        points.forEach(p -> put(p.getKey(), p.getValue()));
-        this.size = size;
     }
 
     public MapRIV add(final MapRIV other) throws SizeMismatchException {
@@ -258,19 +252,26 @@ public class MapRIV extends HashMap<Integer, Double> implements RIV {
     public MapRIV permute(final Permutations permutations, final int times) {
         if (times == 0)
             return this;
-        else {
-            final IntStream keys = keyStream();
-            return new MapRIV(
-                    times > 0 ? permuteKeys(keys, permutations.left, times)
-                            : permuteKeys(keys, permutations.right, -times),
-                    vals(), size);
-        }
+        else
+            return new MapRIV(times > 0
+                    ? permuteKeys(keyStream(), permutations.left, times)
+                    : permuteKeys(keyStream(), permutations.right, -times),
+                    valStream().toArray(), size);
     }
 
     @Override
     public VectorElement[] points() {
         return stream().map(VectorElement::elt).sorted(VectorElement::compare)
                 .toArray(VectorElement[]::new);
+    }
+
+    public MapRIV removeZeros() {
+        final ConcurrentHashMap<Integer, Double> map = entrySet().stream()
+                .filter(e -> !Util.doubleEquals(0, e.getValue()))
+                .collect(ConcurrentHashMap::new,
+                        (i, e) -> i.put(e.getKey(), e.getValue()),
+                        ConcurrentHashMap::putAll);
+        return new MapRIV(map, size);
     }
 
     @Override

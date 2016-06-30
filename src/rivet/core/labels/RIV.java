@@ -32,10 +32,6 @@ public interface RIV {
 
     double get(final int index) throws IndexOutOfBoundsException;
 
-    default int[] keys() {
-        return keyStream().toArray();
-    }
-
     IntStream keyStream();
 
     double magnitude();
@@ -54,10 +50,6 @@ public interface RIV {
 
     @Override
     String toString();
-
-    default double[] vals() {
-        return valStream().toArray();
-    }
 
     DoubleStream valStream();
 }
