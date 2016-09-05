@@ -55,15 +55,15 @@ public interface RIV {
      * <pre>
      * Good: using an empty RIV to accumulate a sum
      *
-     *      given Stream<MapRIV> rivs, int size,
+     *      given Stream&#060;MapRIV&#062; rivs, int size,
      *              MapRIV sum = rivs.reduce(new MapRIV(size),
-     *                      (identity, riv) -> identity.destructiveAdd(riv));
+     *                      (identity, riv) -&#062; identity.destructiveAdd(riv));
      *
      * Bad: using destructiveAdd to produce a throwaway result for comparison
      *
-     *      given List<MapRIV> rivs, MapRIV modifier, MapRIV test
-     *              List<MapRIV> satisfied = rivs.stream().filter(
-     *                      r -> r.destructiveAdd(modifier).equals(test))
+     *      given List&#060;MapRIV&#062; rivs, MapRIV modifier, MapRIV test
+     *              List&#060;MapRIV&#062; satisfied = rivs.stream().filter(
+     *                      r -&#062; r.destructiveAdd(modifier).equals(test))
      *                      .collect(Collectors.toList());
      *              return rivs.containsAll(satisfied);
      *              //returns False!
@@ -90,15 +90,15 @@ public interface RIV {
      * <pre>
      * Good: using an empty RIV to accumulate a sum
      *
-     *      given Stream<MapRIV> rivs, int size,
+     *      given Stream&#060;MapRIV&#062; rivs, int size,
      *              MapRIV sum = rivs.reduce(new MapRIV(size),
-     *                      (identity, riv) -> identity.destructiveAdd(riv));
+     *                      (identity, riv) -&#062; identity.destructiveAdd(riv));
      *
      * Bad: using destructiveAdd to produce a throwaway result for comparison
      *
-     *      given List<MapRIV> rivs, MapRIV modifier, MapRIV test
-     *              List<MapRIV> satisfied = rivs.stream().filter(
-     *                      r -> r.destructiveAdd(modifier).equals(test))
+     *      given List&#060;MapRIV&#062; rivs, MapRIV modifier, MapRIV test
+     *              List&#060;MapRIV&#062; satisfied = rivs.stream().filter(
+     *                      r -&#062; r.destructiveAdd(modifier).equals(test))
      *                      .collect(Collectors.toList());
      *              return rivs.containsAll(satisfied);
      *              //returns False!
@@ -112,7 +112,7 @@ public interface RIV {
      *
      * @param other
      *            : A Random Index Vector of the same size as this one.
-     * @return this + other
+     * @return this - other
      */
     RIV destructiveSub(final RIV other) throws SizeMismatchException;
 

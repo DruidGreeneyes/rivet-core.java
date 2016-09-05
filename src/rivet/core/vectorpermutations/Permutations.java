@@ -4,7 +4,7 @@ import static rivet.core.util.Util.randInts;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import rivet.core.util.Pair;
+import pair.Pair;
 
 /**
  * An immutable pair of permutation vectors, such that perms.right is the

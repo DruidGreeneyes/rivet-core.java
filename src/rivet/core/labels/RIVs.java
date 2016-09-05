@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import pair.Pair;
 import rivet.core.exceptions.SizeMismatchException;
-import rivet.core.util.Pair;
 import rivet.core.vectorpermutations.Permutations;
 
 public class RIVs {
