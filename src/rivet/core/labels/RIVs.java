@@ -17,7 +17,7 @@ public class RIVs {
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
         return getMatchingValStream(rivA, rivB)
-                .mapToDouble((valPair) -> valPair.apply((a, b) -> a * b)).sum();
+                .mapToDouble(valPair -> valPair.into((a, b) -> a * b)).sum();
     }
 
     private static IntStream getMatchingKeyStream(final RIV rivA,
