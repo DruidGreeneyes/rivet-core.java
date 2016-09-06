@@ -1,5 +1,7 @@
 #Rivet.java
 
+[![Build Status](https://travis-ci.org/DruidGreeneyes/rivet-core.java.svg?branch=master)](https://travis-ci.org/DruidGreeneyes/rivet-core.java)
+
 Random-Index Vectoring in Java. Written in the voice of Mister Torgue.
 
 ##WHAT THE F$%K IS THIS!?!?
