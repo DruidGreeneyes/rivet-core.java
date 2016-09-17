@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import pair.Pair;
+import op.Box_Dbl;
+import pair.UniformPair;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
 
@@ -17,7 +18,7 @@ public class RIVs {
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
         return getMatchingValStream(rivA, rivB)
-                .mapToDouble(valPair -> valPair.intoDouble((a, b) -> a * b))
+                .mapToDouble(UniformPair.F.intoDouble(Box_Dbl.multiply))
                 .sum();
     }
 
@@ -26,10 +27,10 @@ public class RIVs {
         return rivA.keyStream().filter(rivA::contains);
     }
 
-    private static Stream<Pair<Double, Double>> getMatchingValStream(
+    private static Stream<UniformPair<Double>> getMatchingValStream(
             final RIV rivA, final RIV rivB) {
         return getMatchingKeyStream(rivA, rivB)
-                .mapToObj((i) -> Pair.make(rivA.get(i), rivB.get(i)));
+                .mapToObj((i) -> UniformPair.make(rivA.get(i), rivB.get(i)));
     }
 
     public static RIV permuteRIV(final RIV riv, final Permutations permutations,
