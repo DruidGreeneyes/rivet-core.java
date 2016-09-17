@@ -30,6 +30,10 @@ public class MapRIV extends ConcurrentHashMap<Integer, Double> implements RIV {
      */
     private static final long serialVersionUID = 350977843775988038L;
 
+    public static MapRIV empty(final int size) {
+        return new MapRIV(size);
+    }
+
     /**
      * @param rivString
      *            : A string representation of a RIV, generally got by calling

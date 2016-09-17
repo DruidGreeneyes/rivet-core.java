@@ -23,6 +23,10 @@ public class ArrayRIV implements RIV, Serializable {
      */
     private static final long serialVersionUID = -1176979873718129432L;
 
+    public static ArrayRIV empty(final int size, final int k) {
+        return new ArrayRIV(size);
+    }
+
     public static ArrayRIV fromString(final String rivString) {
         String[] r = rivString.split(" ");
         final int l = r.length - 1;
