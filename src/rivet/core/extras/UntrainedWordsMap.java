@@ -8,10 +8,13 @@ public final class UntrainedWordsMap {
 
     public static MapRIV rivAndSumWords(final String[] words, final int size,
             final int k) {
-        return Arrays.stream(words).reduce(new MapRIV(size),
-                (identity, word) -> identity
-                        .destructiveAdd(MapRIV.generateLabel(size, k, word)),
-                (a, b) -> a.destructiveAdd(b));
+        return Arrays.stream(words)
+                     .reduce(new MapRIV(size),
+                             (identity,
+                                     word) -> identity.destructiveAdd(MapRIV.generateLabel(size,
+                                                                                           k,
+                                                                                           word)),
+                             (a, b) -> a.destructiveAdd(b));
     }
 
     public static MapRIV rivettizeText(final String text, final int size,
@@ -30,8 +33,9 @@ public final class UntrainedWordsMap {
     }
 
     public static MapRIV sumMapRIVs(final MapRIV[] rivs) {
-        return Arrays.stream(rivs).reduce(new MapRIV(rivs[0].size()),
-                (i, r) -> i.destructiveAdd(r));
+        return Arrays.stream(rivs)
+                     .reduce(new MapRIV(rivs[0].size()),
+                             (i, r) -> i.destructiveAdd(r));
     }
 
     public static String[] tokenizeText(final String text) {
