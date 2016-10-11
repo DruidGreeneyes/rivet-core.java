@@ -5,6 +5,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import op.Box_Dbl;
+import pair.ImmutablePair;
 import pair.UniformPair;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
@@ -17,20 +18,22 @@ public class RIVs {
     }
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
-        return getMatchingValStream(rivA, rivB)
-                .mapToDouble(UniformPair.F.intoDouble(Box_Dbl.multiply))
-                .sum();
+        return getMatchingValStream(rivA,
+                                    rivB).mapToDouble(ImmutablePair.F.intoDouble(Box_Dbl.multiply))
+                                         .sum();
     }
 
     private static IntStream getMatchingKeyStream(final RIV rivA,
             final RIV rivB) {
-        return rivA.keyStream().filter(rivA::contains);
+        return rivA.keyStream()
+                   .filter(rivA::contains);
     }
 
     private static Stream<UniformPair<Double>> getMatchingValStream(
             final RIV rivA, final RIV rivB) {
-        return getMatchingKeyStream(rivA, rivB)
-                .mapToObj((i) -> UniformPair.make(rivA.get(i), rivB.get(i)));
+        return getMatchingKeyStream(rivA,
+                                    rivB).mapToObj(i -> UniformPair.make(rivA.get(i),
+                                                                         rivB.get(i)));
     }
 
     public static RIV permuteRIV(final RIV riv, final Permutations permutations,
@@ -40,10 +43,12 @@ public class RIVs {
 
     public static double similarity(final RIV rivA, final RIV rivB) {
         final double mag = rivA.magnitude() * rivB.magnitude();
-        return mag == 0 ? 0 : dotProduct(rivA, rivB) / mag;
+        return mag == 0
+                ? 0
+                : dotProduct(rivA, rivB) / mag;
     }
 
-    public static RIV sumRIVs(final RIV zeroValue, final RIV... rivs)
+    public static RIV sumRIVs(final RIV zeroValue, final RIV...rivs)
             throws SizeMismatchException {
         return sumRIVs(zeroValue, Arrays.stream(rivs));
     }

@@ -50,7 +50,7 @@ public final class VectorElement
 
     // Values
     private final int index;
-    private double value;
+    private double    value;
 
     // Constructors
     public VectorElement(final int index, final double value) {
@@ -71,7 +71,8 @@ public final class VectorElement
         if (!equals(p))
             throw new IndexOutOfBoundsException(
                     String.format("Point indices do not match! %s != %s",
-                            toString(), p.toString()));
+                                  toString(),
+                                  p.toString()));
     }
 
     @Override

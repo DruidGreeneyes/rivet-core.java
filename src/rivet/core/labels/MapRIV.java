@@ -23,7 +23,8 @@ import rivet.core.vectorpermutations.Permutations;
  *
  * @author josh
  */
-public class MapRIV extends ConcurrentHashMap<Integer, Double> implements RIV {
+public final class MapRIV extends ConcurrentHashMap<Integer, Double>
+        implements RIV {
 
     /**
      * CEREAL
