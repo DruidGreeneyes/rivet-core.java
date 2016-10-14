@@ -199,6 +199,15 @@ public interface RIV {
     VectorElement[] points();
 
     /**
+     * 
+     * @param riv
+     * @return RIVs.similarity(this, riv)
+     */
+    default double similarityTo(RIV riv) {
+        return RIVs.similarity(this, riv);
+    }
+
+    /**
      * @return the number of dimensions in this random index vector
      */
     int size();
