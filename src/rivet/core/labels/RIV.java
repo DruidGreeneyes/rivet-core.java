@@ -237,4 +237,7 @@ public interface RIV {
      *         DoubleStream.
      */
     DoubleStream valStream();
+
+    @Override
+    int hashCode();
 }

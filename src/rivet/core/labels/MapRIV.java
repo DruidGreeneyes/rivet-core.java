@@ -432,6 +432,15 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
         merge(index, value, (a, b) -> a - b);
     }
 
+    /**
+     * Returns the sum of the keys of this RIV. Pretty much guaranteed to not be
+     * unique.
+     */
+    @Override
+    public int hashCode() {
+        return keyStream().sum();
+    }
+
     @Override
     public String toString() {
         // "0|1 1|3 4|2 5"

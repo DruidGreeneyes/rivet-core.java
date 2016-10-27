@@ -302,6 +302,11 @@ public final class ArrayRIV implements RIV, Serializable {
     }
 
     @Override
+    public int hashCode() {
+        return keyStream().sum();
+    }
+
+    @Override
     public String toString() {
         // "0|1 1|3 4|2 5"
         // "I|V I|V I|V Size"
