@@ -328,12 +328,18 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
                                            .getInterfaces(),
                                       RIV.class))
             return false;
+        else if (other.getClass().equals(MapRIV.class))
+            return equalsMapRIV((MapRIV) other);
         else
             return equalsRIV((RIV) other);
     }
 
-    public boolean equalsRIV(final RIV other) {
+    public boolean equalsMapRIV(final MapRIV other) {
         return size == other.size() && super.equals(other);
+    }
+    
+    public boolean equalsRIV(final RIV other) {
+        return size == other.size() && Arrays.deepEquals(this.points(), other.points());
     }
 
     @Override
