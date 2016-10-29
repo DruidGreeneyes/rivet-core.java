@@ -240,4 +240,8 @@ public interface RIV {
 
     @Override
     int hashCode();
+    
+    default double saturation() {
+    	return count() / size();
+    }
 }
