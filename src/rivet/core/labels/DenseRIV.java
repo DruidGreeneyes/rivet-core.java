@@ -139,5 +139,10 @@ public class DenseRIV implements RIV {
 	public DoubleStream valStream() {
 		return Arrays.stream(vector);
 	}
+	
+	@Override
+	public double saturation() {
+		return 1;
+	}
 
 }
