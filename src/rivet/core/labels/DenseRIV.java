@@ -8,7 +8,6 @@ import java.util.stream.IntStream;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
-import druid.utils.pair.Pair;
 
 public class DenseRIV implements RIV {
 	
@@ -144,7 +143,7 @@ public class DenseRIV implements RIV {
 
 	@Override
 	public VectorElement[] points() {
-		return keyStream().mapToObj(i -> Pair.make(i, vector[i])).toArray(VectorElement[]::new);
+		return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i])).toArray(VectorElement[]::new);
 	}
 
 	@Override
