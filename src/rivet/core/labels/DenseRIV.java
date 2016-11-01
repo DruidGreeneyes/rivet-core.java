@@ -1,23 +1,35 @@
 package rivet.core.labels;
 
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
-import pair.Pair;
 import rivet.core.exceptions.SizeMismatchException;
+import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
+import druid.utils.pair.Pair;
 
 public class DenseRIV implements RIV {
 	
 	private double[] vector;
 	
+	public DenseRIV(final int size, final int[] indices, final double[] values) {
+	    vector = new double[size];
+	    Arrays.fill(vector, 0);
+	    for(int i = 0; i < indices.length; i++)
+	       vector[indices[i]] = values[i];
+	}
+	
 	public DenseRIV(final int size, final VectorElement[] points) {
 		vector = new double[size];
 		Arrays.fill(vector, 0);
-		for (VectorElement point : points) {
+		for (VectorElement point : points)
 			vector[point.index()] = point.value();
-		}
+	}
+	
+	private DenseRIV(final double[] points) {
+	    vector = Arrays.copyOf(points, points.length);
 	}
 	
 	public DenseRIV(RIV source) {
@@ -116,8 +128,18 @@ public class DenseRIV implements RIV {
 
 	@Override
 	public DenseRIV permute(Permutations permutations, int times) {
-		// TODO Auto-generated method stub
-		return null;
+		if (times == 0) return this;
+		else {
+            int[] prm = (times > 0) ? permutations.left : permutations.right;
+            times = Math.abs(times);
+            double[] res = Arrays.copyOf(vector, vector.length);
+            double[] p = new double[vector.length];
+            for (int i = 0; i < times; i++) {
+                p[prm[i]] = res[i];
+                res = Arrays.copyOf(p, p.length);
+            }
+            return new DenseRIV(res);
+        }
 	}
 
 	@Override
@@ -144,5 +166,30 @@ public class DenseRIV implements RIV {
 	public double saturation() {
 		return 1;
 	}
-
+	
+	public static DenseRIV generateLabel(final int size, final int nnz, final CharSequence word) {
+	    final long seed = makeSeed(word);
+	    final int j = nnz % 2 == 0 ? nnz : nnz + 1;
+	    return new DenseRIV(size, makeIndices(size, j, seed), makeVals(j, seed));
+	}
+	
+	private static int[] makeIndices(final int size, final int count, final long seed) {
+	    return Util.randInts(size, count, seed).toArray();
+	}
+	
+	private static long makeSeed(final CharSequence word) {
+	    final AtomicInteger c = new AtomicInteger();
+	    return word.chars()
+	               .mapToLong(ch -> ch * (long) Math.pow(10, c.incrementAndGet()))
+	               .sum();
+	}
+	
+	private static double[] makeVals(final int count, final long seed) {
+	    final double[] l = new double[count];
+	    for (int i = 0; i < count; i +=2) {
+	        l[i] = 1;
+	        l[i + 1] = -1;
+        }
+        return Util.shuffleDoubleArray(l, seed);
+	}
 }
