@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import pair.UniformPair;
+import druid.utils.pair.UniformPair;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
 
