@@ -237,4 +237,11 @@ public interface RIV {
      *         DoubleStream.
      */
     DoubleStream valStream();
+
+    @Override
+    int hashCode();
+    
+    default double saturation() {
+    	return count() / size();
+    }
 }

@@ -2,6 +2,7 @@ package rivet.core.labels;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -11,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import counter.IntCounter;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
@@ -75,9 +75,10 @@ public final class ArrayRIV implements RIV, Serializable {
     }
 
     static long makeSeed(final CharSequence word) {
-        final IntCounter c = new IntCounter();
+        final AtomicInteger c = new AtomicInteger();
         return word.chars()
-                   .mapToLong((ch) -> ch * (long) Math.pow(10, c.inc()))
+                   .mapToLong(ch -> ch
+                                    * (long) Math.pow(10, c.incrementAndGet()))
                    .sum();
     }
 
@@ -299,6 +300,11 @@ public final class ArrayRIV implements RIV, Serializable {
     public ArrayRIV subtract(final RIV other) throws SizeMismatchException {
         return copy().destructiveSub(other)
                      .removeZeros();
+    }
+
+    @Override
+    public int hashCode() {
+        return keyStream().sum();
     }
 
     @Override

@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import op.Box_Dbl;
-import pair.ImmutablePair;
 import pair.UniformPair;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
@@ -19,7 +17,8 @@ public class RIVs {
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
         return getMatchingValStream(rivA,
-                                    rivB).mapToDouble(ImmutablePair.F.intoDouble(Box_Dbl.multiply))
+                                    rivB).mapToDouble(pair -> pair.left
+                                                              * pair.right)
                                          .sum();
     }
 

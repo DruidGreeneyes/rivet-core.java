@@ -3,6 +3,7 @@ package rivet.core.labels;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -11,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import counter.IntCounter;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
@@ -136,9 +136,10 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
      * @return a probably-unique long, used to seed java's Random.
      */
     static long makeSeed(final CharSequence word) {
-        final IntCounter c = new IntCounter();
+        final AtomicInteger c = new AtomicInteger();
         return word.chars()
-                   .mapToLong((ch) -> ch * (long) Math.pow(10, c.inc()))
+                   .mapToLong(ch -> ch
+                                    * (long) Math.pow(10, c.incrementAndGet()))
                    .sum();
     }
 
@@ -436,6 +437,15 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
 
     private void subtractPoint(final int index, final double value) {
         merge(index, value, (a, b) -> a - b);
+    }
+
+    /**
+     * Returns the sum of the keys of this RIV. Pretty much guaranteed to not be
+     * unique.
+     */
+    @Override
+    public int hashCode() {
+        return keyStream().sum();
     }
 
     @Override

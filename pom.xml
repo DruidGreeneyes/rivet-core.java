@@ -62,9 +62,9 @@
       	<version>-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>colt</groupId>
-        <artifactId>colt</artifactId>
-        <version>1.2.0</version>
+      	<groupId>colt</groupId>
+      	<artifactId>colt</artifactId>
+      	<version>1.2.0</version>
       </dependency>
   </dependencies>
 </project>
