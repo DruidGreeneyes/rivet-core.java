@@ -26,7 +26,7 @@ public interface RIV {
      * @return this + other
      * @throws SizeMismatchException
      */
-    RIV add(final RIV other) throws SizeMismatchException;
+    RIV add(final RIV other);
 
     /**
      * @param index
@@ -34,7 +34,7 @@ public interface RIV {
      *         otherwise false.
      * @throws IndexOutOfBoundsException
      */
-    boolean contains(final int index) throws IndexOutOfBoundsException;
+    boolean contains(final int index);
 
     /**
      * @return a copy of this random index vector
@@ -114,7 +114,7 @@ public interface RIV {
      *            : A Random Index Vector of the same size as this one.
      * @return this - other
      */
-    RIV destructiveSub(final RIV other) throws SizeMismatchException;
+    RIV destructiveSub(final RIV other);
 
     /**
      * Perform element-wise division
@@ -199,11 +199,11 @@ public interface RIV {
     VectorElement[] points();
 
     /**
-     * 
+     *
      * @param riv
      * @return RIVs.similarity(this, riv)
      */
-    default double similarityTo(RIV riv) {
+    default double similarityTo(final RIV riv) {
         return RIVs.similarity(this, riv);
     }
 
@@ -218,7 +218,7 @@ public interface RIV {
      * @return this - other
      * @throws SizeMismatchException
      */
-    RIV subtract(final RIV other) throws SizeMismatchException;
+    RIV subtract(final RIV other);
 
     /**
      * <pre>
@@ -240,8 +240,8 @@ public interface RIV {
 
     @Override
     int hashCode();
-    
+
     default double saturation() {
-    	return count() / size();
+        return count() / size();
     }
 }
