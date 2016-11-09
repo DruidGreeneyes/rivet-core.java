@@ -64,7 +64,7 @@ public class DenseRIV implements RIV, Serializable {
     @Override
     public DenseRIV destructiveAdd(final RIV other) {
         for (final VectorElement point : other.points())
-            vector[point.index()] = point.value();
+            vector[point.index()] += point.value();
         return this;
     }
 
