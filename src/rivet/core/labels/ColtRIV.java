@@ -48,6 +48,10 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
             put(point.index(), point.value());
     }
 
+    public ColtRIV(final RIV riv) {
+        this(riv.size(), riv.points());
+    }
+
     public static ColtRIV empty(final int size) {
         return new ColtRIV(size, new VectorElement[0]);
     }
