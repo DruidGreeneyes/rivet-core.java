@@ -1,13 +1,13 @@
 package rivet.core.lexicon;
 
-import rivet.core.labels.MapRIV;
+import rivet.core.labels.RIV;
 
 public interface Lexicon {
     public int count();
 
-    public Lexicon add(final String word, final MapRIV riv);
+    public Lexicon add(final String word, final RIV riv);
 
-    public MapRIV getLex(final String word);
+    public RIV getLex(final String word);
 
-    public MapRIV getInd(final String word);
+    public RIV getInd(final String word);
 }
