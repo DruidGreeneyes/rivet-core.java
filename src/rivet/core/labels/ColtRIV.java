@@ -6,16 +6,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import cern.colt.function.IntProcedure;
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
-import cern.colt.map.AbstractIntDoubleMap;
 import cern.colt.map.OpenIntDoubleHashMap;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
-import rivet.core.util.VectorComputeFunction;
 import rivet.core.vectorpermutations.Permutations;
 
 /**
@@ -260,5 +255,18 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         final DoubleStream.Builder sb = DoubleStream.builder();
         values().forEach(procedurize((final double i) -> sb.accept(i)));
         return sb.build();
+    }
+
+    @Override
+    public ColtRIV removeZeros() {
+        return copy().destructiveRemoveZeros();
+    }
+
+    @Override
+    public ColtRIV destructiveRemoveZeros() {
+        int i;
+        while (Integer.MIN_VALUE == (i = keyOf(0.0)))
+            removeKey(i);
+        return this;
     }
 }

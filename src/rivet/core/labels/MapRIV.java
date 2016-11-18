@@ -284,7 +284,8 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
         return this;
     }
 
-    private MapRIV destructiveRemoveZeros() {
+    @Override
+    public MapRIV destructiveRemoveZeros() {
         for (final int i : new HashSet<>(keySet()))
             compute(i, (k, v) -> Util.doubleEquals(v, 0)
                     ? null
@@ -329,7 +330,8 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
                                            .getInterfaces(),
                                       RIV.class))
             return false;
-        else if (other.getClass().equals(MapRIV.class))
+        else if (other.getClass()
+                      .equals(MapRIV.class))
             return equalsMapRIV((MapRIV) other);
         else
             return equalsRIV((RIV) other);
@@ -338,9 +340,10 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
     public boolean equalsMapRIV(final MapRIV other) {
         return size == other.size() && super.equals(other);
     }
-    
+
     public boolean equalsRIV(final RIV other) {
-        return size == other.size() && Arrays.deepEquals(this.points(), other.points());
+        return size == other.size()
+               && Arrays.deepEquals(points(), other.points());
     }
 
     @Override
@@ -392,6 +395,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
     /**
      * @return a copy of this with all zeros removed.
      */
+    @Override
     public MapRIV removeZeros() {
         final ConcurrentHashMap<Integer, Double> map = entrySet().stream()
                                                                  .filter(e -> !Util.doubleEquals(0,

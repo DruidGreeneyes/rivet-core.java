@@ -206,4 +206,22 @@ public class DenseRIV implements RIV, Serializable {
         }
         return Util.shuffleDoubleArray(l, seed);
     }
+
+    /**
+     * Doesn't do anything.
+     */
+    @Deprecated
+    @Override
+    public DenseRIV removeZeros() {
+        return this;
+    }
+
+    /**
+     * Doesn't do anything.
+     */
+    @Deprecated
+    @Override
+    public DenseRIV destructiveRemoveZeros() {
+        return this;
+    }
 }

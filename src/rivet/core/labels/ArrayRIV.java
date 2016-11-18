@@ -278,7 +278,8 @@ public final class ArrayRIV implements RIV, Serializable {
         return points;
     }
 
-    private ArrayRIV removeZeros() {
+    @Override
+    public ArrayRIV removeZeros() {
         final VectorElement[] elts = stream().filter(ve -> !ve.contains(0))
                                              .toArray(VectorElement[]::new);
         if (elts.length == count())
@@ -324,5 +325,13 @@ public final class ArrayRIV implements RIV, Serializable {
     @Override
     public DoubleStream valStream() {
         return stream().mapToDouble(VectorElement::value);
+    }
+
+    @Override
+    public ArrayRIV destructiveRemoveZeros() {
+        for (int i = 0; i < points.length; i++)
+            if (points[i].value() == 0.0)
+                ArrayUtils.remove(points, i);
+        return this;
     }
 }

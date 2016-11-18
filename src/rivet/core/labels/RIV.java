@@ -244,4 +244,8 @@ public interface RIV {
     default double saturation() {
         return count() / size();
     }
+
+    RIV removeZeros();
+
+    RIV destructiveRemoveZeros();
 }
