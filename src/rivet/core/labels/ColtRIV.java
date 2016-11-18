@@ -3,6 +3,7 @@ package rivet.core.labels;
 import static rivet.core.util.colt.ColtConversions.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -124,6 +125,16 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
                              Util.safeSubSequence(source,
                                                   startIndex,
                                                   startIndex + tokenLength));
+    }
+
+    public static Function<String, ColtRIV> labelGenerator(final int size,
+            final int nnz) {
+        return word -> generateLabel(size, nnz, word);
+    }
+
+    public static Function<Integer, ColtRIV> labelGenerator(final int size,
+            final int nnz, final CharSequence source, final int tokenLength) {
+        return i -> generateLabel(size, nnz, source, i, tokenLength);
     }
 
     @Override
