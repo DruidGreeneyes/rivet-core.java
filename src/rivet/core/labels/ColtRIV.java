@@ -1,7 +1,5 @@
 package rivet.core.labels;
 
-import static rivet.core.util.colt.ColtConversions.procedurize;
-
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -185,9 +183,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public IntStream keyStream() {
-        final IntStream.Builder sb = IntStream.builder();
-        keys().forEach(procedurize(sb::accept));
-        return sb.build();
+        return Arrays.stream(table);
     }
 
     /*
@@ -246,9 +242,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public DoubleStream valStream() {
-        final DoubleStream.Builder sb = DoubleStream.builder();
-        values().forEach(procedurize((final double i) -> sb.accept(i)));
-        return sb.build();
+        return Arrays.stream(values);
     }
 
     /*
