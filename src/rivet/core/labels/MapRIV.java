@@ -205,27 +205,26 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
      * @throws SizeMismatchException
      */
     public MapRIV add(final MapRIV other) throws SizeMismatchException {
-        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        // assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
         return copy().destructiveAdd(other)
                      .destructiveRemoveZeros();
     }
 
-    @Override
-    public MapRIV add(final RIV other) throws SizeMismatchException {
-        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
-        return copy().destructiveAdd(other)
-                     .destructiveRemoveZeros();
-    }
+    /*
+     * @Override public MapRIV add(final RIV other) throws SizeMismatchException
+     * { assertSizeMatch(other, "Cannot add rivs of mismatched sizes."); return
+     * copy().destructiveAdd(other) .destructiveRemoveZeros(); }
+     */
 
     private void addPoint(final int index, final double value) {
         merge(index, value, (a, b) -> a + b);
     }
 
-    private void assertSizeMatch(final RIV other, final String message)
-            throws SizeMismatchException {
-        if (size != other.size())
-            throw new SizeMismatchException(message);
-    }
+    /*
+     * private void assertSizeMatch(final RIV other, final String message)
+     * throws SizeMismatchException { if (size != other.size()) throw new
+     * SizeMismatchException(message); }
+     */
 
     private void assertValidIndex(final int index) {
         if (index > size || index < 0)
@@ -259,14 +258,14 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
      */
     public MapRIV destructiveAdd(final MapRIV other)
             throws SizeMismatchException {
-        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        // assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
         other.forEach((i, v) -> merge(i, v, (a, b) -> a + b));
         return this;
     }
 
     @Override
     public MapRIV destructiveAdd(final RIV other) throws SizeMismatchException {
-        assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
+        // assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
         for (final VectorElement point : other.points())
             addPoint(point.index(), point.value());
         return this;
@@ -279,7 +278,8 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
      * @param scalar
      * @return multiplies every element in this by scalar, then returns this.
      */
-    private MapRIV destructiveMult(final double scalar) {
+    @Override
+    public MapRIV destructiveMult(final double scalar) {
         replaceAll((k, v) -> v * scalar);
         return this;
     }
@@ -304,23 +304,23 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
      */
     public MapRIV destructiveSub(final MapRIV other)
             throws SizeMismatchException {
-        assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
+        // assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
         other.forEach((i, v) -> subtractPoint(i, v));
         return this;
     }
 
     @Override
     public MapRIV destructiveSub(final RIV other) throws SizeMismatchException {
-        assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
+        // assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
         for (final VectorElement point : other.points())
             subtractPoint(point.index(), point.value());
         return this;
     }
 
-    @Override
-    public MapRIV divide(final double scalar) {
-        return copy().destructiveMult(1 / scalar);
-    }
+    /*
+     * @Override public MapRIV divide(final double scalar) { return
+     * copy().destructiveMult(1 / scalar); }
+     */
 
     @Override
     public boolean equals(final Object other) {
@@ -358,21 +358,15 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
                        .mapToInt(x -> x);
     }
 
-    @Override
-    public double magnitude() {
-        return Math.sqrt(valStream().map(x -> x * x)
-                                    .sum());
-    }
-
-    @Override
-    public MapRIV multiply(final double scalar) {
-        return copy().destructiveMult(scalar);
-    }
-
-    @Override
-    public MapRIV normalize() {
-        return divide(magnitude());
-    }
+    /*
+     * @Override public double magnitude() { return Math.sqrt(valStream().map(x
+     * -> x * x) .sum()); }
+     *
+     * @Override public MapRIV multiply(final double scalar) { return
+     * copy().destructiveMult(scalar); }
+     *
+     * @Override public MapRIV normalize() { return divide(magnitude()); }
+     */
 
     @Override
     public MapRIV permute(final Permutations permutations, final int times) {
@@ -392,20 +386,13 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
                        .toArray(VectorElement[]::new);
     }
 
-    /**
-     * @return a copy of this with all zeros removed.
+    /*
+     * @Override public MapRIV removeZeros() { final ConcurrentHashMap<Integer,
+     * Double> map = entrySet().stream() .filter(e -> !Util.doubleEquals(0,
+     * e.getValue())) .collect(ConcurrentHashMap::new, (i, e) ->
+     * i.put(e.getKey(), e.getValue()), ConcurrentHashMap::putAll); return new
+     * MapRIV(map, size); }
      */
-    @Override
-    public MapRIV removeZeros() {
-        final ConcurrentHashMap<Integer, Double> map = entrySet().stream()
-                                                                 .filter(e -> !Util.doubleEquals(0,
-                                                                                                 e.getValue()))
-                                                                 .collect(ConcurrentHashMap::new,
-                                                                          (i, e) -> i.put(e.getKey(),
-                                                                                          e.getValue()),
-                                                                          ConcurrentHashMap::putAll);
-        return new MapRIV(map, size);
-    }
 
     @Override
     public int size() {
@@ -432,12 +419,11 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
         return copy().destructiveSub(other)
                      .destructiveRemoveZeros();
     }
-
-    @Override
-    public MapRIV subtract(final RIV other) throws SizeMismatchException {
-        return copy().destructiveSub(other)
-                     .destructiveRemoveZeros();
-    }
+    /*
+     * @Override public MapRIV subtract(final RIV other) throws
+     * SizeMismatchException { return copy().destructiveSub(other)
+     * .destructiveRemoveZeros(); }
+     */
 
     private void subtractPoint(final int index, final double value) {
         merge(index, value, (a, b) -> a - b);
@@ -470,5 +456,37 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
     public DoubleStream valStream() {
         return values().stream()
                        .mapToDouble(x -> x);
+    }
+
+    @Override
+    public MapRIV destructiveAdd(final RIV...rivs) {
+        IntStream.range(0, size)
+                 .parallel()
+                 .forEach(i -> merge(i,
+                                     Arrays.stream(rivs)
+                                           .parallel()
+                                           .mapToDouble(riv -> riv.get(i))
+                                           .sum(),
+                                     (a, b) -> a + b));
+        return this;
+    }
+
+    @Override
+    public MapRIV destructiveSub(final RIV...rivs) {
+        IntStream.range(0, size)
+                 .parallel()
+                 .forEach(i -> merge(i,
+                                     Arrays.stream(rivs)
+                                           .parallel()
+                                           .mapToDouble(riv -> riv.get(i))
+                                           .sum(),
+                                     (a, b) -> a - b));
+        return this;
+    }
+
+    @Override
+    public MapRIV destructiveDiv(final double scalar) {
+        replaceAll((k, v) -> v / scalar);
+        return this;
     }
 }

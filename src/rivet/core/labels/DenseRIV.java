@@ -3,6 +3,7 @@ package rivet.core.labels;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
@@ -41,10 +42,10 @@ public class DenseRIV implements RIV, Serializable {
         this(source.size(), source.points());
     }
 
-    @Override
-    public DenseRIV add(final RIV other) {
-        return copy().destructiveAdd(other);
-    }
+    /*
+     * @Override public DenseRIV add(final RIV other) { return
+     * copy().destructiveAdd(other); }
+     */
 
     @Override
     public boolean contains(final int index) {
@@ -75,22 +76,24 @@ public class DenseRIV implements RIV, Serializable {
         return this;
     }
 
+    @Override
     public DenseRIV destructiveDiv(final double scalar) {
         for (int i = 0; i < vector.length; i++)
             vector[i] = vector[i] / scalar;
         return this;
     }
 
+    @Override
     public DenseRIV destructiveMult(final double scalar) {
         for (int i = 0; i < vector.length; i++)
             vector[i] = vector[i] * scalar;
         return this;
     }
 
-    @Override
-    public DenseRIV divide(final double scalar) {
-        return copy().destructiveDiv(scalar);
-    }
+    /*
+     * @Override public DenseRIV divide(final double scalar) { return
+     * copy().destructiveDiv(scalar); }
+     */
 
     @Override
     public double get(final int index) {
@@ -102,32 +105,20 @@ public class DenseRIV implements RIV, Serializable {
         return IntStream.range(0, vector.length);
     }
 
-    @Override
-    public double magnitude() {
-        double sum = 0;
-        for (final double v : vector)
-            sum += (v * v);
-        return Math.sqrt(sum);
-    }
-
-    @Override
-    public DenseRIV multiply(final double scalar) {
-        return copy().destructiveMult(scalar);
-    }
-
-    private DenseRIV destructiveNorm() {
-        double sum = 0;
-        for (final double v : vector)
-            sum += v;
-        for (int i = 0; i < vector.length; i++)
-            vector[i] = vector[i] / sum;
-        return this;
-    }
-
-    @Override
-    public DenseRIV normalize() {
-        return copy().destructiveNorm();
-    }
+    /*
+     * @Override public double magnitude() { double sum = 0; for (final double v
+     * : vector) sum += (v * v); return Math.sqrt(sum); }
+     *
+     * @Override public DenseRIV multiply(final double scalar) { return
+     * copy().destructiveMult(scalar); }
+     *
+     * private DenseRIV destructiveNorm() { double sum = 0; for (final double v
+     * : vector) sum += v; for (int i = 0; i < vector.length; i++) vector[i] =
+     * vector[i] / sum; return this; }
+     *
+     * @Override public DenseRIV normalize() { return copy().destructiveNorm();
+     * }
+     */
 
     @Override
     public DenseRIV permute(final Permutations permutations, int times) {
@@ -159,10 +150,10 @@ public class DenseRIV implements RIV, Serializable {
         return vector.length;
     }
 
-    @Override
-    public DenseRIV subtract(final RIV other) throws SizeMismatchException {
-        return copy().destructiveSub(other);
-    }
+    /*
+     * @Override public DenseRIV subtract(final RIV other) throws
+     * SizeMismatchException { return copy().destructiveSub(other); }
+     */
 
     @Override
     public DoubleStream valStream() {
@@ -174,6 +165,15 @@ public class DenseRIV implements RIV, Serializable {
         return 1;
     }
 
+    /**
+     * Uses Java's seeded RNG to generate a random index vector such that, given
+     * the same input, generateLabel will always produce the same output.
+     *
+     * @param size
+     * @param k
+     * @param word
+     * @return a MapRIV
+     */
     public static DenseRIV generateLabel(final int size, final int nnz,
             final CharSequence word) {
         final long seed = makeSeed(word);
@@ -182,6 +182,35 @@ public class DenseRIV implements RIV, Serializable {
                 : nnz + 1;
         return new DenseRIV(size, makeIndices(size, j, seed),
                 makeVals(j, seed));
+    }
+
+    /**
+     * Uses Java's seeded RNG to generate a random index vector such that, given
+     * the same input, generateLabel will always produce the same output.
+     *
+     * @param size
+     * @param k
+     * @param word
+     * @return a MapRIV
+     */
+    public static DenseRIV generateLabel(final int size, final int k,
+            final CharSequence source, final int startIndex,
+            final int tokenLength) {
+        return generateLabel(size,
+                             k,
+                             Util.safeSubSequence(source,
+                                                  startIndex,
+                                                  startIndex + tokenLength));
+    }
+
+    public static Function<String, DenseRIV> labelGenerator(final int size,
+            final int nnz) {
+        return word -> generateLabel(size, nnz, word);
+    }
+
+    public static Function<Integer, DenseRIV> labelGenerator(final int size,
+            final int nnz, final CharSequence source, final int tokenLength) {
+        return i -> generateLabel(size, nnz, source, i, tokenLength);
     }
 
     private static int[] makeIndices(final int size, final int count,
@@ -222,6 +251,28 @@ public class DenseRIV implements RIV, Serializable {
     @Deprecated
     @Override
     public DenseRIV destructiveRemoveZeros() {
+        return this;
+    }
+
+    @Override
+    public DenseRIV destructiveAdd(final RIV...rivs) {
+        IntStream.range(0, vector.length)
+                 .parallel()
+                 .forEach(i -> vector[i] += Arrays.stream(rivs)
+                                                  .parallel()
+                                                  .mapToDouble(riv -> riv.get(i))
+                                                  .sum());
+        return this;
+    }
+
+    @Override
+    public DenseRIV destructiveSub(final RIV...rivs) {
+        IntStream.range(0, vector.length)
+                 .parallel()
+                 .forEach(i -> vector[i] -= Arrays.stream(rivs)
+                                                  .parallel()
+                                                  .mapToDouble(riv -> riv.get(i))
+                                                  .sum());
         return this;
     }
 }

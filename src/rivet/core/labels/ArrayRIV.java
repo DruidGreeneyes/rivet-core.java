@@ -98,13 +98,14 @@ public final class ArrayRIV implements RIV, Serializable {
         return keys.toArray();
     }
 
-    private VectorElement[] points;
+    private final VectorElement[] points;
 
     private final int size;
 
-    public ArrayRIV(final ArrayRIV riv) {
-        points = riv.points.clone();
-        size = riv.size;
+    public ArrayRIV(final RIV testRIV1) {
+        points = testRIV1.points()
+                         .clone();
+        size = testRIV1.size();
     }
 
     public ArrayRIV(final int size) {
@@ -132,11 +133,13 @@ public final class ArrayRIV implements RIV, Serializable {
         this.size = size;
     }
 
-    @Override
-    public ArrayRIV add(final RIV other) throws SizeMismatchException {
-        return copy().destructiveAdd(other)
-                     .removeZeros();
-    }
+    /**
+     * @Override public ArrayRIV add(final RIV other) { return
+     *           copy().destructiveAdd(other) .removeZeros(); }
+     *
+     *           public ArrayRIV add(final RIV...rivs) { return
+     *           copy().destructiveAdd(rivs); }
+     **/
 
     private int binarySearch(final int index) {
         return binarySearch(VectorElement.fromIndex(index));
@@ -166,23 +169,10 @@ public final class ArrayRIV implements RIV, Serializable {
             throws SizeMismatchException {
         if (size == other.size()) {
             other.keyStream()
-                 .forEach((k) -> destructiveSet(getPoint(k).add(other.get(k))));
+                 .forEach((k) -> getPoint(k).destructiveAdd(other.get(k)));
             return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
-    }
-
-    private void destructiveSet(final VectorElement elt)
-            throws IndexOutOfBoundsException {
-        if (validIndex(elt.index())) {
-            final int i = binarySearch(elt);
-            if (i < 0)
-                points = ArrayUtils.add(points, ~i, elt);
-            else
-                points[i] = elt;
-        } else
-            throw new IndexOutOfBoundsException(
-                    "Index " + elt.index() + " is outside the bounds of this vector.");
     }
 
     @Override
@@ -190,8 +180,7 @@ public final class ArrayRIV implements RIV, Serializable {
             throws SizeMismatchException {
         if (size == other.size()) {
             other.keyStream()
-                 .forEach((
-                         k) -> destructiveSet(getPoint(k).subtract(other.get(k))));
+                 .forEach(k -> getPoint(k).destructiveSub(other.get(k)));
             return this;
         } else
             throw new SizeMismatchException("Target RIV is the wrong size!");
@@ -252,15 +241,14 @@ public final class ArrayRIV implements RIV, Serializable {
                 size).removeZeros();
     }
 
-    @Override
-    public ArrayRIV multiply(final double scalar) {
-        return mapVals((v) -> v * scalar);
-    }
+    /*
+     * @Override public ArrayRIV multiply(final double scalar) { return
+     * mapVals((v) -> v * scalar); }
+     */
 
-    @Override
-    public ArrayRIV normalize() {
-        return divide(magnitude());
-    }
+    /*
+     * @Override public ArrayRIV normalize() { return divide(magnitude()); }
+     */
 
     @Override
     public ArrayRIV permute(final Permutations permutations, final int times) {
@@ -297,11 +285,11 @@ public final class ArrayRIV implements RIV, Serializable {
         return Arrays.stream(points);
     }
 
-    @Override
-    public ArrayRIV subtract(final RIV other) throws SizeMismatchException {
-        return copy().destructiveSub(other)
-                     .removeZeros();
-    }
+    /*
+     * @Override public ArrayRIV subtract(final RIV other) throws
+     * SizeMismatchException { return copy().destructiveSub(other)
+     * .removeZeros(); }
+     */
 
     @Override
     public int hashCode() {
@@ -332,6 +320,36 @@ public final class ArrayRIV implements RIV, Serializable {
         for (int i = 0; i < points.length; i++)
             if (points[i].value() == 0.0)
                 ArrayUtils.remove(points, i);
+        return this;
+    }
+
+    @Override
+    public ArrayRIV destructiveAdd(final RIV...rivs) {
+        for (int i = 0; i < size; i++)
+            for (final RIV riv : rivs)
+                getPoint(i).destructiveAdd(riv.get(i));
+        return this;
+    }
+
+    @Override
+    public RIV destructiveSub(final RIV...rivs) {
+        for (int i = 0; i < size; i++)
+            for (final RIV riv : rivs)
+                getPoint(i).destructiveSub(riv.get(i));
+        return this;
+    }
+
+    @Override
+    public RIV destructiveDiv(final double scalar) {
+        Arrays.stream(points)
+              .forEach(elt -> elt.destructiveDiv(scalar));
+        return this;
+    }
+
+    @Override
+    public RIV destructiveMult(final double scalar) {
+        Arrays.stream(points)
+              .forEach(elt -> elt.destructiveMult(scalar));
         return this;
     }
 }

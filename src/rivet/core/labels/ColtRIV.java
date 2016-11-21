@@ -1,15 +1,17 @@
 package rivet.core.labels;
 
-import static rivet.core.util.colt.ColtConversions.*;
+import static rivet.core.util.colt.ColtConversions.procedurize;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+
 import cern.colt.list.DoubleArrayList;
 import cern.colt.list.IntArrayList;
 import cern.colt.map.OpenIntDoubleHashMap;
-import rivet.core.exceptions.SizeMismatchException;
+import cern.jet.math.Mult;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
@@ -136,10 +138,10 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return i -> generateLabel(size, nnz, source, i, tokenLength);
     }
 
-    @Override
-    public ColtRIV add(final RIV other) throws SizeMismatchException {
-        return copy().destructiveAdd(other);
-    }
+    /*
+     * @Override public ColtRIV add(final RIV other) throws
+     * SizeMismatchException { return copy().destructiveAdd(other); }
+     */
 
     @Override
     public boolean contains(final int index) throws IndexOutOfBoundsException {
@@ -158,29 +160,26 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public ColtRIV destructiveAdd(final RIV other) {
-        for (final VectorElement point : other.points()) {
-            final int i = point.index();
-            put(i, get(i) + point.value());
-        }
+        other.keyStream()
+             .forEach(i -> put(i, get(i) + other.get(i)));
         return this;
     }
 
     @Override
     public ColtRIV destructiveSub(final RIV other) {
-        for (final VectorElement point : other.points()) {
-            final int i = point.index();
-            put(i, get(i) - point.value());
-        }
+        other.keyStream()
+             .forEach(i -> put(i, get(i) - other.get(i)));
         return this;
     }
 
-    @Override
-    public ColtRIV divide(final double scalar) {
-        return copy().destructiveDiv(scalar);
-    }
+    /*
+     * @Override public ColtRIV divide(final double scalar) { return
+     * copy().destructiveDiv(scalar); }
+     */
 
+    @Override
     public ColtRIV destructiveDiv(final double scalar) {
-        this.assign(x -> x / scalar);
+        this.assign(Mult.div(scalar));
         return this;
     }
 
@@ -191,29 +190,24 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return sb.build();
     }
 
-    @Override
-    public double magnitude() {
-        return Math.sqrt(valStream().map(x -> x * x)
-                                    .sum());
-    }
+    /*
+     * @Override public double magnitude() { return Math.sqrt(valStream().map(x
+     * -> x * x) .sum()); }
+     *
+     * @Override public ColtRIV multiply(final double scalar) { return
+     * copy().destructiveMult(scalar); }
+     */
 
     @Override
-    public ColtRIV multiply(final double scalar) {
-        return copy().destructiveMult(scalar);
-    }
-
     public ColtRIV destructiveMult(final double scalar) {
-        this.assign(x -> x * scalar);
+        this.assign(Mult.mult(scalar));
         return this;
     }
 
-    @Override
-    public ColtRIV normalize() {
-        final double mag = magnitude();
-        final ColtRIV res = copy();
-        res.assign(x -> x / mag);
-        return res;
-    }
+    /*
+     * @Override public ColtRIV normalize() { final double mag = magnitude();
+     * final ColtRIV res = copy(); res.assign(x -> x / mag); return res; }
+     */
 
     private static IntArrayList permuteKeys(IntStream keys, final int times,
             final int[] permutation) {
@@ -245,10 +239,10 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return res;
     }
 
-    @Override
-    public ColtRIV subtract(final RIV other) throws SizeMismatchException {
-        return copy().destructiveSub(other);
-    }
+    /*
+     * @Override public ColtRIV subtract(final RIV other) throws
+     * SizeMismatchException { return copy().destructiveSub(other); }
+     */
 
     @Override
     public DoubleStream valStream() {
@@ -257,16 +251,38 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return sb.build();
     }
 
-    @Override
-    public ColtRIV removeZeros() {
-        return copy().destructiveRemoveZeros();
-    }
+    /*
+     * @Override public ColtRIV removeZeros() { return
+     * copy().destructiveRemoveZeros(); }
+     */
 
     @Override
     public ColtRIV destructiveRemoveZeros() {
         int i;
-        while (Integer.MIN_VALUE == (i = keyOf(0.0)))
+        while (Integer.MIN_VALUE != (i = keyOf(0.0)))
             removeKey(i);
+        return this;
+    }
+
+    @Override
+    public ColtRIV destructiveAdd(final RIV...rivs) {
+        IntStream.range(0, size)
+                 .parallel()
+                 .forEach(i -> put(i, get(i) + Arrays.stream(rivs)
+                                                     .parallel()
+                                                     .mapToDouble(riv -> riv.get(i))
+                                                     .sum()));
+        return this;
+    }
+
+    @Override
+    public ColtRIV destructiveSub(final RIV...rivs) {
+        IntStream.range(0, size)
+                 .parallel()
+                 .forEach(i -> put(i, get(i) - Arrays.stream(rivs)
+                                                     .parallel()
+                                                     .mapToDouble(riv -> riv.get(i))
+                                                     .sum()));
         return this;
     }
 }

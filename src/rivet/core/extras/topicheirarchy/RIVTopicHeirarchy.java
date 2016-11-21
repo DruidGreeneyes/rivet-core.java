@@ -3,22 +3,25 @@ package rivet.core.extras.topicheirarchy;
 import java.util.ArrayList;
 
 import rivet.core.labels.ArrayRIV;
+import rivet.core.labels.RIV;
 import rivet.core.labels.RIVs;
 
 public class RIVTopicHeirarchy {
 
     private static final ArrayList<RIVTopicHeirarchy> _find(
-            final RIVTopicHeirarchy point, final ArrayRIV riv,
+            final RIVTopicHeirarchy point, final RIV riv,
             final ArrayList<RIVTopicHeirarchy> nodes) {
         nodes.add(point);
         if (!point.hasChildren())
             return nodes;
         else {
-            final RIVTopicHeirarchy next = point.children.stream().reduce(point,
-                    (i, node) -> RIVs.similarity(i.topic.meanVector(),
-                            riv) > RIVs.similarity(node.topic.meanVector(), riv)
-                                    ? i
-                                    : node);
+            final RIVTopicHeirarchy next = point.children.stream()
+                                                         .reduce(point,
+                                                                 (i, node) -> RIVs.similarity(i.topic.meanVector(),
+                                                                                              riv) > RIVs.similarity(node.topic.meanVector(),
+                                                                                                                     riv)
+                                                                                                                             ? i
+                                                                                                                             : node);
             if (next == point)
                 return nodes;
             else
@@ -27,22 +30,25 @@ public class RIVTopicHeirarchy {
     }
 
     public static final String[] assignTopics(final RIVTopicHeirarchy point,
-            final ArrayRIV riv) {
-        final ArrayList<RIVTopicHeirarchy> nodes = _find(findRoot(point), riv,
-                new ArrayList<>());
-        return nodes.stream().map(RIVTopicHeirarchy::name)
-                .toArray(String[]::new);
+            final RIV riv) {
+        final ArrayList<RIVTopicHeirarchy> nodes =
+                _find(findRoot(point), riv, new ArrayList<>());
+        return nodes.stream()
+                    .map(RIVTopicHeirarchy::name)
+                    .toArray(String[]::new);
     }
 
     public static final RIVTopicHeirarchy find(final RIVTopicHeirarchy point,
             final ArrayRIV riv) {
-        final ArrayList<RIVTopicHeirarchy> nodes = _find(findRoot(point), riv,
-                new ArrayList<>());
+        final ArrayList<RIVTopicHeirarchy> nodes =
+                _find(findRoot(point), riv, new ArrayList<>());
         return nodes.get(nodes.size() - 1);
     }
 
     public static RIVTopicHeirarchy findRoot(final RIVTopicHeirarchy point) {
-        return point.isRoot() ? point : findRoot(point.parent);
+        return point.isRoot()
+                ? point
+                : findRoot(point.parent);
     }
 
     public static RIVTopicHeirarchy makeNode(final NamedRIVMap topic,
@@ -63,7 +69,7 @@ public class RIVTopicHeirarchy {
     private RIVTopicHeirarchy parent;
 
     private ArrayList<RIVTopicHeirarchy> children;
-    final double similarityThreshold;
+    final double                         similarityThreshold;
 
     private RIVTopicHeirarchy(final NamedRIVMap t, final double s) {
         this(t, null, s);
@@ -114,7 +120,7 @@ public class RIVTopicHeirarchy {
     public void graftNew(final NamedRIV riv) {
         final RIVTopicHeirarchy point = find(riv.riv());
         if (RIVs.similarity(point.topic.meanVector(),
-                riv.riv()) >= similarityThreshold)
+                            riv.riv()) >= similarityThreshold)
             point.add(riv);
         else
             point.adopt(riv);
@@ -158,9 +164,10 @@ public class RIVTopicHeirarchy {
         if (topic.contains(riv))
             topic.remove(riv);
         else
-            throw new IndexOutOfBoundsException(String.format(
-                    "Tried to subtract but riv is not present in topic!\n%s : %s",
-                    riv.name(), String.join(", ", topic.keySet())));
+            throw new IndexOutOfBoundsException(
+                    String.format("Tried to subtract but riv is not present in topic!\n%s : %s",
+                                  riv.name(),
+                                  String.join(", ", topic.keySet())));
         if (topic.isEmpty())
             suicide();
     }

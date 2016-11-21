@@ -26,7 +26,9 @@ public interface RIV {
      * @return this + other
      * @throws SizeMismatchException
      */
-    RIV add(final RIV other);
+    default RIV add(final RIV other) {
+        return copy().destructiveAdd(other);
+    }
 
     /**
      * @param index
@@ -81,6 +83,12 @@ public interface RIV {
      */
     RIV destructiveAdd(final RIV other);
 
+    default RIV add(final RIV...rivs) {
+        return copy().destructiveAdd(rivs);
+    }
+
+    RIV destructiveAdd(final RIV...rivs);
+
     /**
      * Destructive add/subtract methods are provided for optimization purposes,
      * but because they modify the calling structure, neither should be used in
@@ -116,6 +124,12 @@ public interface RIV {
      */
     RIV destructiveSub(final RIV other);
 
+    default RIV subtract(final RIV...rivs) {
+        return copy().destructiveSub(rivs);
+    }
+
+    RIV destructiveSub(final RIV...rivs);
+
     /**
      * Perform element-wise division
      *
@@ -123,7 +137,11 @@ public interface RIV {
      *            : A double
      * @return a copy of this, where each element has been divided by scalar
      */
-    RIV divide(final double scalar);
+    default RIV divide(final double scalar) {
+        return copy().destructiveDiv(scalar);
+    }
+
+    RIV destructiveDiv(final double scalar);
 
     @Override
     boolean equals(final Object other);
@@ -159,7 +177,10 @@ public interface RIV {
      *
      * @return Math.sqrt(this.valStream().map(x -> x * x).sum())
      */
-    double magnitude();
+    default double magnitude() {
+        return Math.sqrt(valStream().map(x -> x * x)
+                                    .sum());
+    }
 
     /**
      * Perform element-wise multiplication
@@ -168,7 +189,11 @@ public interface RIV {
      *            : A double
      * @return a copy of this, where each element has been multiplied by scalar
      */
-    RIV multiply(final double scalar);
+    default RIV multiply(final double scalar) {
+        return copy().destructiveMult(scalar);
+    }
+
+    RIV destructiveMult(final double scalar);
 
     /**
      * Create a random index vector with the same proportions as this one, but
@@ -176,7 +201,9 @@ public interface RIV {
      *
      * @return this.divide(this.magnitude())
      */
-    RIV normalize();
+    default RIV normalize() {
+        return divide(magnitude());
+    }
 
     /**
      * Permute this random index vector using a specified permutation pair, one
@@ -218,7 +245,9 @@ public interface RIV {
      * @return this - other
      * @throws SizeMismatchException
      */
-    RIV subtract(final RIV other);
+    default RIV subtract(final RIV other) {
+        return copy().destructiveSub(other);
+    }
 
     /**
      * <pre>
@@ -245,7 +274,9 @@ public interface RIV {
         return count() / size();
     }
 
-    RIV removeZeros();
+    default RIV removeZeros() {
+        return copy().destructiveRemoveZeros();
+    }
 
     RIV destructiveRemoveZeros();
 }

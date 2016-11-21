@@ -24,20 +24,22 @@ public class ArrayRIVTests {
             fun.apply(arg);
             fail("Expected error, recieved none.");
         } catch (final Exception e) {
-            if (!e.getClass().equals(exceptionClass))
-                fail(String.format(
-                        "Expected Exception of type %s, recieved type %e",
-                        exceptionClass.getName(), e.getClass().getName()));
+            if (!e.getClass()
+                  .equals(exceptionClass))
+                fail(String.format("Expected Exception of type %s, recieved type %e",
+                                   exceptionClass.getName(),
+                                   e.getClass()
+                                    .getName()));
         }
     }
 
-    int[] testKeys;
-    double[] testVals;
+    int[]           testKeys;
+    double[]        testVals;
     VectorElement[] testPoints;
-    int testSize;
-    int testK;
-    long testSeed;
-    String testString;
+    int             testSize;
+    int             testK;
+    long            testSeed;
+    String          testString;
 
     double e = Util.roundingError;
 
@@ -59,9 +61,9 @@ public class ArrayRIVTests {
 
     @Test
     public final void testAdd() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV = new ArrayRIV(testSize).add(testRIV4);
-        final ArrayRIV testRIV8 = testRIV4.add(testRIV4);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV = new ArrayRIV(testSize).add(testRIV4);
+        final RIV testRIV8 = testRIV4.add(testRIV4);
         assertEquals("0|1.000000 1|-1.000000 10", testRIV4.toString());
         assertEquals("0|2.000000 1|-2.000000 10", testRIV8.toString());
         assertEquals(-2, testRIV8.get(1), e);
@@ -71,15 +73,15 @@ public class ArrayRIVTests {
 
     @Test
     public final void testArrayRIVArrayRIV() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV1");
-        final ArrayRIV testRIV = new ArrayRIV(testRIV1);
+        final RIV testRIV1 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV1");
+        final RIV testRIV = new ArrayRIV(testRIV1);
         assertEquals(testRIV1, testRIV);
     }
 
     @Test
     public final void testArrayRIVInt() {
-        final ArrayRIV testRIV = new ArrayRIV(15000);
+        final RIV testRIV = new ArrayRIV(15000);
         assertEquals(15000, testRIV.size());
         assertEquals(0, testRIV.count());
         assertEquals(0, testRIV.get(14500), e);
@@ -94,18 +96,21 @@ public class ArrayRIVTests {
             final int index = ArrayUtils.indexOf(testKeys, sortedTestKeys[i]);
             sortedTestVals[i] = testVals[index];
         }
-        final ArrayRIV testRIV3 = new ArrayRIV(testKeys, testVals, testSize);
+        final RIV testRIV3 = new ArrayRIV(testKeys, testVals, testSize);
         assertEquals(testSize, testRIV3.size());
         assertEquals(testK, testRIV3.count());
-        assertArrayEquals(testRIV3.keyStream().toArray(), sortedTestKeys);
-        final double[] vals = testRIV3.valStream().toArray();
+        assertArrayEquals(testRIV3.keyStream()
+                                  .toArray(),
+                          sortedTestKeys);
+        final double[] vals = testRIV3.valStream()
+                                      .toArray();
         for (int i = 0; i < testK; i++)
             assertEquals(vals[i], sortedTestVals[i], e);
     }
 
     @Test
     public final void testArrayRIVVectorElementArrayInt() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
         assertEquals(testSize, testRIV4.size());
         assertEquals(testK, testRIV4.count());
         final VectorElement[] points = testRIV4.points();
@@ -115,9 +120,8 @@ public class ArrayRIVTests {
 
     @Test
     public final void testDestructiveAdd() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV = new ArrayRIV(testSize)
-                .destructiveAdd(testRIV4);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV = new ArrayRIV(testSize).destructiveAdd(testRIV4);
         assertEquals(-1, testRIV4.get(1), e);
         assertEquals(-1, testRIV.get(1), e);
         assertEquals(testRIV4, testRIV);
@@ -125,33 +129,33 @@ public class ArrayRIVTests {
 
     @Test
     public final void testDivide() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV = testRIV4.divide(2);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV = testRIV4.divide(2);
         assertEquals(-0.5, testRIV.get(1), e);
     }
 
     @Test
     public final void testEqualsRandomIndexVector() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV1");
-        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV2");
+        final RIV testRIV1 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV1");
+        final RIV testRIV2 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV2");
         assertEquals(testRIV1, testRIV1);
         assertNotEquals(testRIV1, testRIV2);
     }
 
     @Test
     public final void testFromString() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
         assertEquals(testRIV4, ArrayRIV.fromString(testString));
     }
 
     @Test
     public final void testGenerateLabelIntIntCharSequence() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV1");
-        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV2");
+        final RIV testRIV1 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV1");
+        final RIV testRIV2 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV2");
         assertEquals(testSize, testRIV2.size());
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
@@ -160,10 +164,10 @@ public class ArrayRIVTests {
 
     @Test
     public final void testGenerateLabelIntIntCharSequenceIntInt() {
-        final ArrayRIV testRIV1 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV1", 0, 5);
-        final ArrayRIV testRIV2 = ArrayRIV.generateLabel(testSize, testK,
-                "testRIV2", 5, 10);
+        final RIV testRIV1 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV1", 0, 5);
+        final RIV testRIV2 =
+                ArrayRIV.generateLabel(testSize, testK, "testRIV2", 5, 10);
         assertEquals(testSize, testRIV2.size());
         assertEquals(testSize, testRIV1.size());
         assertEquals(testK, testRIV2.count());
@@ -172,7 +176,7 @@ public class ArrayRIVTests {
 
     @Test
     public final void testGet() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
         assertEquals(-1, testRIV4.get(1), e);
         assertEquals(0, testRIV4.get(9), e);
         assertThrows(IndexOutOfBoundsException.class, testRIV4::get, 1000000);
@@ -181,13 +185,18 @@ public class ArrayRIVTests {
     @Test
     public final void testMakeIndices() {
         assertEquals(testK, testKeys.length);
-        assertEquals(testK, Arrays.stream(testKeys).distinct().count());
         assertEquals(testK, Arrays.stream(testKeys)
-                .filter((x) -> 0 < x && x < testSize).count());
-        final int[] test2 = ArrayRIV.makeIndices(testSize, testK,
-                ArrayRIV.makeSeed("not seed"));
+                                  .distinct()
+                                  .count());
+        assertEquals(testK, Arrays.stream(testKeys)
+                                  .filter((x) -> 0 < x && x < testSize)
+                                  .count());
+        final int[] test2 =
+                ArrayRIV.makeIndices(testSize,
+                                     testK,
+                                     ArrayRIV.makeSeed("not seed"));
         assertFalse(Arrays.stream(test2)
-                .allMatch((x) -> ArrayUtils.contains(testKeys, x)));
+                          .allMatch((x) -> ArrayUtils.contains(testKeys, x)));
     }
 
     @Test
@@ -202,37 +211,50 @@ public class ArrayRIVTests {
     public final void testMakeValues() {
         assertEquals(testK, testVals.length);
         assertEquals(testK, Arrays.stream(testVals)
-                .filter((x) -> x == 1 || x == -1).count());
-        assertEquals(0, Arrays.stream(testVals).sum(), e);
+                                  .filter((x) -> x == 1 || x == -1)
+                                  .count());
+        assertEquals(0,
+                     Arrays.stream(testVals)
+                           .sum(),
+                     e);
     }
 
     @Test
     public final void testMultiply() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV8 = testRIV4.multiply(2);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV8 = testRIV4.multiply(2);
         assertEquals(-2, testRIV8.get(1), e);
     }
 
     @Test
     public final void testNormalize() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIVA = testRIV4.multiply(2);
+        final RIV testRIVA = testRIV4.multiply(2);
         final ArrayRIV testRIVB = testRIV4.mapVals((v) -> v + 2);
         assertFalse(testRIV4.equals(testRIVB));
-        assertEquals(testRIV4.normalize().magnitude(),
-                testRIVA.normalize().magnitude(), e);
-        assertEquals(testRIV4.normalize().magnitude(),
-                testRIVB.normalize().magnitude(), e);
-        assertEquals(testRIVA.normalize().magnitude(),
-                testRIVB.normalize().magnitude(), e);
+        assertEquals(testRIV4.normalize()
+                             .magnitude(),
+                     testRIVA.normalize()
+                             .magnitude(),
+                     e);
+        assertEquals(testRIV4.normalize()
+                             .magnitude(),
+                     testRIVB.normalize()
+                             .magnitude(),
+                     e);
+        assertEquals(testRIVA.normalize()
+                             .magnitude(),
+                     testRIVB.normalize()
+                             .magnitude(),
+                     e);
     }
 
     @Test
     public final void testPermute() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final Permutations p = Permutations.generate(testSize);
-        final ArrayRIV testRIVA = testRIV4.permute(p, 1);
-        final ArrayRIV testRIVB = testRIV4.permute(p, -1);
+        final RIV testRIVA = testRIV4.permute(p, 1);
+        final RIV testRIVB = testRIV4.permute(p, -1);
         assertFalse(testRIVA.equals(testRIV4));
         assertFalse(testRIVA.equals(testRIVB));
         assertFalse(testRIV4.equals(testRIVB));
@@ -244,15 +266,15 @@ public class ArrayRIVTests {
 
     @Test
     public final void testSubtract() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
-        final ArrayRIV testRIV0 = testRIV4.subtract(testRIV4);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV0 = testRIV4.subtract(testRIV4);
         assertEquals(0, testRIV0.get(9), e);
         assertEquals(0, testRIV0.count());
     }
 
     @Test
     public final void testToString() {
-        final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
+        final RIV testRIV4 = new ArrayRIV(testPoints, testSize);
         assertEquals(testString, testRIV4.toString());
     }
 
