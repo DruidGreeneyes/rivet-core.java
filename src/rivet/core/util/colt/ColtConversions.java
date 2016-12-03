@@ -1,12 +1,11 @@
 package rivet.core.util.colt;
 
-import java.util.function.BiConsumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
 
-import cern.colt.function.DoubleProcedure;
-import cern.colt.function.IntDoubleProcedure;
-import cern.colt.function.IntProcedure;
+import cern.colt.function.tdouble.DoubleProcedure;
+import cern.colt.function.tdouble.IntDoubleProcedure;
+import cern.colt.function.tint.IntProcedure;
 
 public class ColtConversions {
 

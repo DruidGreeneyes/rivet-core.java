@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
@@ -98,14 +97,15 @@ public final class ArrayRIV implements RIV, Serializable {
         return keys.toArray();
     }
 
-    private final VectorElement[] points;
+    private VectorElement[] points;
 
     private final int size;
 
-    public ArrayRIV(final RIV testRIV1) {
-        points = testRIV1.points()
-                         .clone();
-        size = testRIV1.size();
+    public ArrayRIV(final RIV riv) {
+        points = Arrays.stream(riv.points())
+                       .map(VectorElement::copy)
+                       .toArray(VectorElement[]::new);
+        size = riv.size();
     }
 
     public ArrayRIV(final int size) {
@@ -165,31 +165,37 @@ public final class ArrayRIV implements RIV, Serializable {
     }
 
     @Override
-    public ArrayRIV destructiveAdd(final RIV other)
-            throws SizeMismatchException {
-        if (size == other.size()) {
-            other.keyStream()
-                 .forEach((k) -> getPoint(k).destructiveAdd(other.get(k)));
-            return this;
-        } else
-            throw new SizeMismatchException("Target RIV is the wrong size!");
+    public ArrayRIV destructiveAdd(final RIV other) {
+        other.keyStream()
+             .forEach((
+                     k) -> destructiveSet(getPoint(k).destructiveAdd(other.get(k))));
+        return this;
     }
 
     @Override
-    public ArrayRIV destructiveSub(final RIV other)
-            throws SizeMismatchException {
-        if (size == other.size()) {
-            other.keyStream()
-                 .forEach(k -> getPoint(k).destructiveSub(other.get(k)));
-            return this;
-        } else
-            throw new SizeMismatchException("Target RIV is the wrong size!");
+    public ArrayRIV destructiveSub(final RIV other) {
+        other.keyStream()
+             .forEach(k -> destructiveSet(getPoint(k).destructiveSub(other.get(k))));
+        return this;
     }
 
-    @Override
-    public ArrayRIV divide(final double scalar) {
-        return mapVals((v) -> v / scalar);
+    private void destructiveSet(final VectorElement elt)
+            throws IndexOutOfBoundsException {
+        if (validIndex(elt.index())) {
+            final int i = binarySearch(elt);
+            if (i < 0)
+                points = ArrayUtils.add(points, ~i, elt);
+            else
+                points[i] = elt;
+        } else
+            throw new IndexOutOfBoundsException(
+                    "Index " + elt.index() + " is outside the bounds of this vector.");
     }
+
+    /*
+     * @Override public ArrayRIV divide(final double scalar) { return
+     * mapVals((v) -> v / scalar); }
+     */
 
     @Override
     public boolean equals(final Object other) {
@@ -235,11 +241,11 @@ public final class ArrayRIV implements RIV, Serializable {
                                     .sum());
     }
 
-    protected ArrayRIV mapVals(final DoubleUnaryOperator fun) {
-        return new ArrayRIV(keyStream().toArray(), valStream().map(fun)
-                                                              .toArray(),
-                size).removeZeros();
-    }
+    /*
+     * protected ArrayRIV mapVals(final DoubleUnaryOperator fun) { return new
+     * ArrayRIV(keyStream().toArray(), valStream().map(fun) .toArray(),
+     * size).destructiveRemoveZeros(); }
+     */
 
     /*
      * @Override public ArrayRIV multiply(final double scalar) { return
@@ -318,8 +324,10 @@ public final class ArrayRIV implements RIV, Serializable {
     @Override
     public ArrayRIV destructiveRemoveZeros() {
         for (int i = 0; i < points.length; i++)
-            if (points[i].value() == 0.0)
-                ArrayUtils.remove(points, i);
+            if (points[i].contains(0)) {
+                points = ArrayUtils.remove(points, i);
+                i--;
+            }
         return this;
     }
 

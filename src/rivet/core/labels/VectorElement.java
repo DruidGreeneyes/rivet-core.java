@@ -80,8 +80,12 @@ public final class VectorElement
         return Integer.compare(index, p.index);
     }
 
-    public boolean contains(final int value) {
-        return this.value == value;
+    public boolean contains(final double value) {
+        return Util.doubleEquals(value, this.value);
+    }
+
+    public VectorElement copy() {
+        return elt(index, value);
     }
 
     public VectorElement destructiveAdd(final double v) {

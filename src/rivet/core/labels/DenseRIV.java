@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+
+import org.apache.commons.lang3.ArrayUtils;
 
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
@@ -16,152 +19,19 @@ public class DenseRIV implements RIV, Serializable {
      *
      */
     private static final long serialVersionUID = -4215652990755933410L;
-    private final double[]    vector;
 
-    public DenseRIV(final int size, final int[] indices,
-            final double[] values) {
-        vector = new double[size];
-        Arrays.fill(vector, 0);
-        for (int i = 0; i < indices.length; i++)
-            vector[indices[i]] = values[i];
+    public static DenseRIV empty(final int size) {
+        return new DenseRIV(new VectorElement[0], size);
     }
 
-    public DenseRIV(final int size, final VectorElement[] points) {
-        vector = new double[size];
-        Arrays.fill(vector, 0);
-        for (final VectorElement point : points)
-            vector[point.index()] = point.value();
-    }
-
-    private DenseRIV(final double[] points) {
-        vector = Arrays.copyOf(points, points.length);
-    }
-
-    public DenseRIV(final RIV source) {
-        this(source.size(), source.points());
-    }
-
-    /*
-     * @Override public DenseRIV add(final RIV other) { return
-     * copy().destructiveAdd(other); }
-     */
-
-    @Override
-    public boolean contains(final int index) {
-        return index >= 0 && index < vector.length;
-    }
-
-    @Override
-    public DenseRIV copy() {
-        return new DenseRIV(this);
-    }
-
-    @Override
-    public int count() {
-        return size();
-    }
-
-    @Override
-    public DenseRIV destructiveAdd(final RIV other) {
-        for (final VectorElement point : other.points())
-            vector[point.index()] += point.value();
-        return this;
-    }
-
-    @Override
-    public DenseRIV destructiveSub(final RIV other) {
-        for (final VectorElement point : other.points())
-            vector[point.index()] -= point.value();
-        return this;
-    }
-
-    @Override
-    public DenseRIV destructiveDiv(final double scalar) {
-        for (int i = 0; i < vector.length; i++)
-            vector[i] = vector[i] / scalar;
-        return this;
-    }
-
-    @Override
-    public DenseRIV destructiveMult(final double scalar) {
-        for (int i = 0; i < vector.length; i++)
-            vector[i] = vector[i] * scalar;
-        return this;
-    }
-
-    /*
-     * @Override public DenseRIV divide(final double scalar) { return
-     * copy().destructiveDiv(scalar); }
-     */
-
-    @Override
-    public double get(final int index) {
-        return vector[index];
-    }
-
-    @Override
-    public IntStream keyStream() {
-        return IntStream.range(0, vector.length);
-    }
-
-    /*
-     * @Override public double magnitude() { double sum = 0; for (final double v
-     * : vector) sum += (v * v); return Math.sqrt(sum); }
-     *
-     * @Override public DenseRIV multiply(final double scalar) { return
-     * copy().destructiveMult(scalar); }
-     *
-     * private DenseRIV destructiveNorm() { double sum = 0; for (final double v
-     * : vector) sum += v; for (int i = 0; i < vector.length; i++) vector[i] =
-     * vector[i] / sum; return this; }
-     *
-     * @Override public DenseRIV normalize() { return copy().destructiveNorm();
-     * }
-     */
-
-    @Override
-    public DenseRIV permute(final Permutations permutations, int times) {
-        if (times == 0)
-            return this;
-        else {
-            final int[] prm = (times > 0)
-                    ? permutations.left
-                    : permutations.right;
-            times = Math.abs(times);
-            double[] res = Arrays.copyOf(vector, vector.length);
-            final double[] p = new double[vector.length];
-            for (int i = 0; i < times; i++) {
-                p[prm[i]] = res[i];
-                res = Arrays.copyOf(p, p.length);
-            }
-            return new DenseRIV(res);
-        }
-    }
-
-    @Override
-    public VectorElement[] points() {
-        return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i]))
-                          .toArray(VectorElement[]::new);
-    }
-
-    @Override
-    public int size() {
-        return vector.length;
-    }
-
-    /*
-     * @Override public DenseRIV subtract(final RIV other) throws
-     * SizeMismatchException { return copy().destructiveSub(other); }
-     */
-
-    @Override
-    public DoubleStream valStream() {
-        return Arrays.stream(vector);
-    }
-
-    @Override
-    public double saturation() {
-        return 1;
+    public static DenseRIV fromString(final String string) {
+        String[] bits = string.split(" ");
+        final int size = Integer.parseInt(bits[bits.length - 1]);
+        bits = Arrays.copyOf(bits, bits.length - 1);
+        final VectorElement[] points = Arrays.stream(bits)
+                                             .map(VectorElement::fromString)
+                                             .toArray(VectorElement[]::new);
+        return new DenseRIV(points, size);
     }
 
     /**
@@ -179,8 +49,8 @@ public class DenseRIV implements RIV, Serializable {
         final int j = nnz % 2 == 0
                 ? nnz
                 : nnz + 1;
-        return new DenseRIV(size, makeIndices(size, j, seed),
-                makeVals(j, seed));
+        return new DenseRIV(makeIndices(size, j, seed), makeVals(j, seed),
+                size);
     }
 
     /**
@@ -207,18 +77,22 @@ public class DenseRIV implements RIV, Serializable {
         return word -> generateLabel(size, nnz, word);
     }
 
+    /*
+     * @Override public DenseRIV add(final RIV other) { return
+     * copy().destructiveAdd(other); }
+     */
+
     public static Function<Integer, DenseRIV> labelGenerator(final int size,
             final int nnz, final CharSequence source, final int tokenLength) {
         return i -> generateLabel(size, nnz, source, i, tokenLength);
     }
 
-    private static int[] makeIndices(final int size, final int count,
-            final long seed) {
+    static int[] makeIndices(final int size, final int count, final long seed) {
         return Util.randInts(size, count, seed)
                    .toArray();
     }
 
-    private static long makeSeed(final CharSequence word) {
+    static long makeSeed(final CharSequence word) {
         final AtomicInteger c = new AtomicInteger();
         return word.chars()
                    .mapToLong(ch -> ch
@@ -226,7 +100,7 @@ public class DenseRIV implements RIV, Serializable {
                    .sum();
     }
 
-    private static double[] makeVals(final int count, final long seed) {
+    static double[] makeVals(final int count, final long seed) {
         final double[] l = new double[count];
         for (int i = 0; i < count; i += 2) {
             l[i] = 1;
@@ -235,21 +109,75 @@ public class DenseRIV implements RIV, Serializable {
         return Util.shuffleDoubleArray(l, seed);
     }
 
-    /**
-     * Doesn't do anything.
-     */
-    @Deprecated
-    @Override
-    public DenseRIV removeZeros() {
-        return this;
+    private final double[] vector;
+
+    private DenseRIV(final double[] points) {
+        vector = Arrays.copyOf(points, points.length);
     }
 
-    /**
-     * Doesn't do anything.
+    public DenseRIV(final int[] indices, final double[] values,
+            final int size) {
+        vector = new double[size];
+        Arrays.fill(vector, 0);
+        for (int i = 0; i < indices.length; i++)
+            vector[indices[i]] = values[i];
+    }
+
+    /*
+     * @Override public DenseRIV divide(final double scalar) { return
+     * copy().destructiveDiv(scalar); }
      */
-    @Deprecated
+
+    public DenseRIV(final RIV source) {
+        this(source.points(), source.size());
+    }
+
+    public DenseRIV(final VectorElement[] points, final int size) {
+        vector = new double[size];
+        Arrays.fill(vector, 0);
+        for (final VectorElement point : points)
+            vector[point.index()] = point.value();
+    }
+
+    /*
+     * @Override public double magnitude() { double sum = 0; for (final double v
+     * : vector) sum += (v * v); return Math.sqrt(sum); }
+     *
+     * @Override public DenseRIV multiply(final double scalar) { return
+     * copy().destructiveMult(scalar); }
+     *
+     * private DenseRIV destructiveNorm() { double sum = 0; for (final double v
+     * : vector) sum += v; for (int i = 0; i < vector.length; i++) vector[i] =
+     * vector[i] / sum; return this; }
+     *
+     * @Override public DenseRIV normalize() { return copy().destructiveNorm();
+     * }
+     */
+
     @Override
-    public DenseRIV destructiveRemoveZeros() {
+    public boolean contains(final int index) {
+        return index >= 0 && index < vector.length;
+    }
+
+    @Override
+    public DenseRIV copy() {
+        return new DenseRIV(this);
+    }
+
+    @Override
+    public int count() {
+        return size();
+    }
+
+    /*
+     * @Override public DenseRIV subtract(final RIV other) throws
+     * SizeMismatchException { return copy().destructiveSub(other); }
+     */
+
+    @Override
+    public DenseRIV destructiveAdd(final RIV other) {
+        for (final VectorElement point : other.points())
+            vector[point.index()] += point.value();
         return this;
     }
 
@@ -265,6 +193,36 @@ public class DenseRIV implements RIV, Serializable {
     }
 
     @Override
+    public DenseRIV destructiveDiv(final double scalar) {
+        for (int i = 0; i < vector.length; i++)
+            vector[i] = vector[i] / scalar;
+        return this;
+    }
+
+    @Override
+    public DenseRIV destructiveMult(final double scalar) {
+        for (int i = 0; i < vector.length; i++)
+            vector[i] = vector[i] * scalar;
+        return this;
+    }
+
+    /**
+     * Doesn't do anything.
+     */
+    @Deprecated
+    @Override
+    public DenseRIV destructiveRemoveZeros() {
+        return this;
+    }
+
+    @Override
+    public DenseRIV destructiveSub(final RIV other) {
+        for (final VectorElement point : other.points())
+            vector[point.index()] -= point.value();
+        return this;
+    }
+
+    @Override
     public DenseRIV destructiveSub(final RIV...rivs) {
         IntStream.range(0, vector.length)
                  .parallel()
@@ -273,5 +231,95 @@ public class DenseRIV implements RIV, Serializable {
                                                   .mapToDouble(riv -> riv.get(i))
                                                   .sum());
         return this;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        else if (!ArrayUtils.contains(obj.getClass()
+                                         .getInterfaces(),
+                                      RIV.class))
+            return false;
+        else
+            return equalsRIV((RIV) obj);
+    }
+
+    public boolean equalsRIV(final RIV riv) {
+        if (vector.length != riv.size())
+            return false;
+        for (int i = 0; i < vector.length; i++)
+            if (get(i) != riv.get(i))
+                return false;
+        return true;
+    }
+
+    @Override
+    public double get(final int index) {
+        return vector[index];
+    }
+
+    @Override
+    public IntStream keyStream() {
+        return IntStream.range(0, vector.length);
+    }
+
+    @Override
+    public DenseRIV permute(final Permutations permutations, int times) {
+        if (times == 0)
+            return this;
+        else {
+            final int[] prm = times > 0
+                    ? permutations.left
+                    : permutations.right;
+            times = Math.abs(times);
+            double[] res = Arrays.copyOf(vector, vector.length);
+            final double[] p = new double[vector.length];
+            for (int t = 0; t < times; t++) {
+                for (int i = 0; i < res.length; i++)
+                    p[prm[i]] = res[i];
+                res = Arrays.copyOf(p, p.length);
+            }
+            return new DenseRIV(res);
+        }
+    }
+
+    @Override
+    public VectorElement[] points() {
+        return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i]))
+                          .toArray(VectorElement[]::new);
+    }
+
+    /**
+     * Doesn't do anything.
+     */
+    @Deprecated
+    @Override
+    public DenseRIV removeZeros() {
+        return this;
+    }
+
+    @Override
+    public double saturation() {
+        return 1;
+    }
+
+    @Override
+    public int size() {
+        return vector.length;
+    }
+
+    @Override
+    public String toString() {
+        return IntStream.range(0, vector.length)
+                        .mapToObj(i -> String.format("%d|%f", i, vector[i]))
+                        .collect(Collectors.joining(" ",
+                                                    "",
+                                                    " " + vector.length));
+    }
+
+    @Override
+    public DoubleStream valStream() {
+        return Arrays.stream(vector);
     }
 }

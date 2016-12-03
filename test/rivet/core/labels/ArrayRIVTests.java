@@ -230,7 +230,8 @@ public class ArrayRIVTests {
     public final void testNormalize() {
         final ArrayRIV testRIV4 = new ArrayRIV(testPoints, testSize);
         final RIV testRIVA = testRIV4.multiply(2);
-        final ArrayRIV testRIVB = testRIV4.mapVals((v) -> v + 2);
+        final RIV testRIVB =
+                testRIV4.add(new ArrayRIV(testKeys, testVals, testSize));
         assertFalse(testRIV4.equals(testRIVB));
         assertEquals(testRIV4.normalize()
                              .magnitude(),

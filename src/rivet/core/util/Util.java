@@ -16,12 +16,13 @@ import java.util.stream.LongStream;
 import org.apache.commons.math3.special.Gamma;
 
 public final class Util {
-    public static double roundingError = 0.0000001;
+    public static double roundingError = 0.000001;
 
     public static DoubleBinaryOperator multiplier = (x, y) -> x * y;
 
     public static <T> List<T> copyList(final List<T> lis) {
-        return lis.stream().collect(Collectors.toList());
+        return lis.stream()
+                  .collect(Collectors.toList());
     }
 
     public static boolean doubleEquals(final double a, final double b) {
@@ -71,7 +72,7 @@ public final class Util {
         return x -> multiplier.applyAsDouble(x, mult);
     }
 
-    public static double product(final double... args) {
+    public static double product(final double...args) {
         return product(Arrays.stream(args));
     }
 
@@ -98,7 +99,9 @@ public final class Util {
 
     public static IntStream randInts(final int bound, final int length,
             final Long seed) {
-        return new Random(seed).ints(0, bound).distinct().limit(length);
+        return new Random(seed).ints(0, bound)
+                               .distinct()
+                               .limit(length);
     }
 
     public static IntStream range(final int bound) {
@@ -130,23 +133,28 @@ public final class Util {
     public static CharSequence safeSubSequence(final CharSequence seq,
             final int start, final int end) {
         final int l = seq.length() - 1;
-        return seq.subSequence(start, end > l ? l : end);
+        return seq.subSequence(start, end > l
+                ? l
+                : end);
     }
 
     public static double[] shuffleDoubleArray(final double[] arr,
             final Long seed) {
         final int size = arr.length;
-        return randInts(size, size, seed).mapToDouble((i) -> arr[i]).toArray();
+        return randInts(size, size, seed).mapToDouble((i) -> arr[i])
+                                         .toArray();
     }
 
     public static int[] shuffleIntArray(final int[] arr, final Long seed) {
         final int size = arr.length;
-        return randInts(size, size, seed).map((i) -> arr[i]).toArray();
+        return randInts(size, size, seed).map((i) -> arr[i])
+                                         .toArray();
     }
 
     public static <T> List<T> shuffleList(final List<T> lis, final Long seed) {
         final int size = lis.size();
-        return randInts(size, size, seed).mapToObj(lis::get).collect(toList());
+        return randInts(size, size, seed).mapToObj(lis::get)
+                                         .collect(toList());
     }
 
     private Util() {

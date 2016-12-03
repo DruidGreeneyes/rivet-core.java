@@ -27,7 +27,8 @@ public interface RIV {
      * @throws SizeMismatchException
      */
     default RIV add(final RIV other) {
-        return copy().destructiveAdd(other);
+        return copy().destructiveAdd(other)
+                     .destructiveRemoveZeros();
     }
 
     /**
@@ -84,7 +85,8 @@ public interface RIV {
     RIV destructiveAdd(final RIV other);
 
     default RIV add(final RIV...rivs) {
-        return copy().destructiveAdd(rivs);
+        return copy().destructiveAdd(rivs)
+                     .destructiveRemoveZeros();
     }
 
     RIV destructiveAdd(final RIV...rivs);
@@ -125,7 +127,8 @@ public interface RIV {
     RIV destructiveSub(final RIV other);
 
     default RIV subtract(final RIV...rivs) {
-        return copy().destructiveSub(rivs);
+        return copy().destructiveSub(rivs)
+                     .destructiveRemoveZeros();
     }
 
     RIV destructiveSub(final RIV...rivs);
@@ -138,7 +141,8 @@ public interface RIV {
      * @return a copy of this, where each element has been divided by scalar
      */
     default RIV divide(final double scalar) {
-        return copy().destructiveDiv(scalar);
+        return copy().destructiveDiv(scalar)
+                     .destructiveRemoveZeros();
     }
 
     RIV destructiveDiv(final double scalar);
@@ -246,7 +250,8 @@ public interface RIV {
      * @throws SizeMismatchException
      */
     default RIV subtract(final RIV other) {
-        return copy().destructiveSub(other);
+        return copy().destructiveSub(other)
+                     .destructiveRemoveZeros();
     }
 
     /**
