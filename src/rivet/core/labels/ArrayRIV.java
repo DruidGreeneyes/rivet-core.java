@@ -273,6 +273,11 @@ public final class ArrayRIV implements RIV, Serializable {
     }
 
     @Override
+    public Stream<VectorElement> pointStream() {
+        return Arrays.stream(points);
+    }
+
+    @Override
     public ArrayRIV removeZeros() {
         final VectorElement[] elts = stream().filter(ve -> !ve.contains(0))
                                              .toArray(VectorElement[]::new);

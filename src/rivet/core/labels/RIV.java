@@ -3,6 +3,7 @@ package rivet.core.labels;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
@@ -227,7 +228,12 @@ public interface RIV {
      * @return An array of VectorElements representing the non-zero points in
      *         this random index vector.
      */
-    VectorElement[] points();
+    default VectorElement[] points() {
+        return pointStream().sorted(VectorElement::compare)
+                            .toArray(VectorElement[]::new);
+    }
+
+    Stream<VectorElement> pointStream();
 
     /**
      *

@@ -379,13 +379,6 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
                     valStream().toArray(), size);
     }
 
-    @Override
-    public VectorElement[] points() {
-        return stream().map(VectorElement::elt)
-                       .sorted(VectorElement::compare)
-                       .toArray(VectorElement[]::new);
-    }
-
     /*
      * @Override public MapRIV removeZeros() { final ConcurrentHashMap<Integer,
      * Double> map = entrySet().stream() .filter(e -> !Util.doubleEquals(0,
@@ -488,5 +481,10 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
     public MapRIV destructiveDiv(final double scalar) {
         replaceAll((k, v) -> v / scalar);
         return this;
+    }
+
+    @Override
+    public Stream<VectorElement> pointStream() {
+        return stream().map(VectorElement::elt);
     }
 }

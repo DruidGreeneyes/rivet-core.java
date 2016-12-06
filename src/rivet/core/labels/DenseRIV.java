@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -285,9 +286,8 @@ public class DenseRIV implements RIV, Serializable {
     }
 
     @Override
-    public VectorElement[] points() {
-        return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i]))
-                          .toArray(VectorElement[]::new);
+    public Stream<VectorElement> pointStream() {
+        return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i]));
     }
 
     /**

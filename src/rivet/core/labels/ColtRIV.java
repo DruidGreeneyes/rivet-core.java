@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
@@ -273,14 +274,10 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     }
 
     @Override
-    public VectorElement[] points() {
-        final AtomicInteger c = new AtomicInteger(count());
-        final VectorElement[] res = new VectorElement[count()];
-        forEachPair((a, b) -> {
-            res[c.decrementAndGet()] = VectorElement.elt(a, b);
-            return true;
-        });
-        return res;
+    public Stream<VectorElement> pointStream() {
+        final Stream.Builder<VectorElement> sb = Stream.builder();
+        forEachPair(procedurize((k, v) -> sb.accept(VectorElement.elt(k, v))));
+        return sb.build();
     }
 
     @Override
