@@ -228,9 +228,10 @@ public class ImmutableRIV implements RIV {
                 "Destructive methods not available on Immutable RIV.");
     }
 
-    private Stream<VectorElement> permute(final Stream<VectorElement> points,
+    private static void permute(final VectorElement[] points,
             final int[] permutation) {
-        return points.map(elt -> elt.destructiveSet(permutation[elt.index()]));
+        for (final VectorElement point : points)
+            point.destructiveSet(permutation[point.index()]);
     }
 
     @Override
@@ -242,11 +243,11 @@ public class ImmutableRIV implements RIV {
                 ? permutations.left
                 : permutations.right;
         final int t = Math.abs(times);
-        Stream<VectorElement> points = pointStream();
+        final VectorElement[] points = points();
         for (int i = 0; i < t; i++)
-            points = permute(points, permutation);
-        return new ImmutableRIV(size, points.sorted()
-                                            .toArray(VectorElement[]::new));
+            permute(points, permutation);
+        Arrays.sort(points);
+        return new ImmutableRIV(size, points);
     }
 
     @Override
@@ -279,5 +280,18 @@ public class ImmutableRIV implements RIV {
     @Override
     public int hashCode() {
         return keyStream().sum();
+    }
+
+    @Override
+    public double magnitude() {
+        double sum = 0;
+        for (final double v : vals)
+            sum += v * v;
+        return Math.sqrt(sum);
+    }
+
+    public static ImmutableRIV empty(final int size) {
+        return new ImmutableRIV(size, ArrayUtils.EMPTY_INT_ARRAY,
+                ArrayUtils.EMPTY_DOUBLE_ARRAY);
     }
 }
