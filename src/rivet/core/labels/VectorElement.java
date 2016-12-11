@@ -49,8 +49,8 @@ public final class VectorElement
     }
 
     // Values
-    private final int index;
-    private double    value;
+    private int    index;
+    private double value;
 
     // Constructors
     public VectorElement(final int index, final double value) {
@@ -173,4 +173,13 @@ public final class VectorElement
         return value;
     }
 
+    public VectorElement destructiveSet(final int index) {
+        this.index = index;
+        return this;
+    }
+
+    public VectorElement destructiveSet(final double value) {
+        this.value = value;
+        return this;
+    }
 }

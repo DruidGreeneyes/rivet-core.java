@@ -243,6 +243,25 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return this;
     }
 
+    @Override
+    public boolean equals(final Object other) {
+        return RIVs.equals(this, other);
+    }
+
+    @Override
+    public boolean equals(final RIV other) {
+        if (other.getClass()
+                 .equals(ColtRIV.class))
+            return equals(other);
+        else
+            return size == other.size()
+                   && Arrays.deepEquals(points(), other.points());
+    }
+
+    public boolean equals(final ColtRIV other) {
+        return size == other.size() && super.equals(other);
+    }
+
     /*
      * @Override public ColtRIV subtract(final RIV other) throws
      * SizeMismatchException { return copy().destructiveSub(other); }
@@ -297,5 +316,10 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         final DoubleStream.Builder sb = DoubleStream.builder();
         forEachPair(procedurize((k, v) -> sb.accept(v)));
         return sb.build();
+    }
+
+    @Override
+    public int hashCode() {
+        return keyStream().sum();
     }
 }

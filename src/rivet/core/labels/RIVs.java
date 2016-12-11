@@ -4,11 +4,24 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import druid.utils.pair.UniformPair;
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.vectorpermutations.Permutations;
 
 public class RIVs {
+
+    protected static boolean equals(final RIV riv, final Object other) {
+        if (riv == other)
+            return true;
+        else if (ArrayUtils.contains(other.getClass()
+                                          .getInterfaces(),
+                                     RIV.class))
+            return riv.equals((RIV) other);
+        else
+            return false;
+    }
 
     public static RIV addRIVs(final RIV rivA, final RIV rivB)
             throws SizeMismatchException {

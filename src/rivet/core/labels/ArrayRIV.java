@@ -3,7 +3,6 @@ package rivet.core.labels;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.DoubleUnaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -199,17 +198,11 @@ public final class ArrayRIV implements RIV, Serializable {
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other)
-            return true;
-        else if (!ArrayUtils.contains(other.getClass()
-                                           .getInterfaces(),
-                                      RIV.class))
-            return false;
-        else
-            return equalsRIV((RIV) other);
+        return RIVs.equals(this, other);
     }
 
-    public boolean equalsRIV(final RIV other) {
+    @Override
+    public boolean equals(final RIV other) {
         return size() == other.size() && Arrays.equals(points, other.points());
     }
 

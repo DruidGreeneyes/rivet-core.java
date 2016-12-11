@@ -9,8 +9,6 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
@@ -236,17 +234,11 @@ public class DenseRIV implements RIV, Serializable {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        else if (!ArrayUtils.contains(obj.getClass()
-                                         .getInterfaces(),
-                                      RIV.class))
-            return false;
-        else
-            return equalsRIV((RIV) obj);
+        return RIVs.equals(this, obj);
     }
 
-    public boolean equalsRIV(final RIV riv) {
+    @Override
+    public boolean equals(final RIV riv) {
         if (vector.length != riv.size())
             return false;
         for (int i = 0; i < vector.length; i++)
@@ -321,5 +313,10 @@ public class DenseRIV implements RIV, Serializable {
     @Override
     public DoubleStream valStream() {
         return Arrays.stream(vector);
+    }
+
+    @Override
+    public int hashCode() {
+        return keyStream().sum();
     }
 }

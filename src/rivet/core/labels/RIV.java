@@ -149,7 +149,9 @@ public interface RIV {
     RIV destructiveDiv(final double scalar);
 
     @Override
-    boolean equals(final Object other);
+    boolean equals(Object other);
+
+    boolean equals(RIV other);
 
     /**
      * Written for the sake of making it easier to string dot-chains together.

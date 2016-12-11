@@ -10,8 +10,6 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
@@ -324,26 +322,21 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
 
     @Override
     public boolean equals(final Object other) {
-        if (this == other)
-            return true;
-        else if (!ArrayUtils.contains(other.getClass()
-                                           .getInterfaces(),
-                                      RIV.class))
-            return false;
-        else if (other.getClass()
-                      .equals(MapRIV.class))
-            return equalsMapRIV((MapRIV) other);
-        else
-            return equalsRIV((RIV) other);
+        return RIVs.equals(this, other);
     }
 
-    public boolean equalsMapRIV(final MapRIV other) {
+    public boolean equals(final MapRIV other) {
         return size == other.size() && super.equals(other);
     }
 
-    public boolean equalsRIV(final RIV other) {
-        return size == other.size()
-               && Arrays.deepEquals(points(), other.points());
+    @Override
+    public boolean equals(final RIV other) {
+        if (other.getClass()
+                 .equals(MapRIV.class))
+            return equals((MapRIV) other);
+        else
+            return size == other.size()
+                   && Arrays.deepEquals(points(), other.points());
     }
 
     @Override
