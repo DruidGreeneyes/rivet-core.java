@@ -252,7 +252,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     public boolean equals(final RIV other) {
         if (other.getClass()
                  .equals(ColtRIV.class))
-            return equals(other);
+            return equals((ColtRIV) other);
         else
             return size == other.size()
                    && Arrays.deepEquals(points(), other.points());

@@ -185,7 +185,7 @@ public class ImmutableRIV implements RIV {
     public boolean equals(final RIV other) {
         if (other.getClass()
                  .equals(ImmutableRIV.class))
-            return equals(other);
+            return equals((ImmutableRIV) other);
         else
             return size == other.size()
                    && Arrays.deepEquals(points(), other.points());
