@@ -32,7 +32,7 @@ public interface RIV {
                      .destructiveRemoveZeros();
     }
 
-    default RIV toImmutable() {
+    default ImmutableRIV toImmutable() {
         return new ImmutableRIV(this);
     }
 

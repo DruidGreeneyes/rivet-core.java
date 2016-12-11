@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.NotImplementedException;
 
 import rivet.core.vectorpermutations.Permutations;
 
@@ -25,12 +26,17 @@ public class ImmutableRIV implements RIV {
 
     private ImmutableRIV(final int size, final VectorElement[] points) {
         this.size = size;
-        keys = new int[points.length];
-        vals = new double[points.length];
+        final int[] ks = new int[points.length];
+        final double[] vs = new double[points.length];
+        final int[] zeros = new int[0];
         for (int i = 0; i < points.length; i++) {
-            keys[i] = points[i].index();
-            vals[i] = points[i].value();
+            ks[i] = points[i].index();
+            vs[i] = points[i].value();
+            if (vs[i] == 0)
+                ArrayUtils.add(zeros, i);
         }
+        keys = ArrayUtils.removeAll(ks, zeros);
+        vals = ArrayUtils.removeAll(vs, zeros);
     }
 
     public ImmutableRIV(final RIV riv) {
@@ -121,12 +127,14 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public ImmutableRIV destructiveAdd(final RIV other) {
-        return add(other);
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
     }
 
     @Override
     public ImmutableRIV destructiveAdd(final RIV...rivs) {
-        return add(rivs);
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
     }
 
     private static final DoubleBinaryOperator subtract = (a, b) -> a - b;
@@ -143,12 +151,14 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public ImmutableRIV destructiveSub(final RIV other) {
-        return subtract(other);
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
     }
 
     @Override
     public ImmutableRIV destructiveSub(final RIV...rivs) {
-        return subtract(rivs);
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
     }
 
     private static DoubleUnaryOperator divideBy(final double scalar) {
@@ -162,7 +172,8 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public ImmutableRIV destructiveDiv(final double scalar) {
-        return divide(scalar);
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
     }
 
     @Override
@@ -213,7 +224,8 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public ImmutableRIV destructiveMult(final double scalar) {
-        return multiply(scalar);
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
     }
 
     private Stream<VectorElement> permute(final Stream<VectorElement> points,
@@ -255,6 +267,12 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public ImmutableRIV destructiveRemoveZeros() {
+        throw new NotImplementedException(
+                "Destructive methods not available on Immutable RIV.");
+    }
+
+    @Override
+    public ImmutableRIV removeZeros() {
         return this;
     }
 
