@@ -32,6 +32,10 @@ public interface RIV {
                      .destructiveRemoveZeros();
     }
 
+    default RIV toImmutable() {
+        return new ImmutableRIV(this);
+    }
+
     /**
      * @param index
      * @return true if the value at this index in the random index vector != 0,

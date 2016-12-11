@@ -33,6 +33,10 @@ public class ImmutableRIV implements RIV {
         }
     }
 
+    public ImmutableRIV(final RIV riv) {
+        this(riv.size(), riv.points());
+    }
+
     @Override
     public boolean contains(final int index) {
         return ArrayUtils.contains(keys, index);
