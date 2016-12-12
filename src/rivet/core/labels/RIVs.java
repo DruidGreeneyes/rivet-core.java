@@ -37,9 +37,9 @@ public class RIVs {
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
         double sum = 0;
-        final double[][] matchingVals = getMatchingVals(rivA, rivB);
-        for (final double[] vals : matchingVals)
-            sum += vals[0] * vals[1];
+        for (final int k : rivA.keyArr())
+            if (rivB.contains(k))
+                sum += rivA.get(k) * rivB.get(k);
         return sum;
     }
 
