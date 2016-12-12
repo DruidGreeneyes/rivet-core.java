@@ -287,7 +287,11 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public int hashCode() {
-        return keyStream().sum();
+        int sum = 0;
+        for (final double d : vals)
+            sum += d;
+        return sum;
+
     }
 
     @Override
@@ -305,11 +309,11 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public int[] keyArr() {
-        return keys;
+        return Arrays.copyOf(keys, keys.length);
     }
 
     @Override
     public double[] valArr() {
-        return vals;
+        return Arrays.copyOf(vals, vals.length);
     }
 }
