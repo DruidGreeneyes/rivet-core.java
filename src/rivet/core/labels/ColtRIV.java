@@ -322,4 +322,32 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     public int hashCode() {
         return keyStream().sum();
     }
+
+    @Override
+    public VectorElement[] points() {
+        final VectorElement[] points = new VectorElement[count()];
+        final AtomicInteger c = new AtomicInteger();
+        forEachPair(procedurize((k, v) -> points[c.getAndIncrement()] =
+                VectorElement.elt(k, v)));
+        Arrays.sort(points);
+        return points;
+    }
+
+    @Override
+    public int[] keyArr() {
+        final VectorElement[] points = points();
+        final int[] keys = new int[points.length];
+        for (int i = 0; i < keys.length; i++)
+            keys[i] = points[i].index();
+        return keys;
+    }
+
+    @Override
+    public double[] valArr() {
+        final VectorElement[] points = points();
+        final double[] vals = new double[points.length];
+        for (int i = 0; i < vals.length; i++)
+            vals[i] = points[i].value();
+        return vals;
+    }
 }

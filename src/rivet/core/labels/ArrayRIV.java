@@ -358,4 +358,20 @@ public final class ArrayRIV implements RIV, Serializable {
               .forEach(elt -> elt.destructiveMult(scalar));
         return this;
     }
+
+    @Override
+    public int[] keyArr() {
+        final int[] keys = new int[points.length];
+        for (int i = 0; i < points.length; i++)
+            keys[i] = points[i].index();
+        return keys;
+    }
+
+    @Override
+    public double[] valArr() {
+        final double[] vals = new double[points.length];
+        for (int i = 0; i < points.length; i++)
+            vals[i] = points[i].value();
+        return vals;
+    }
 }

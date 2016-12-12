@@ -234,10 +234,7 @@ public interface RIV {
      * @return An array of VectorElements representing the non-zero points in
      *         this random index vector.
      */
-    default VectorElement[] points() {
-        return pointStream().sorted(VectorElement::compare)
-                            .toArray(VectorElement[]::new);
-    }
+    VectorElement[] points();
 
     Stream<VectorElement> pointStream();
 
@@ -296,4 +293,8 @@ public interface RIV {
     }
 
     RIV destructiveRemoveZeros();
+
+    int[] keyArr();
+
+    double[] valArr();
 }

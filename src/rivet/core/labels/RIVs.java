@@ -28,17 +28,43 @@ public class RIVs {
         return rivA.add(rivB);
     }
 
-    public static double dotProduct(final RIV rivA, final RIV rivB) {
+    public static double dotProduct2(final RIV rivA, final RIV rivB) {
         return getMatchingValStream(rivA,
                                     rivB).mapToDouble(pair -> pair.left
                                                               * pair.right)
                                          .sum();
     }
 
+    public static double dotProduct(final RIV rivA, final RIV rivB) {
+        double sum = 0;
+        for (final double[] vals : getMatchingVals(rivA, rivB))
+            sum += vals[0] * vals[1];
+        return sum;
+    }
+
+    private static int[] getMatchingKeys(final RIV rivA, final RIV rivB) {
+        final int[] keys = rivA.keyArr(), keysB = rivB.keyArr();
+        for (int i = 0; i < keys.length; i++)
+            if (!ArrayUtils.contains(keysB, keys[i]))
+                keys[i] = -1;
+        ArrayUtils.removeAllOccurences(keysB, -1);
+        return keys;
+    }
+
     private static IntStream getMatchingKeyStream(final RIV rivA,
             final RIV rivB) {
         return rivA.keyStream()
-                   .filter(rivA::contains);
+                   .filter(rivB::contains);
+    }
+
+    private static double[][] getMatchingVals(final RIV rivA, final RIV rivB) {
+        final int[] keys = getMatchingKeys(rivA, rivB);
+        final double[][] vals = new double[keys.length][2];
+        for (int i = 0; i < keys.length; i++) {
+            vals[i][0] = rivA.get(i);
+            vals[i][1] = rivB.get(i);
+        }
+        return vals;
     }
 
     private static Stream<UniformPair<Double>> getMatchingValStream(

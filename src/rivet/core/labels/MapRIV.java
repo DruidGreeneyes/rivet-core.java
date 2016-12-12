@@ -10,6 +10,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import rivet.core.exceptions.SizeMismatchException;
 import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
@@ -479,5 +481,26 @@ public final class MapRIV extends ConcurrentHashMap<Integer, Double>
     @Override
     public Stream<VectorElement> pointStream() {
         return stream().map(VectorElement::elt);
+    }
+
+    @Override
+    public int[] keyArr() {
+        return ArrayUtils.toPrimitive(keySet().toArray(new Integer[count()]));
+    }
+
+    @Override
+    public double[] valArr() {
+        return ArrayUtils.toPrimitive(values().toArray(new Double[count()]));
+    }
+
+    @Override
+    public VectorElement[] points() {
+        final VectorElement[] points = new VectorElement[count()];
+        final AtomicInteger c = new AtomicInteger();
+        forEach(10000,
+                (a, b) -> points[c.getAndIncrement()] =
+                        VectorElement.elt(a, b));
+        Arrays.sort(points);
+        return points;
     }
 }

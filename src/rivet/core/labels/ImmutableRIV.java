@@ -251,6 +251,14 @@ public class ImmutableRIV implements RIV {
     }
 
     @Override
+    public VectorElement[] points() {
+        final VectorElement[] points = new VectorElement[keys.length];
+        for (int i = 0; i < keys.length; i++)
+            points[i] = VectorElement.elt(keys[i], vals[i]);
+        return points;
+    }
+
+    @Override
     public Stream<VectorElement> pointStream() {
         return IntStream.range(0, keys.length)
                         .mapToObj(i -> VectorElement.elt(keys[i], vals[i]));
@@ -293,5 +301,15 @@ public class ImmutableRIV implements RIV {
     public static ImmutableRIV empty(final int size) {
         return new ImmutableRIV(size, ArrayUtils.EMPTY_INT_ARRAY,
                 ArrayUtils.EMPTY_DOUBLE_ARRAY);
+    }
+
+    @Override
+    public int[] keyArr() {
+        return keys;
+    }
+
+    @Override
+    public double[] valArr() {
+        return vals;
     }
 }

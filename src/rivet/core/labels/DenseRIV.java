@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -303,11 +302,11 @@ public class DenseRIV implements RIV, Serializable {
 
     @Override
     public String toString() {
-        return IntStream.range(0, vector.length)
-                        .mapToObj(i -> String.format("%d|%f", i, vector[i]))
-                        .collect(Collectors.joining(" ",
-                                                    "",
-                                                    " " + vector.length));
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < vector.length; i++)
+            sb.append(String.format("%d|%f ", i, vector[i]));
+        sb.append("" + vector.length);
+        return sb.toString();
     }
 
     @Override
@@ -318,5 +317,24 @@ public class DenseRIV implements RIV, Serializable {
     @Override
     public int hashCode() {
         return keyStream().sum();
+    }
+
+    @Override
+    public VectorElement[] points() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public int[] keyArr() {
+        final int[] keys = new int[vector.length];
+        for (int i = 0; i < keys.length; i++)
+            keys[i] = i;
+        return keys;
+    }
+
+    @Override
+    public double[] valArr() {
+        return Arrays.copyOf(vector, vector.length);
     }
 }
