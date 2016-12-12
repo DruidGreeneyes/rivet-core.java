@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,11 +38,11 @@ public class MapRIVTests {
         }
     }
 
-    int[]                              testKeys;
-    double[]                           testVals;
-    ConcurrentHashMap<Integer, Double> testPointMap;
-    int                                testSize;
-    int                                testK;
+    int[]                                     testKeys;
+    double[]                                  testVals;
+    ConcurrentHashMap<Integer, MutableDouble> testPointMap;
+    int                                       testSize;
+    int                                       testK;
 
     long testSeed;
 
@@ -60,8 +61,8 @@ public class MapRIVTests {
         testPointMap = new ConcurrentHashMap<>();
         for (int i = 0; i < 48; i += 2) {
             final int j = i + 1;
-            testPointMap.put(i, 1.0);
-            testPointMap.put(j, -1.0);
+            testPointMap.put(i, new MutableDouble(1.0));
+            testPointMap.put(j, new MutableDouble(-1.0));
         }
     }
 
@@ -167,7 +168,10 @@ public class MapRIVTests {
         final VectorElement[] points = testRIV.points();
         assertEquals(testK, points.length);
         for (final VectorElement point : points)
-            assertEquals(point.value(), testPointMap.get(point.index()), e);
+            assertEquals(point.value(),
+                         testPointMap.get(point.index())
+                                     .getValue(),
+                         e);
     }
 
     @Test
