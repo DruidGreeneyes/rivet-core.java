@@ -294,6 +294,13 @@ public class ImmutableRIV implements RIV {
         return sum;
     }
 
+    public int hashCode2() {
+        int sum = 0;
+        for (final double v : vals)
+            sum += v;
+        return sum;
+    }
+
     @Override
     public double magnitude() {
         double sum = 0;
