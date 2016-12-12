@@ -171,8 +171,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public ColtRIV destructiveAdd(final RIV other) {
-        other.keyStream()
-             .forEach(i -> put(i, get(i) + other.get(i)));
+        for (final int i : other.keyArr())
+            put(i, get(i) + other.get(i));
         return this;
     }
 
@@ -183,18 +183,21 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public ColtRIV destructiveAdd(final RIV...rivs) {
-        IntStream.range(0, size)
-                 .parallel()
-                 .forEach(i -> put(i, get(i) + Arrays.stream(rivs)
-                                                     .parallel()
-                                                     .mapToDouble(riv -> riv.get(i))
-                                                     .sum()));
+        for (int i = 0; i < size; i++) {
+            double v = get(i);
+            for (final RIV riv : rivs)
+                v += riv.get(i);
+            if (v == 0)
+                removeKey(i);
+            else
+                put(i, v);
+        }
         return this;
     }
 
     @Override
     public ColtRIV destructiveDiv(final double scalar) {
-        this.assign(DoubleMult.div(scalar));
+        assign(DoubleMult.div(scalar));
         return this;
     }
 
@@ -208,7 +211,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public ColtRIV destructiveMult(final double scalar) {
-        this.assign(DoubleMult.mult(scalar));
+        assign(DoubleMult.mult(scalar));
         return this;
     }
 
@@ -227,19 +230,22 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public ColtRIV destructiveSub(final RIV other) {
-        other.keyStream()
-             .forEach(i -> put(i, get(i) - other.get(i)));
+        for (final int i : other.keyArr())
+            put(i, get(i) - other.get(i));
         return this;
     }
 
     @Override
     public ColtRIV destructiveSub(final RIV...rivs) {
-        IntStream.range(0, size)
-                 .parallel()
-                 .forEach(i -> put(i, get(i) - Arrays.stream(rivs)
-                                                     .parallel()
-                                                     .mapToDouble(riv -> riv.get(i))
-                                                     .sum()));
+        for (int i = 0; i < size; i++) {
+            double v = get(i);
+            for (final RIV riv : rivs)
+                v -= riv.get(i);
+            if (v == 0)
+                removeKey(i);
+            else
+                put(i, v);
+        }
         return this;
     }
 
@@ -269,9 +275,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public IntStream keyStream() {
-        final IntStream.Builder sb = IntStream.builder();
-        forEachKey(procedurize(sb::accept));
-        return sb.build();
+        return Arrays.stream(keyArr());
     }
 
     /*

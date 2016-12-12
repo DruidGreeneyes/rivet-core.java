@@ -7,7 +7,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import com.carrotsearch.hppc.IntDoubleHashMap;
 import com.carrotsearch.hppc.predicates.IntDoublePredicate;
-import com.carrotsearch.hppc.procedures.DoubleProcedure;
 import com.carrotsearch.hppc.procedures.IntDoubleProcedure;
 import com.carrotsearch.hppc.procedures.IntProcedure;
 
@@ -63,8 +62,15 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public HPPCRIV destructiveAdd(final RIV...rivs) {
-        for (final RIV riv : rivs)
-            destructiveAdd(riv);
+        for (int i = 0; i < size; i++) {
+            double v = get(i);
+            for (final RIV riv : rivs)
+                v += riv.get(i);
+            if (v == 0)
+                remove(i);
+            else
+                put(i, v);
+        }
         return this;
     }
 
@@ -77,8 +83,15 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public HPPCRIV destructiveSub(final RIV...rivs) {
-        for (final RIV riv : rivs)
-            destructiveSub(riv);
+        for (int i = 0; i < size; i++) {
+            double v = get(i);
+            for (final RIV riv : rivs)
+                v -= riv.get(i);
+            if (v == 0)
+                remove(i);
+            else
+                put(i, v);
+        }
         return this;
     }
 
