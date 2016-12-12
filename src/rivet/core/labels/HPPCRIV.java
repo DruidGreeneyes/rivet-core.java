@@ -184,9 +184,11 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public int hashCode() {
-        final AtomicInteger c = new AtomicInteger();
-        keys().forEach((IntProcedure) c::addAndGet);
-        return c.get();
+        int sum = 0;
+        final double[] vals = valArr();
+        for (int i = 0; i < vals.length; i++)
+            sum += vals[i] * (31 ^ (vals.length - 1 - i));
+        return sum;
     }
 
     @Override

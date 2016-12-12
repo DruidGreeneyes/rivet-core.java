@@ -319,7 +319,11 @@ public class DenseRIV implements RIV, Serializable {
 
     @Override
     public int hashCode() {
-        return keyStream().sum();
+        int sum = 0;
+        final double[] vals = valArr();
+        for (int i = 0; i < vals.length; i++)
+            sum += vals[i] * (31 ^ (vals.length - 1 - i));
+        return sum;
     }
 
     @Override

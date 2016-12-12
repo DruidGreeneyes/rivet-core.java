@@ -285,13 +285,13 @@ public class ImmutableRIV implements RIV {
         return this;
     }
 
+    // implements the String hashCode function;
     @Override
     public int hashCode() {
         int sum = 0;
         for (int i = 0; i < vals.length; i++)
             sum += vals[i] * (31 ^ (vals.length - 1 - i));
         return sum;
-
     }
 
     @Override
