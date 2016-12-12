@@ -56,8 +56,8 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public HPPCRIV destructiveAdd(final RIV other) {
-        other.keyStream()
-             .forEach(i -> addTo(i, other.get(i)));
+        for (final int i : other.keyArr())
+            addTo(i, other.get(i));
         return this;
     }
 
@@ -70,8 +70,8 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public HPPCRIV destructiveSub(final RIV other) {
-        other.keyStream()
-             .forEach(i -> addTo(i, -other.get(i)));
+        for (final int i : other.keyArr())
+            addTo(i, -other.get(i));
         return this;
     }
 
@@ -108,9 +108,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public IntStream keyStream() {
-        final IntStream.Builder sb = IntStream.builder();
-        keys().forEach((IntProcedure) sb::accept);
-        return sb.build();
+        return Arrays.stream(keyArr());
     }
 
     @Override
@@ -152,10 +150,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public Stream<VectorElement> pointStream() {
-        final Stream.Builder<VectorElement> sb = Stream.builder();
-        forEach((IntDoubleProcedure) (k,
-                v) -> sb.accept(VectorElement.elt(k, v)));
-        return sb.build();
+        return Arrays.stream(points());
     }
 
     @Override
@@ -165,9 +160,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
 
     @Override
     public DoubleStream valStream() {
-        final DoubleStream.Builder sb = DoubleStream.builder();
-        values().forEach((DoubleProcedure) sb::accept);
-        return sb.build();
+        return Arrays.stream(valArr());
     }
 
     @Override
@@ -179,7 +172,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
     @Override
     public int hashCode() {
         final AtomicInteger c = new AtomicInteger();
-        keys().forEach(c::addAndGet);
+        keys().forEach((IntProcedure) c::addAndGet);
         return c.get();
     }
 
