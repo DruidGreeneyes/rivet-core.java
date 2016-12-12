@@ -16,8 +16,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableDouble;
 
 import rivet.core.exceptions.SizeMismatchException;
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.util.Util;
-import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 /**

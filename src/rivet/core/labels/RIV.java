@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import rivet.core.exceptions.SizeMismatchException;
-import rivet.core.util.Util.IntDoubleConsumer;
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 /**

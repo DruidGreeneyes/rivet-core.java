@@ -8,7 +8,8 @@ import java.util.stream.Stream;
 import com.carrotsearch.hppc.IntDoubleHashMap;
 import com.carrotsearch.hppc.predicates.IntDoublePredicate;
 import com.carrotsearch.hppc.procedures.IntDoubleProcedure;
-import rivet.core.util.Util.IntDoubleConsumer;
+
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public class HPPCRIV extends IntDoubleHashMap implements RIV {

@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.util.Util;
-import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public final class ArrayRIV implements RIV, Serializable {

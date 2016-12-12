@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.util.Util;
-import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 /**

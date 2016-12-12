@@ -8,8 +8,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.util.Util;
-import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public class DenseRIV implements RIV, Serializable {

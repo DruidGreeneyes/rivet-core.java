@@ -157,11 +157,6 @@ public final class Util {
                                          .collect(toList());
     }
 
-    @FunctionalInterface
-    public static interface IntDoubleConsumer {
-        public void accept(int i, double d);
-    }
-
     private Util() {
     }
 }

@@ -6,7 +6,7 @@ import java.util.function.IntConsumer;
 import cern.colt.function.tdouble.DoubleProcedure;
 import cern.colt.function.tdouble.IntDoubleProcedure;
 import cern.colt.function.tint.IntProcedure;
-import rivet.core.util.Util.IntDoubleConsumer;
+import rivet.core.util.IntDoubleConsumer;
 
 public class ColtConversions {
 

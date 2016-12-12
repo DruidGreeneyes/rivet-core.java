@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
-import rivet.core.util.Util.IntDoubleConsumer;
+import rivet.core.util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public class ImmutableRIV implements RIV {
