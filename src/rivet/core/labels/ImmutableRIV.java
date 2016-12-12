@@ -28,12 +28,12 @@ public class ImmutableRIV implements RIV {
         this.size = size;
         final int[] ks = new int[points.length];
         final double[] vs = new double[points.length];
-        final int[] zeros = new int[0];
+        int[] zeros = new int[0];
         for (int i = 0; i < points.length; i++) {
             ks[i] = points[i].index();
             vs[i] = points[i].value();
             if (vs[i] == 0)
-                ArrayUtils.add(zeros, i);
+                zeros = ArrayUtils.add(zeros, i);
         }
         keys = ArrayUtils.removeAll(ks, zeros);
         vals = ArrayUtils.removeAll(vs, zeros);
@@ -60,11 +60,11 @@ public class ImmutableRIV implements RIV {
 
     private ImmutableRIV map(final DoubleUnaryOperator operation) {
         double[] newVals = new double[vals.length];
-        final int[] zeros = new int[0];
+        int[] zeros = new int[0];
         for (int i = 0; i < vals.length; i++) {
             newVals[i] = operation.applyAsDouble(vals[i]);
             if (newVals[i] == 0)
-                ArrayUtils.add(zeros, i);
+                zeros = ArrayUtils.add(zeros, i);
         }
         final int[] newKeys = ArrayUtils.removeAll(keys, zeros);
         newVals = ArrayUtils.removeAll(newVals, zeros);
@@ -78,12 +78,12 @@ public class ImmutableRIV implements RIV {
                                  .sorted()
                                  .toArray();
         double[] newVals = new double[newKeys.length];
-        final int[] zeros = new int[0];
+        int[] zeros = new int[0];
         for (int i = 0; i < newKeys.length; i++) {
             final int k = newKeys[i];
             newVals[i] = mergeFunction.applyAsDouble(get(k), other.get(k));
             if (newVals[i] == 0)
-                ArrayUtils.add(zeros, i);
+                zeros = ArrayUtils.add(zeros, i);
         }
         newKeys = ArrayUtils.removeAll(newKeys, zeros);
         newVals = ArrayUtils.removeAll(newVals, zeros);

@@ -37,18 +37,19 @@ public class RIVs {
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
         double sum = 0;
-        for (final double[] vals : getMatchingVals(rivA, rivB))
+        final double[][] matchingVals = getMatchingVals(rivA, rivB);
+        for (final double[] vals : matchingVals)
             sum += vals[0] * vals[1];
         return sum;
     }
 
-    private static int[] getMatchingKeys(final RIV rivA, final RIV rivB) {
-        final int[] keys = rivA.keyArr(), keysB = rivB.keyArr();
+    static int[] getMatchingKeys(final RIV rivA, final RIV rivB) {
+        final int[] keys = rivA.keyArr();
+        final int[] keysB = rivB.keyArr();
         for (int i = 0; i < keys.length; i++)
             if (!ArrayUtils.contains(keysB, keys[i]))
                 keys[i] = -1;
-        ArrayUtils.removeAllOccurences(keysB, -1);
-        return keys;
+        return ArrayUtils.removeAllOccurences(keys, -1);
     }
 
     private static IntStream getMatchingKeyStream(final RIV rivA,
@@ -57,12 +58,12 @@ public class RIVs {
                    .filter(rivB::contains);
     }
 
-    private static double[][] getMatchingVals(final RIV rivA, final RIV rivB) {
+    static double[][] getMatchingVals(final RIV rivA, final RIV rivB) {
         final int[] keys = getMatchingKeys(rivA, rivB);
         final double[][] vals = new double[keys.length][2];
         for (int i = 0; i < keys.length; i++) {
-            vals[i][0] = rivA.get(i);
-            vals[i][1] = rivB.get(i);
+            vals[i][0] = rivA.get(keys[i]);
+            vals[i][1] = rivB.get(keys[i]);
         }
         return vals;
     }

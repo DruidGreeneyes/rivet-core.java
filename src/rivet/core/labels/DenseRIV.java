@@ -19,7 +19,7 @@ public class DenseRIV implements RIV, Serializable {
     private static final long serialVersionUID = -4215652990755933410L;
 
     public static DenseRIV empty(final int size) {
-        return new DenseRIV(new VectorElement[0], size);
+        return new DenseRIV(size);
     }
 
     public static DenseRIV fromString(final String string) {
@@ -115,8 +115,7 @@ public class DenseRIV implements RIV, Serializable {
 
     public DenseRIV(final int[] indices, final double[] values,
             final int size) {
-        vector = new double[size];
-        Arrays.fill(vector, 0);
+        this(size);
         for (int i = 0; i < indices.length; i++)
             vector[indices[i]] = values[i];
     }
@@ -130,9 +129,13 @@ public class DenseRIV implements RIV, Serializable {
         this(source.points(), source.size());
     }
 
-    public DenseRIV(final VectorElement[] points, final int size) {
+    private DenseRIV(final int size) {
         vector = new double[size];
         Arrays.fill(vector, 0);
+    }
+
+    public DenseRIV(final VectorElement[] points, final int size) {
+        this(size);
         for (final VectorElement point : points)
             vector[point.index()] = point.value();
     }
@@ -321,8 +324,10 @@ public class DenseRIV implements RIV, Serializable {
 
     @Override
     public VectorElement[] points() {
-        // TODO Auto-generated method stub
-        return null;
+        final VectorElement[] points = new VectorElement[vector.length];
+        for (int i = 0; i < vector.length; i++)
+            points[i] = VectorElement.elt(i, vector[i]);
+        return points;
     }
 
     @Override

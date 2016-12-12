@@ -5,7 +5,6 @@ import static rivet.core.util.colt.ColtConversions.procedurize;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -122,11 +121,11 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return Util.shuffleDoubleArray(vals, seed);
     }
 
-    private static int[] permuteKeys(IntStream keys, final int times,
+    private static int[] permuteKeys(final int[] keys,
             final int[] permutation) {
-        for (int i = 0; i < times; i++)
-            keys = keys.map((k) -> permutation[k]);
-        return keys.toArray();
+        for (int i = 0; i < keys.length; i++)
+            keys[i] = permutation[keys[i]];
+        return keys;
     }
 
     public final int size;
@@ -287,12 +286,14 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     public ColtRIV permute(final Permutations permutations, final int times) {
         if (times == 0)
             return this;
-        final int[] newKeys = times > 0
-                ? permuteKeys(keyStream(), times, permutations.left)
-                : permuteKeys(keyStream(), -times, permutations.right);
-        final ColtRIV res = new ColtRIV(newKeys, this.values()
-                                                     .elements(),
-                size);
+        final int[] perm = (times > 0)
+                ? permutations.left
+                : permutations.right;
+        final int t = Math.abs(times);
+        final int[] newKeys = keyArr();
+        for (int i = 0; i < t; i++)
+            permuteKeys(newKeys, perm);
+        final ColtRIV res = new ColtRIV(newKeys, valArr(), size);
         return res;
     }
 
@@ -310,9 +311,11 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public String toString() {
-        return Arrays.stream(points())
-                     .map(VectorElement::toString)
-                     .collect(Collectors.joining(" ", "", " " + size));
+        final StringBuilder sb = new StringBuilder();
+        for (final VectorElement point : points())
+            sb.append(point.toString() + " ");
+        sb.append("" + size);
+        return sb.toString();
     }
 
     @Override

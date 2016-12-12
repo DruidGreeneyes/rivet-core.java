@@ -1,6 +1,6 @@
 package rivet.core.labels;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
@@ -18,10 +18,12 @@ public class RIVTest {
             fun.apply(arg);
             fail("Expected error, recieved none.");
         } catch (final Exception e) {
-            if (!e.getClass().equals(exceptionClass))
-                fail(String.format(
-                        "Expected Exception of type %s, recieved type %e",
-                        exceptionClass.getName(), e.getClass().getName()));
+            if (!e.getClass()
+                  .equals(exceptionClass))
+                fail(String.format("Expected Exception of type %s, recieved type %e",
+                                   exceptionClass.getName(),
+                                   e.getClass()
+                                    .getName()));
         }
     }
 
@@ -46,7 +48,31 @@ public class RIVTest {
         final ArrayRIV testRIVA = ArrayRIV.fromString("4|1.0 6|-1.0 10");
         final ArrayRIV testRIVB = ArrayRIV.fromString("3|1.0 7|-1.0 10");
         assertEquals(0, RIVs.dotProduct(testRIVA, testRIVB), 0.000001);
-        assertEquals(0, RIVs.dotProduct(testRIVA, testRIVB), 0.000001);
+        assertEquals(2, RIVs.dotProduct(testRIVA, testRIVA), 0.000001);
+    }
+
+    @Test
+    public final void testGetMatchingKeys() {
+        final ArrayRIV testRIVA = ArrayRIV.fromString("4|1.0 6|-1.0 10");
+        final ArrayRIV testRIVB = ArrayRIV.fromString("3|1.0 7|-1.0 10");
+        final int[] referenceA = { 4, 6 };
+        final int[] referenceB = {};
+        final int[] testKeysA = RIVs.getMatchingKeys(testRIVA, testRIVA);
+        final int[] testKeysB = RIVs.getMatchingKeys(testRIVA, testRIVB);
+        assertArrayEquals(referenceA, testKeysA);
+        assertArrayEquals(referenceB, testKeysB);
+    }
+
+    @Test
+    public final void testGetMatchingVals() {
+        final ArrayRIV testRIVA = ArrayRIV.fromString("4|1.0 6|-1.0 10");
+        final ArrayRIV testRIVB = ArrayRIV.fromString("3|1.0 7|-1.0 10");
+        final double[][] referenceA = { { 1.0, 1.0 }, { -1.0, -1.0 } };
+        final double[][] referenceB = {};
+        final double[][] testKeysA = RIVs.getMatchingVals(testRIVA, testRIVA);
+        final double[][] testKeysB = RIVs.getMatchingVals(testRIVA, testRIVB);
+        assertArrayEquals(referenceA, testKeysA);
+        assertArrayEquals(referenceB, testKeysB);
     }
 
     @Test
