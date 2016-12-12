@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 
 import rivet.core.util.Util;
+import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public final class ArrayRIV implements RIV, Serializable {
@@ -377,5 +378,11 @@ public final class ArrayRIV implements RIV, Serializable {
         for (int i = 0; i < points.length; i++)
             vals[i] = points[i].value();
         return vals;
+    }
+
+    @Override
+    public void forEach(final IntDoubleConsumer fun) {
+        for (final VectorElement elt : points)
+            fun.accept(elt.index(), elt.value());
     }
 }

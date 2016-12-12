@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
 import rivet.core.util.Util;
+import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 /**
@@ -360,5 +361,10 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         for (int i = 0; i < vals.length; i++)
             vals[i] = points[i].value();
         return vals;
+    }
+
+    @Override
+    public void forEach(final IntDoubleConsumer fun) {
+        super.forEachPair(procedurize(fun));
     }
 }

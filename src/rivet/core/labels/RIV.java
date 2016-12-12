@@ -6,6 +6,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import rivet.core.exceptions.SizeMismatchException;
+import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 /**
@@ -297,4 +298,6 @@ public interface RIV {
     int[] keyArr();
 
     double[] valArr();
+
+    void forEach(IntDoubleConsumer fun);
 }

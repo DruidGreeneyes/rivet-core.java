@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import rivet.core.util.Util;
+import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public class DenseRIV implements RIV, Serializable {
@@ -345,5 +346,11 @@ public class DenseRIV implements RIV, Serializable {
     @Override
     public double[] valArr() {
         return Arrays.copyOf(vector, vector.length);
+    }
+
+    @Override
+    public void forEach(final IntDoubleConsumer fun) {
+        for (int i = 0; i < vector.length; i++)
+            fun.accept(i, vector[i]);
     }
 }

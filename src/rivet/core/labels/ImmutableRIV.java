@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
+import rivet.core.util.Util.IntDoubleConsumer;
 import rivet.core.vectorpermutations.Permutations;
 
 public class ImmutableRIV implements RIV {
@@ -322,5 +323,11 @@ public class ImmutableRIV implements RIV {
     @Override
     public double[] valArr() {
         return Arrays.copyOf(vals, vals.length);
+    }
+
+    @Override
+    public void forEach(final IntDoubleConsumer fun) {
+        for (int i = 0; i < keys.length; i++)
+            fun.accept(keys[i], vals[i]);
     }
 }
