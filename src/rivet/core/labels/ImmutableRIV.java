@@ -288,8 +288,8 @@ public class ImmutableRIV implements RIV {
     @Override
     public int hashCode() {
         int sum = 0;
-        for (final double d : vals)
-            sum += d;
+        for (int i = 0; i < vals.length; i++)
+            sum += vals[i] * (31 ^ (vals.length - 1 - i));
         return sum;
 
     }
