@@ -37,9 +37,8 @@ public class RIVs {
 
     public static double dotProduct(final RIV rivA, final RIV rivB) {
         double sum = 0;
-        for (final int k : rivA.keyArr())
-            if (rivB.contains(k))
-                sum += rivA.get(k) * rivB.get(k);
+        for (final VectorElement p : rivA.points())
+            sum += p.value() * rivB.get(p.index());
         return sum;
     }
 
