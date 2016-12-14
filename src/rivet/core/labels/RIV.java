@@ -300,4 +300,8 @@ public interface RIV {
     double[] valArr();
 
     void forEach(IntDoubleConsumer fun);
+
+    default DenseRIV toDense() {
+        return new DenseRIV(this);
+    }
 }

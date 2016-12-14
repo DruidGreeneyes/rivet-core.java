@@ -196,6 +196,16 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
             put(keys[i], new MutableDouble(vals[i]));
     }
 
+    public MutableDouble put(int index, double value) {
+        return super.put(index, new MutableDouble(value));
+    }
+
+    public MapRIV(final RIV riv) {
+        super();
+        size = riv.size();
+        riv.forEach(this::put);
+    }
+
     public MapRIV(final MapRIV riv) {
         super(riv);
         size = riv.size;

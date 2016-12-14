@@ -9,6 +9,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
 import rivet.core.util.IntDoubleConsumer;
@@ -30,7 +32,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     private static final long serialVersionUID = 7489480432514925162L;
 
     public static ColtRIV empty(final int size) {
-        return new ColtRIV(new VectorElement[0], size);
+        return new ColtRIV(size);
     }
 
     public static ColtRIV fromString(final String string) {
@@ -138,13 +140,18 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         this.size = size;
     }
 
+    private ColtRIV(final int size) {
+        this(ArrayUtils.EMPTY_INT_ARRAY, ArrayUtils.EMPTY_DOUBLE_ARRAY, size);
+    }
+
     /*
      * @Override public ColtRIV add(final RIV other) throws
      * SizeMismatchException { return copy().destructiveAdd(other); }
      */
 
     public ColtRIV(final RIV riv) {
-        this(riv.points(), riv.size());
+        this(riv.size());
+        riv.forEach(this::put);
     }
 
     public ColtRIV(final VectorElement[] points, final int size) {

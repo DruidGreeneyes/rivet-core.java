@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import com.carrotsearch.hppc.IntDoubleHashMap;
 import com.carrotsearch.hppc.predicates.IntDoublePredicate;
 import com.carrotsearch.hppc.procedures.IntDoubleProcedure;
@@ -21,7 +22,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
         this.size = size;
     }
 
-    public HPPCRIV(final int size, final int[] indices, final double[] values) {
+    public HPPCRIV(final int[] indices, final double[] values, final int size) {
         this(size);
         for (int i = 0; i < indices.length; i++)
             put(indices[i], values[i]);
@@ -36,6 +37,11 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
         this(size);
         for (final VectorElement point : points)
             put(point.index(), point.value());
+    }
+
+    public HPPCRIV(final RIV riv) {
+        this(riv.size());
+        riv.forEach(this::put);
     }
 
     @Override

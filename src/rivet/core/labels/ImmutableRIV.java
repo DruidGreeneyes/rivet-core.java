@@ -18,8 +18,8 @@ public class ImmutableRIV implements RIV {
     private final int[]    keys;
     private final double[] vals;
 
-    private ImmutableRIV(final int size, final int[] keys,
-            final double[] vals) {
+    private ImmutableRIV(final int[] keys, final double[] vals,
+            final int size) {
         this.size = size;
         this.keys = Arrays.copyOf(keys, keys.length);
         this.vals = Arrays.copyOf(vals, vals.length);
@@ -41,7 +41,7 @@ public class ImmutableRIV implements RIV {
     }
 
     public ImmutableRIV(final RIV riv) {
-        this(riv.size(), riv.points());
+        this(riv.keyArr(), riv.valArr(), riv.size());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ImmutableRIV implements RIV {
 
     @Override
     public RIV copy() {
-        return new ImmutableRIV(size, keys, vals);
+        return new ImmutableRIV(keys, vals, size);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ImmutableRIV implements RIV {
         }
         final int[] newKeys = ArrayUtils.removeAll(keys, zeros);
         newVals = ArrayUtils.removeAll(newVals, zeros);
-        return new ImmutableRIV(size, newKeys, newVals);
+        return new ImmutableRIV(newKeys, newVals, size);
     }
 
     private ImmutableRIV merge(final DoubleBinaryOperator mergeFunction,
@@ -88,7 +88,7 @@ public class ImmutableRIV implements RIV {
         }
         newKeys = ArrayUtils.removeAll(newKeys, zeros);
         newVals = ArrayUtils.removeAll(newVals, zeros);
-        return new ImmutableRIV(size, newKeys, newVals);
+        return new ImmutableRIV(newKeys, newVals, size);
     }
 
     private ImmutableRIV merge(final DoubleBinaryOperator mergeFunction,
@@ -111,7 +111,7 @@ public class ImmutableRIV implements RIV {
         }
         newKeys = ArrayUtils.removeAll(newKeys, zeros);
         newVals = ArrayUtils.removeAll(newVals, zeros);
-        return new ImmutableRIV(size, newKeys, newVals);
+        return new ImmutableRIV(newKeys, newVals, size);
     }
 
     private static final DoubleBinaryOperator add = (a, b) -> a + b;
@@ -311,8 +311,8 @@ public class ImmutableRIV implements RIV {
     }
 
     public static ImmutableRIV empty(final int size) {
-        return new ImmutableRIV(size, ArrayUtils.EMPTY_INT_ARRAY,
-                ArrayUtils.EMPTY_DOUBLE_ARRAY);
+        return new ImmutableRIV(ArrayUtils.EMPTY_INT_ARRAY,
+                ArrayUtils.EMPTY_DOUBLE_ARRAY, size);
     }
 
     @Override

@@ -126,8 +126,15 @@ public class DenseRIV implements RIV, Serializable {
      * copy().destructiveDiv(scalar); }
      */
 
+    public double put(final int index, final double value) {
+        double v = vector[index];
+        vector[index] = value;
+        return v;
+    }
+
     public DenseRIV(final RIV source) {
-        this(source.points(), source.size());
+        this(source.size());
+        source.forEach(this::put);
     }
 
     private DenseRIV(final int size) {
