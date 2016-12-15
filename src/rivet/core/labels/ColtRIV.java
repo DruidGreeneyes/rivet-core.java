@@ -9,8 +9,6 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
 import rivet.core.util.IntDoubleConsumer;
