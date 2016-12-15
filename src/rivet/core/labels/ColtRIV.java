@@ -9,6 +9,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
 import rivet.core.util.IntDoubleConsumer;
@@ -167,7 +169,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public ColtRIV copy() {
-        return new ColtRIV(points(), size);
+        return new ColtRIV(this);
     }
 
     @Override
@@ -353,19 +355,22 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public int[] keyArr() {
-        final VectorElement[] points = points();
-        final int[] keys = new int[points.length];
-        for (int i = 0; i < keys.length; i++)
-            keys[i] = points[i].index();
+        final int[] keys = new int[count()];
+        final int c = 0;
+        for (int i = 0; i < size; i++)
+            if (containsKey(i)) {
+                keys[c] = i;
+                i++;
+            }
         return keys;
     }
 
     @Override
     public double[] valArr() {
-        final VectorElement[] points = points();
-        final double[] vals = new double[points.length];
-        for (int i = 0; i < vals.length; i++)
-            vals[i] = points[i].value();
+        double[] vals = new double[size];
+        for (int i = 0; i < size; i++)
+            vals[i] = get(i);
+        vals = ArrayUtils.removeAllOccurences(vals, 0.0);
         return vals;
     }
 
