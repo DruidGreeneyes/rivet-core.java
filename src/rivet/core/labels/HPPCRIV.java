@@ -1,7 +1,9 @@
 package rivet.core.labels;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -11,9 +13,108 @@ import com.carrotsearch.hppc.predicates.IntDoublePredicate;
 import com.carrotsearch.hppc.procedures.IntDoubleProcedure;
 
 import rivet.core.util.IntDoubleConsumer;
+import rivet.core.util.Util;
 import rivet.core.vectorpermutations.Permutations;
 
-public class HPPCRIV extends IntDoubleHashMap implements RIV {
+public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
+
+    /**
+    *
+    */
+    private static final long serialVersionUID = 7489480432514925162L;
+
+    public static HPPCRIV empty(final int size) {
+        return new HPPCRIV(size);
+    }
+
+    public static HPPCRIV fromString(final String string) {
+        String[] bits = string.split(" ");
+        final int size = Integer.parseInt(bits[bits.length - 1]);
+        bits = Arrays.copyOf(bits, bits.length - 1);
+        final VectorElement[] elements = Arrays.stream(bits)
+                                               .map(VectorElement::fromString)
+                                               .toArray(VectorElement[]::new);
+        return new HPPCRIV(elements, size);
+    }
+
+    /**
+     * Uses Java's seeded RNG to generate a random index vector such that, given
+     * the same input, generateLabel will always produce the same output.
+     *
+     * @param size
+     * @param k
+     * @param word
+     * @return a MapRIV
+     */
+    public static HPPCRIV generateLabel(final int size, final int k,
+            final CharSequence word) {
+        final long seed = makeSeed(word);
+        final int j = k % 2 == 0
+                ? k
+                : k + 1;
+        return new HPPCRIV(makeIndices(size, j, seed), makeVals(j, seed), size);
+    }
+
+    /**
+     * Uses Java's seeded RNG to generate a random index vector such that, given
+     * the same input, generateLabel will always produce the same output.
+     *
+     * @param size
+     * @param k
+     * @param word
+     * @return a MapRIV
+     */
+    public static HPPCRIV generateLabel(final int size, final int k,
+            final CharSequence source, final int startIndex,
+            final int tokenLength) {
+        return generateLabel(size,
+                             k,
+                             Util.safeSubSequence(source,
+                                                  startIndex,
+                                                  startIndex + tokenLength));
+    }
+
+    public static Function<String, HPPCRIV> labelGenerator(final int size,
+            final int nnz) {
+        return word -> generateLabel(size, nnz, word);
+    }
+
+    public static Function<Integer, HPPCRIV> labelGenerator(final int size,
+            final int nnz, final CharSequence source, final int tokenLength) {
+        return i -> generateLabel(size, nnz, source, i, tokenLength);
+    }
+
+    public static int[] makeIndices(final int size, final int count,
+            final long seed) {
+        return Util.randInts(size, count, seed)
+                   .toArray();
+    }
+
+    /**
+     * @param word
+     * @return a probably-unique long, used to seed java's Random.
+     */
+    public static long makeSeed(final CharSequence word) {
+        final AtomicInteger c = new AtomicInteger();
+        return word.chars()
+                   .mapToLong(ch -> ch
+                                    * (long) Math.pow(10, c.incrementAndGet()))
+                   .sum();
+    }
+
+    /**
+     * @param count
+     * @param seed
+     * @return an array of count/2 1s and count/2 -1s, in random order.
+     */
+    public static double[] makeVals(final int count, final long seed) {
+        final double[] vals = new double[count];
+        for (int i = 0; i < count; i += 2) {
+            vals[i] = 1;
+            vals[i + 1] = -1;
+        }
+        return Util.shuffleDoubleArray(vals, seed);
+    }
 
     private final int size;
 
@@ -33,7 +134,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
         size = riv.size;
     }
 
-    public HPPCRIV(final int size, final VectorElement[] points) {
+    public HPPCRIV(final VectorElement[] points, final int size) {
         this(size);
         for (final VectorElement point : points)
             put(point.index(), point.value());
@@ -154,7 +255,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV {
         for (int i = 0; i < t; i++)
             permute(points, perm);
         Arrays.sort(points);
-        return new HPPCRIV(size, points);
+        return new HPPCRIV(points, size);
     }
 
     @Override
