@@ -196,7 +196,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
             put(keys[i], new MutableDouble(vals[i]));
     }
 
-    public MutableDouble put(int index, double value) {
+    public MutableDouble put(final int index, final double value) {
         return super.put(index, new MutableDouble(value));
     }
 
@@ -213,6 +213,8 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
 
     private void addPoint(final Integer index, final MutableDouble value) {
         compute(index, (i, v) -> {
+            if (v == null)
+                v = new MutableDouble();
             v.add(value);
             return v;
         });
@@ -220,6 +222,8 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
 
     private void addPoint(final int index, final double value) {
         compute(index, (i, v) -> {
+            if (v == null)
+                v = new MutableDouble();
             v.add(value);
             return v;
         });
@@ -504,8 +508,6 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
 
     @Override
     public void forEach(final IntDoubleConsumer fun) {
-        final BiConsumer<Integer, MutableDouble> f =
-                (i, v) -> fun.accept(i, v.getValue());
-        super.forEach(f);
+        super.forEach((i, v) -> fun.accept(i, v.getValue()));
     }
 }
