@@ -22,7 +22,7 @@ public final class ArrayRIV implements RIV, Serializable {
      */
     private static final long serialVersionUID = -1176979873718129432L;
 
-    public static ArrayRIV empty(final int size, final int k) {
+    public static ArrayRIV empty(final int size) {
         return new ArrayRIV(size);
     }
 
