@@ -141,7 +141,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     }
 
     private ColtRIV(final int size) {
-        this(ArrayUtils.EMPTY_INT_ARRAY, ArrayUtils.EMPTY_DOUBLE_ARRAY, size);
+        super();
+        this.size = size;
     }
 
     /*
