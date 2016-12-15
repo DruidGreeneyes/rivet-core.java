@@ -171,12 +171,13 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     public HPPCRIV destructiveAdd(final RIV...rivs) {
         for (int i = 0; i < size; i++) {
             double v = get(i);
+            final double vv = v;
             for (final RIV riv : rivs)
                 v += riv.get(i);
-            if (v == 0)
-                remove(i);
-            else
+            if (v != 0)
                 put(i, v);
+            else if (vv != 0)
+                remove(i);
         }
         return this;
     }
@@ -310,6 +311,6 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
     @Override
     public void forEach(final IntDoubleConsumer fun) {
-        super.forEach((IntDoubleProcedure) fun::accept);
+        super.forEach((IntDoubleProcedure) fun);
     }
 }
