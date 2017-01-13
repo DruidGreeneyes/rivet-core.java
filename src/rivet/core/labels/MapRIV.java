@@ -211,7 +211,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
         size = riv.size;
     }
 
-    private void addPoint(final Integer index, final MutableDouble value) {
+    private void _addPoint(final Integer index, final MutableDouble value) {
         compute(index, (i, v) -> {
             if (v == null)
                 v = new MutableDouble();
@@ -258,7 +258,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
 
     public MapRIV destructiveAdd(final MapRIV other)
             throws SizeMismatchException {
-        other.forEach((BiConsumer<Integer, MutableDouble>) this::addPoint);
+        other.forEach(this::_addPoint);
         return this;
     }
 
