@@ -5,7 +5,7 @@ pipeline {
             steps {
                 sh 'mvn clean test package'
                 sh 'ls'
-                junit 'rivet-core.java/target/surefire-reports/*.xml'
+                junit 'target/surefire-reports/*.xml'
             }
         }
     }
