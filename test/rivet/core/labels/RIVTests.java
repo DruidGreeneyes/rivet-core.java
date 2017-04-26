@@ -10,7 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class RIVTest {
+public class RIVTests {
 
     public static <T> void assertThrows(final Class<?> exceptionClass,
             final Function<T, ?> fun, final T arg) {
