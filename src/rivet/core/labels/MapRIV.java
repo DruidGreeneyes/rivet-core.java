@@ -176,8 +176,9 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
 
     public MapRIV(final ConcurrentHashMap<Integer, MutableDouble> points,
             final int size) {
-        super(points);
+        super();
         this.size = size;
+        points.forEach((i, v) -> _addPoint(i, v));
     }
 
     public MapRIV(final int size) {
@@ -203,12 +204,13 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
     public MapRIV(final RIV riv) {
         super();
         size = riv.size();
-        riv.forEach(this::put);
+        destructiveAdd(riv);
     }
 
     public MapRIV(final MapRIV riv) {
-        super(riv);
+        super();
         size = riv.size;
+        destructiveAdd(riv);
     }
 
     private void _addPoint(final Integer index, final MutableDouble value) {

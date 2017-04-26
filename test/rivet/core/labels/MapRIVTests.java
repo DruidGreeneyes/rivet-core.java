@@ -26,7 +26,7 @@ public class MapRIVTests {
         final VectorElement[] pointsA = rivA.points();
         final VectorElement[] pointsB = rivB.points();
         for (int i = 0; i < pointsA.length; i++)
-            assertEquals(pointsA[i], pointsB[i]);
+            assertEquals("RIV equality failure at points index " + i, pointsA[i], pointsB[i]);
         assertTrue(rivA.equals(rivB));
     }
 
