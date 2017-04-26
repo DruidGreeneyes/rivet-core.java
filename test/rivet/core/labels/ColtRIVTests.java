@@ -42,7 +42,7 @@ public class ColtRIVTests {
         testKeys = ColtRIV.makeIndices(testSize, testK, testSeed);
         testVals = ColtRIV.makeVals(testK, testSeed);
         testPoints = new VectorElement[48];
-        for (int i = 0; i < 48; i += 2) {
+        for (int i = 0; i < testK; i += 2) {
             final int j = i + 1;
             testPoints[i] = VectorElement.elt(i, 1.0);
             testPoints[j] = VectorElement.elt(j, -1.0);
@@ -55,7 +55,7 @@ public class ColtRIVTests {
         final RIV testRIV = ColtRIV.empty(testSize)
                                    .add(testRIV4);
         final RIV testRIV8 = testRIV4.add(testRIV4);
-        assertEquals(-2, testRIV8.get(9), e);
+        assertEquals(-2, testRIV8.get(1), e);
         assertEquals(testK, testRIV8.count());
         assertEquals(testRIV4, testRIV);
     }
@@ -64,7 +64,7 @@ public class ColtRIVTests {
     public final void testDivide() {
         final ColtRIV testRIV4 = new ColtRIV(testPoints, testSize);
         final RIV testRIV = testRIV4.divide(2);
-        assertEquals(-0.5, testRIV.get(9), e);
+        assertEquals(-0.5, testRIV.get(1), e);
     }
 
     @Test

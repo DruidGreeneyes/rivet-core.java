@@ -356,21 +356,24 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     @Override
     public int[] keyArr() {
         final int[] keys = new int[count()];
-        final int c = 0;
+        int c = 0;
         for (int i = 0; i < size; i++)
             if (containsKey(i)) {
                 keys[c] = i;
-                i++;
+                c++;
             }
         return keys;
     }
 
     @Override
     public double[] valArr() {
-        double[] vals = new double[size];
+        double[] vals = new double[count()];
+        int c = 0;
         for (int i = 0; i < size; i++)
-            vals[i] = get(i);
-        vals = ArrayUtils.removeAllOccurences(vals, 0.0);
+            if (containsKey(i)) {
+            	vals[c] = get(i);
+            	c++;
+            }
         return vals;
     }
 
