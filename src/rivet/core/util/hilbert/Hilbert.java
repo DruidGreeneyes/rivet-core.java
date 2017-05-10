@@ -196,9 +196,11 @@ public final class Hilbert {
 	private static BigInteger encodeAsBigInt(int[] key) {
 		BigInteger r = BigInteger.ZERO;
 		int i = 0;
-		for (int k : key) {
-			r = r.or(BigInteger.valueOf((long)k).shiftLeft(i * ORDER)); 
-		}
+		for (int k : key) 
+			for (int j = 0; j < ORDER; j++, i++)
+				if(testBit(k, j))
+					r = r.setBit(i);
+		System.out.println("IsNegative: " + r.testBit(r.bitLength()) + ", " + r.toString());
 		return r;
 	}
 	
@@ -359,8 +361,9 @@ public final class Hilbert {
 	private static int fCalculateJ_i(int rho_i, int dims) {
 		//For an integer p_i, find the subscript of the Principal Position,
 		//defined as 
-		int n, J = dims;
-		for (n = 1; n < J; n++) {
+		int n = 1;
+		int J = dims;
+		for (; n < J; n++) {
 			if ((rho_i >>> n & 1) != (rho_i & 1))
 				break;
 		}
@@ -391,18 +394,17 @@ public final class Hilbert {
 		return res;
 	}
 	
-	public static void distributeBits(int[] coords, int rho, int mask, int dims) {
-		for (int j = dims - 1; rho > 0; rho >>>= 1, j--)
-			if ((rho & 1) == 1)
+	public static void distributeBits(int[] coords, int rho_or_alpha, int mask, int dims) {
+		for (int j = dims - 1; rho_or_alpha > 0; rho_or_alpha >>>= 1, j--)
+			if ((rho_or_alpha & 1) == 1)
 				coords[j] |= mask;
 	}
 	
-	public static DenseRIV fDecodeHilbertKey (HKey key) {
-		final int dims = key.dimensions;
-		final int order = key.order;
+	public static DenseRIV fDecodeHilbertKey (BigInteger key, final int dims) {
+		final int order = ORDER;
 		final int[] point = new int[dims];
 		Arrays.fill(point, 0);
-		final int[] keySections = decodeFromBigInt(key.k, order, dims);
+		final int[] keySections = decodeFromBigInt(key, order, dims);
 		//cycle once to initialize everything
 		int i = (order - 1) * dims;
 		int m = MASK;
@@ -423,7 +425,7 @@ public final class Hilbert {
 			sigmaHat = fAddHat(sigma, xJ, dims);
 			omega ^= tauHat;
 			alpha = omega ^ sigmaHat;
-			distributeBits(point, rho, m, dims);
+			distributeBits(point, alpha, m, dims);
 			if (i > 0) {
 				tau = fCalculateT_i(rho);
 				tauHat = fAddHat(tau, xJ, dims);
@@ -434,7 +436,7 @@ public final class Hilbert {
 		return new DenseRIV(point);
 	}
 	
-	public static void finalEncodeStep(final int[] keySections, final int rho, final int i, final int dims)  {
+	private static void finalEncodeStep(final int[] keySections, final int rho, final int i, final int dims)  {
 		final int e = i / ORDER;
 		final int iMod = i % ORDER;
 		if (iMod > ORDER - dims) {
@@ -444,9 +446,8 @@ public final class Hilbert {
 			keySections[e] |= rho << i - e * ORDER;
 	}
 	
-	public static HKey fEncodeHilbertKey (RIV riv) {
+	public static BigInteger fEncodeHilbertKey (RIV riv) {
 		final int dims = riv.size();
-		final int order = ORDER;
 		final int[] point = new int[dims];
 		for (int i = 0; i < dims; i++)
 			point[i] = (int)riv.get(i);
@@ -459,13 +460,15 @@ public final class Hilbert {
 		
 		//cycle once to initialize everything
 		int alpha = fReverseA_i(point, m, dims);		
-		int sigma, sigmaHat = sigma = alpha;
+		int sigma = alpha,
+				sigmaHat = alpha;
 		int rho = fReverseP_i(sigma, dims);
 		finalEncodeStep(keySections, rho, i, dims);
 		
 		int J = fCalculateJ_i(rho, dims);
 		int xJ = J - 1;
-		int tau, tauHat = tau = fCalculateT_i(rho);
+		int tau = fCalculateT_i(rho);
+		int tauHat = tau;
 		
 		//enter the loop
 		i -= dims;
@@ -486,8 +489,16 @@ public final class Hilbert {
 				xJ += J - 1;
 			}
 		}
-		BigInteger k = encodeAsBigInt(keySections);
-		return new HKey(k, ORDER, dims);
+		System.out.println("Hilbert Key sections: " + Arrays.toString(keySections));
+		return encodeAsBigInt(keySections);
+	}
+	
+	public static BigInteger encodeHilbillyKey(RIV riv) {
+		int[] allVals = new int[riv.size()];
+		for (int i = 0; i < allVals.length; i++) {
+			allVals[i] = (int) Math.round(riv.get(i));
+		}
+		return encodeAsBigInt(allVals);
 	}
 	
 	

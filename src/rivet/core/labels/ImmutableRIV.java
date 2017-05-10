@@ -13,7 +13,6 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import rivet.core.util.IntDoubleConsumer;
 import rivet.core.util.Util;
-import rivet.core.util.hilbert.HKey;
 import rivet.core.util.hilbert.Hilbert;
 import rivet.core.vectorpermutations.Permutations;
 
@@ -53,14 +52,15 @@ public class ImmutableRIV implements RIV {
     private final int      size;
     private final int[]    keys;
     private final double[] vals;
-    private final HKey hilbertKey;
+    private static BigInteger DEFAULT_KEY = BigInteger.valueOf(-1L);
+    private BigInteger hilbertKey = DEFAULT_KEY;
+    private BigInteger hilbillyKey = DEFAULT_KEY;
 
     public ImmutableRIV(final int[] keys, final double[] vals,
             final int size) {
         this.size = size;
         this.keys = Arrays.copyOf(keys, keys.length);
         this.vals = Arrays.copyOf(vals, vals.length);
-        this.hilbertKey = Hilbert.fEncodeHilbertKey(this);
     }
 
     private ImmutableRIV(final int size, final VectorElement[] points) {
@@ -76,14 +76,12 @@ public class ImmutableRIV implements RIV {
         }
         keys = ArrayUtils.removeAll(ks, zeros);
         vals = ArrayUtils.removeAll(vs, zeros);
-        this.hilbertKey = Hilbert.fEncodeHilbertKey(this);
     }
     
     public ImmutableRIV(final int size) {
     	this.size = size;
     	keys = new int[0];
     	vals = new double[0];
-    	hilbertKey = new HKey(BigInteger.ZERO, 32, size);
     }
 
     public ImmutableRIV(final RIV riv) {
@@ -368,7 +366,15 @@ public class ImmutableRIV implements RIV {
     }
     
     public BigInteger getHilbertKey() {
-    	return this.hilbertKey.k;
+    	if (hilbertKey.equals(DEFAULT_KEY))
+    		hilbertKey = Hilbert.fEncodeHilbertKey(this);
+    	return hilbertKey;
+    }
+    
+    public BigInteger getHilbillyKey() {
+    	if (hilbillyKey.equals(DEFAULT_KEY))
+    		hilbillyKey = Hilbert.encodeHilbillyKey(this);
+    	return hilbillyKey;
     }
     
     @Override
