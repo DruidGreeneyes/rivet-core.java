@@ -323,16 +323,6 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
         return size == other.size() && super.equals(other);
     }
 
-    @Override
-    public boolean equals(final RIV other) {
-        if (other.getClass()
-                 .equals(MapRIV.class))
-            return equals((MapRIV) other);
-        else
-            return size == other.size()
-                   && Arrays.deepEquals(points(), other.points());
-    }
-
     public double getOrDefault(final int index, final double otherVal) {
         final MutableDouble v = super.get(index);
         if (null == v)
@@ -425,32 +415,24 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
             return v;
         });
     }
-
+    
     /**
-     * Returns the sum of the keys of this RIV. Pretty much guaranteed to not be
-     * unique.
+     * Implements the hash function found in java.lang.String, using values in place of characters. Modifying the RIV is virtually guaranteed to change the hashcode.
      */
     @Override
     public int hashCode() {
-        int sum = 0;
-        final double[] vals = valArr();
-        for (int i = 0; i < vals.length; i++)
-            sum += vals[i] * (31 ^ (vals.length - 1 - i));
-        return sum;
+        return RIVs.hashcode(this);
     }
 
     @Override
     public String toString() {
         // "0|1 1|3 4|2 5"
         // "I|V I|V I|V Size"
-        return stream().sorted((e1, e2) -> Integer.compare(e1.getKey(),
-                                                           e2.getKey()))
-                       .map((e) -> String.format("%d|%f",
-                                                 e.getKey(),
-                                                 e.getValue()))
-                       .collect(Collectors.joining(" ",
-                                                   "",
-                                                   " " + String.valueOf(size)));
+        StringBuilder sb = new StringBuilder();
+        for (VectorElement point : points())
+        	sb.append(point.toString() + " ");
+        sb.append(size);
+        return sb.toString();
     }
 
     @Override
@@ -494,7 +476,10 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
 
     @Override
     public double[] valArr() {
-        return ArrayUtils.toPrimitive(values().toArray(new Double[count()]));
+        double[] vals = new double[count()];
+        AtomicInteger c = new AtomicInteger();
+        values().forEach(v -> vals[c.getAndIncrement()] = v.getValue());
+        return vals;
     }
 
     @Override

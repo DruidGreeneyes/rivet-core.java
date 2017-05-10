@@ -110,8 +110,14 @@ public class DenseRIV implements RIV, Serializable {
 
     private final double[] vector;
 
-    private DenseRIV(final double[] points) {
-        vector = Arrays.copyOf(points, points.length);
+    public DenseRIV(final double[] densePoints) {
+        vector = Arrays.copyOf(densePoints, densePoints.length);
+    }
+    
+    public DenseRIV(final int[] densePoints) {
+    	vector = new double[densePoints.length];
+    	for (int i = 0; i < densePoints.length; i++)
+    		vector[i] = (double) densePoints[i];
     }
 
     public DenseRIV(final int[] indices, final double[] values,
@@ -134,7 +140,7 @@ public class DenseRIV implements RIV, Serializable {
 
     public DenseRIV(final RIV source) {
         this(source.size());
-        source.forEach(this::put);
+        source.forEach((IntDoubleConsumer)this::put);
     }
 
     private DenseRIV(final int size) {
@@ -246,15 +252,9 @@ public class DenseRIV implements RIV, Serializable {
     public boolean equals(final Object obj) {
         return RIVs.equals(this, obj);
     }
-
-    @Override
-    public boolean equals(final RIV riv) {
-        if (vector.length != riv.size())
-            return false;
-        for (int i = 0; i < vector.length; i++)
-            if (get(i) != riv.get(i))
-                return false;
-        return true;
+    
+    public boolean equals(final DenseRIV riv) {
+    	return Arrays.equals(vector, riv.vector);
     }
 
     @Override
@@ -327,11 +327,7 @@ public class DenseRIV implements RIV, Serializable {
 
     @Override
     public int hashCode() {
-        int sum = 0;
-        final double[] vals = valArr();
-        for (int i = 0; i < vals.length; i++)
-            sum += vals[i] * (31 ^ (vals.length - 1 - i));
-        return sum;
+        return RIVs.hashcode(this);
     }
 
     @Override

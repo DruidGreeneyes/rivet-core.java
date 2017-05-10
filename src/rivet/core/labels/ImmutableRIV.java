@@ -1,5 +1,6 @@
 package rivet.core.labels;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
@@ -11,18 +12,55 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.NotImplementedException;
 
 import rivet.core.util.IntDoubleConsumer;
+import rivet.core.util.Util;
+import rivet.core.util.hilbert.HKey;
+import rivet.core.util.hilbert.Hilbert;
 import rivet.core.vectorpermutations.Permutations;
 
 public class ImmutableRIV implements RIV {
+	
+	/**
+     * Uses Java's seeded RNG to generate a random index vector such that, given
+     * the same input, generateLabel will always produce the same output.
+     *
+     * @param size
+     * @param k
+     * @param word
+     * @return a MapRIV
+     */
+    public static ImmutableRIV generateLabel(final int size, final int k,
+            final CharSequence word) {
+        final long seed = RIVs.makeSeed(word);
+        final int j = k % 2 == 0
+                ? k
+                : k + 1;
+        return new ImmutableRIV(RIVs.makeIndices(size, j, seed), RIVs.makeVals(j, seed), size);
+    }
+	
+	public static ImmutableRIV fromString(final String str) {
+		String[] parts = str.split(" ");
+		int size = Integer.parseInt(parts[parts.length - 1]);
+		int[] keys = new int[parts.length - 1];
+		double[] vals = new double[parts.length - 1];
+		for (int i = 0; i < parts.length - 1; i++) {
+			String[] bits = parts[i].split("\\|");
+			keys[i] = Integer.parseInt(bits[0]);
+			vals[i] = Double.parseDouble(bits[1]);
+		}
+		return new ImmutableRIV(keys, vals, size);
+	}
+	
     private final int      size;
     private final int[]    keys;
     private final double[] vals;
+    private final HKey hilbertKey;
 
-    private ImmutableRIV(final int[] keys, final double[] vals,
+    public ImmutableRIV(final int[] keys, final double[] vals,
             final int size) {
         this.size = size;
         this.keys = Arrays.copyOf(keys, keys.length);
         this.vals = Arrays.copyOf(vals, vals.length);
+        this.hilbertKey = Hilbert.fEncodeHilbertKey(this);
     }
 
     private ImmutableRIV(final int size, final VectorElement[] points) {
@@ -38,6 +76,14 @@ public class ImmutableRIV implements RIV {
         }
         keys = ArrayUtils.removeAll(ks, zeros);
         vals = ArrayUtils.removeAll(vs, zeros);
+        this.hilbertKey = Hilbert.fEncodeHilbertKey(this);
+    }
+    
+    public ImmutableRIV(final int size) {
+    	this.size = size;
+    	keys = new int[0];
+    	vals = new double[0];
+    	hilbertKey = new HKey(BigInteger.ZERO, 32, size);
     }
 
     public ImmutableRIV(final RIV riv) {
@@ -105,7 +151,7 @@ public class ImmutableRIV implements RIV {
             double v = get(k);
             for (final RIV riv : others)
                 v = mergeFunction.applyAsDouble(v, riv.get(k));
-            if (v == 0)
+            if (Util.doubleEquals(v, 0, Util.roundingError))
                 zeros = ArrayUtils.add(zeros, i);
             newVals[i] = v;
         }
@@ -180,16 +226,6 @@ public class ImmutableRIV implements RIV {
     @Override
     public boolean equals(final Object obj) {
         return RIVs.equals(this, obj);
-    }
-
-    @Override
-    public boolean equals(final RIV other) {
-        if (other.getClass()
-                 .equals(ImmutableRIV.class))
-            return equals((ImmutableRIV) other);
-        else
-            return size == other.size()
-                   && Arrays.deepEquals(points(), other.points());
     }
 
     public boolean equals(final ImmutableRIV other) {
@@ -329,5 +365,18 @@ public class ImmutableRIV implements RIV {
     public void forEach(final IntDoubleConsumer fun) {
         for (int i = 0; i < keys.length; i++)
             fun.accept(keys[i], vals[i]);
+    }
+    
+    public BigInteger getHilbertKey() {
+    	return this.hilbertKey.k;
+    }
+    
+    @Override
+    public String toString() {
+    	StringBuilder sb = new StringBuilder();
+    	for (VectorElement point : points())
+    		sb.append(point.toString() + " ");
+    	sb.append(size);
+    	return sb.toString();
     }
 }

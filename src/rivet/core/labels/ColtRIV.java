@@ -9,8 +9,6 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
 import cern.jet.math.tdouble.DoubleMult;
 import rivet.core.util.IntDoubleConsumer;
@@ -140,7 +138,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         this.size = size;
     }
 
-    private ColtRIV(final int size) {
+    public ColtRIV(final int size) {
         super();
         this.size = size;
     }
@@ -262,16 +260,6 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
         return RIVs.equals(this, other);
     }
 
-    @Override
-    public boolean equals(final RIV other) {
-        if (other.getClass()
-                 .equals(ColtRIV.class))
-            return equals((ColtRIV) other);
-        else
-            return size == other.size()
-                   && Arrays.deepEquals(points(), other.points());
-    }
-
     public boolean equals(final ColtRIV other) {
         return size == other.size() && super.equals(other);
     }
@@ -320,11 +308,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        for (final VectorElement point : points())
-            sb.append(point.toString() + " ");
-        sb.append("" + size);
-        return sb.toString();
+        return RIVs.toString(this);
     }
 
     @Override
@@ -336,11 +320,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
     @Override
     public int hashCode() {
-        int sum = 0;
-        final double[] vals = valArr();
-        for (int i = 0; i < vals.length; i++)
-            sum += vals[i] * (31 ^ (vals.length - 1 - i));
-        return sum;
+        return RIVs.hashcode(this);
     }
 
     @Override

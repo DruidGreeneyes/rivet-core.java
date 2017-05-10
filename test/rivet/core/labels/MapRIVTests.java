@@ -6,6 +6,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import static rivet.core.labels.RIVs.makeIndices;
+import static rivet.core.labels.RIVs.makeSeed;
+import static rivet.core.labels.RIVs.makeVals;
+
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -55,9 +59,9 @@ public class MapRIVTests {
     public void setUp() throws Exception {
         testK = 48;
         testSize = 16000;
-        testSeed = MapRIV.makeSeed("seed");
-        testKeys = MapRIV.makeIndices(testSize, testK, testSeed);
-        testVals = MapRIV.makeVals(testK, testSeed);
+        testSeed = makeSeed("seed");
+        testKeys = makeIndices(testSize, testK, testSeed);
+        testVals = makeVals(testK, testSeed);
         testPointMap = new ConcurrentHashMap<>();
         for (int i = 0; i < 48; i += 2) {
             final int j = i + 1;
@@ -133,17 +137,17 @@ public class MapRIVTests {
                                   .filter((x) -> 0 < x && x < testSize)
                                   .count());
         final int[] test2 =
-                MapRIV.makeIndices(testSize,
+                makeIndices(testSize,
                                    testK,
-                                   MapRIV.makeSeed("not seed"));
+                                   makeSeed("not seed"));
         assertFalse(Arrays.stream(test2)
                           .allMatch((x) -> ArrayUtils.contains(testKeys, x)));
     }
 
     @Test
     public final void testMakeSeed() {
-        final long seed2 = MapRIV.makeSeed("seed");
-        final long seed3 = MapRIV.makeSeed("not seed");
+        final long seed2 = makeSeed("seed");
+        final long seed3 = makeSeed("not seed");
         assertEquals(testSeed, seed2);
         assertNotEquals(testSeed, seed3);
     }

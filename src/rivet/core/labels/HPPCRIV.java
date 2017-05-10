@@ -8,6 +8,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.carrotsearch.hppc.IntDoubleHashMap;
 import com.carrotsearch.hppc.predicates.IntDoublePredicate;
 import com.carrotsearch.hppc.procedures.IntDoubleProcedure;
@@ -118,7 +120,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
     private final int size;
 
-    private HPPCRIV(final int size) {
+    public HPPCRIV(final int size) {
         super();
         this.size = size;
     }
@@ -162,8 +164,11 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
     @Override
     public HPPCRIV destructiveAdd(final RIV other) {
-        for (final int i : other.keyArr())
-            addTo(i, other.get(i));
+        for (final int i : other.keyArr()) {
+        	double v = other.get(i);
+        	if (!Util.doubleEquals(v, 0))
+        		addTo(i, v);
+        }
         return this;
     }
 
@@ -174,9 +179,9 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
             final double vv = v;
             for (final RIV riv : rivs)
                 v += riv.get(i);
-            if (v != 0)
+            if (!Util.doubleEquals(v, 0))
                 put(i, v);
-            else if (vv != 0)
+            else if (!Util.doubleEquals(vv, 0))
                 remove(i);
         }
         return this;
@@ -205,19 +210,20 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
     @Override
     public HPPCRIV destructiveDiv(final double scalar) {
-        forEach((IntDoubleProcedure) (k, v) -> indexReplace(k, v / scalar));
+        forEach((IntDoubleProcedure) (k, v) -> put(k, v / scalar));
         return this;
     }
-
+    
     @Override
-    public boolean equals(final RIV other) {
-        if (other.getClass()
-                 .equals(HPPCRIV.class))
-            return equals(other);
-        else
-            return size == other.size()
-                   && Arrays.deepEquals(points(), other.points());
+    public boolean equals(final Object other) {
+    	return RIVs.equals(this, other);
     }
+    
+    /* 
+    public boolean equals(final HPPCRIV other) {
+    	return size == other.size && super.equals(other);
+    }
+    */
 
     @Override
     public double get(final int index) throws IndexOutOfBoundsException {
@@ -234,7 +240,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
     @Override
     public HPPCRIV destructiveMult(final double scalar) {
-        forEach((IntDoubleProcedure) (k, v) -> indexReplace(k, v * scalar));
+        forEach((IntDoubleProcedure) (k, v) -> put(k, v * scalar));
         return this;
     }
 
@@ -286,31 +292,42 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
     @Override
     public HPPCRIV destructiveRemoveZeros() {
-        removeAll((IntDoublePredicate) (k, v) -> v == 0);
+        removeAll((IntDoublePredicate) (k, v) -> Util.doubleEquals(v, 0.0));
         return this;
     }
 
     @Override
     public int hashCode() {
-        int sum = 0;
-        final double[] vals = valArr();
-        for (int i = 0; i < vals.length; i++)
-            sum += vals[i] * (31 ^ (vals.length - 1 - i));
-        return sum;
+        return RIVs.hashcode(this);
     }
 
     @Override
     public int[] keyArr() {
-        return keys().toArray();
+        int[] keys = new int[count()];
+        for (int i = 0, j = 0; i < size; i++)
+        	if (!Util.doubleEquals(get(i), 0))
+        		keys[j++] = i;
+        return keys;
     }
 
     @Override
     public double[] valArr() {
-        return values().toArray();
+    	double[] vals = new double[count()];
+    	int c = 0;
+    	for (int k : keyArr())
+    		vals[c++] = get(k);
+    	return vals;
     }
 
     @Override
     public void forEach(final IntDoubleConsumer fun) {
-        super.forEach((IntDoubleProcedure) fun);
+    	IntDoubleProcedure f = (a, b) -> {
+    		fun.accept(a, b);
+    	};
+        super.forEach(f);
+    }
+    
+    public String toString() {
+    	return RIVs.toString(this);
     }
 }

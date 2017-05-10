@@ -201,10 +201,9 @@ public final class ArrayRIV implements RIV, Serializable {
     public boolean equals(final Object other) {
         return RIVs.equals(this, other);
     }
-
-    @Override
-    public boolean equals(final RIV other) {
-        return size() == other.size() && Arrays.equals(points, other.points());
+    
+    public boolean equals(final ArrayRIV other) {
+    	return size == other.size && Arrays.deepEquals(points, other.points);
     }
 
     @Override
@@ -298,11 +297,7 @@ public final class ArrayRIV implements RIV, Serializable {
 
     @Override
     public int hashCode() {
-        int sum = 0;
-        final double[] vals = valArr();
-        for (int i = 0; i < vals.length; i++)
-            sum += vals[i] * (31 ^ (vals.length - 1 - i));
-        return sum;
+        return RIVs.hashcode(this);
     }
 
     @Override
