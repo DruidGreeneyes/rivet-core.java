@@ -1,0 +1,21 @@
+<< START HIDDEN CONTENT >> Sheet Name : CORP DPR Summary INTRA-MONTH 1E-07 1E-07 9E-07 9E-07 9E-07 .
+INTRA MONTH OWENS ILLINOIS N/A GAS TRANSPORT AND DISTRIBUTION $ / MMBTU FUEL ( ) GAS MID-MKT SALES ORIG .
+TEM/OUTSOURCE ORIG .
+K O .
+ACCOUNT MGMT UPSELL .
+Note : Today 's change value a result following : << END HIDDEN CONTENT >> .
+CORP DPR Summary PRIVILEGED AND CONFIDENTIAL INTERNAL DISTRIBUTION ONLY DAILY POSITION REPORT REPORT DATE : / 12/12 POSITIONS PRICE/MATURITY RISK VALUE-at-RISK Change Value NET OPEN LIMIT SENSITIVITY LIMIT - DAY LIMIT TODAY Day Rolling MTD QTD YTD ENRON ENERGY SERVICES COMMODITY GAS N/A N/A #REF N/A SUPPLY INTRA-MONTH STORAGE REAL PROJECT OPTIONS POWER N/A SUPPLY-WEST N/A N/A N/A SUPPLY-EAST N/A N/A N/A REAL PROJECT OPTIONS INTRA MONTH OWENS ILLINOIS N/A TARIFF MANAGEMENT GAS TRANSPORT AND DISTRIBUTION $ / MMBTU FUEL ( ) POWER TRANSMISSION AND DISTRIBUTION $ MWH TRANSITION CTC 1M LATER REGULATORY SWITCH OPTIONS RETAIL GENERATION SERVICES INTEREST RATE RHO % CHG DRIFT - DAY CHG ORIGINATION SALES GAS MID-MKT SALES ORIG .
+TEM/OUTSOURCE ORIG .
+K O ( ) .
+ACCOUNT MGMT UPSELL CONTRACT RISK MANAGEMENT GAS HEDGE MGMT POWER HEDGE MGMT TARIFFS PRUDENCY/NET OPEN IN 's GAS PORTFOLIO POWER PORTFOLIO TARIFF PORTFOLIO CONSUMPTION PREMIUM CREDIT RESERVE/NET OPEN IN 's .
+TOTAL Note : Today 's change value a result following : Note : Today 's change value a result following : ) .
+Nymex Gas Curve decreased resulting a K gain ) .
+CA South peak decreased Q2 CAL resulting a k loss .
+Palo Verde peak decreased CAL decreased Q2 Q4 resulting a k loss .
+Cinergy peak decreased CAL resulting a k loss .
+Entergy peak decreased CAL resulting a k loss .
+NY Zone G peak decreased CAL resulting a k gain .
+NY Zone J peak decreased CAL resulting a k loss .
+West Hub peak decreased CAL resulting a k loss .
+R : risk_analysis WebReports [ DPR12120_final .
+xls ] CORP DPR Summary Document Properties Author : Hwang Last saved : Preston Arthur Ochsner Application : Microsoft Excel Last printed : / 12/13 :03:2 Created : / 08/02 :14:3 Company : Enron .

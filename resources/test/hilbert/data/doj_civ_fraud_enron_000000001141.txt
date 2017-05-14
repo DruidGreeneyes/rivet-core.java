@@ -1,0 +1,3 @@
+Attachment f : attachcus buy-r RBuyJun201 00009E2A3432AB7434691940D0540FA35C2418200 .
+ValSum_47 .5 adj GE vals only .
+xls not found !

@@ -1,0 +1,26 @@
+<< START HIDDEN CONTENT >> Sheet Name : CORP DPR Summary INTRA-MONTH E-07 E-07 8E-07 8E-07 8E-07 .
+INTRA MONTH OWENS ILLINOIS N/A GAS TRANSPORT AND DISTRIBUTION $ / MMBTU FUEL ( ) GAS MID-MKT SALES ORIG .
+TEM/OUTSOURCE ORIG .
+K O .
+ACCOUNT MGMT UPSELL .
+Note : Today 's change value a result following : << END HIDDEN CONTENT >> .
+CORP DPR Summary PRIVILEGED AND CONFIDENTIAL INTERNAL DISTRIBUTION ONLY DAILY POSITION REPORT REPORT DATE : / 12/1 POSITIONS PRICE/MATURITY RISK VALUE-at-RISK Change Value NET OPEN LIMIT SENSITIVITY LIMIT - DAY LIMIT TODAY Day Rolling MTD QTD YTD ENRON ENERGY SERVICES COMMODITY GAS N/A N/A #REF N/A SUPPLY INTRA-MONTH STORAGE REAL PROJECT OPTIONS POWER N/A SUPPLY-WEST N/A N/A N/A SUPPLY-EAST N/A N/A N/A REAL PROJECT OPTIONS INTRA MONTH OWENS ILLINOIS N/A TARIFF MANAGEMENT GAS TRANSPORT AND DISTRIBUTION $ / MMBTU FUEL ( ) POWER TRANSMISSION AND DISTRIBUTION $ MWH TRANSITION CTC 1M LATER REGULATORY SWITCH OPTIONS RETAIL GENERATION SERVICES INTEREST RATE RHO % CHG DRIFT - DAY CHG ORIGINATION SALES GAS MID-MKT SALES ORIG .
+TEM/OUTSOURCE ORIG .
+K O ( ) .
+ACCOUNT MGMT UPSELL CONTRACT RISK MANAGEMENT GAS HEDGE MGMT POWER HEDGE MGMT TARIFFS PRUDENCY/NET OPEN IN 's GAS PORTFOLIO POWER PORTFOLIO TARIFF PORTFOLIO CONSUMPTION PREMIUM CREDIT RESERVE/NET OPEN IN 's .
+TOTAL Note : Today 's change value a result following : Note : Today 's change value a result following : ) .
+Increase credit reserve due gas credit reserve Arcadia Position $ k ) .
+Socal gas curves decreased coupled a long position , resulting a k loss .
+NP-15 peak decreased resulting a k loss .
+COB peak increased Q1 Q3 increased Q4 resulting a k gain .
+Entergy increased Q1 decreased Q2 resulting a k loss .
+NY Zone G increased resulting a k loss .
+R : risk_analysis WebReports [ DPR1210_final .
+xls ] CORP DPR Summary * G { 00204F3-00-00-C00-0000046 } # #C : WINNT System32 VBAEN32.OLB #Visual Basic For Applicationst \ G { -00 -00 - C00-0000046 } # #xl 5en32 .
+olb * G { -00 -00 - C00-0000046 } # #C : WINNT System32 StdOle2.Tlb #OLE Automation \ G { 2DF8D04C-5BFA-101B-BDE5-0AA04DE52 } # #C : Program Files Microsoft Office Office MSO97.DLL #Microsoft Office Object Library VBAProject stdole Office .
+VBAProje stdole le fÈ ¥ * G { } # #C : WINN T System StdOl e2.Tlb #O LE Autom ` ation MSFor ms 52674C1 6E2B-1D@4-9143 0B743DF1 TWD Microsof Librar P2$PTEM@P\VBE\ M Â ´ Aâ € ™ CvOffi cDvO@sf F8D04C-5 BFA-101B BDE5 SAA5@u4 am Files DLLHX hisWorkb Sheet1 .
+N0 { -00 -00 - C00-0000046 } Attribut e VB_Nam e " She@et1 Ã ¨ B t0 { } | Creata Predecl Expose Template`Deriv ustomiz .
+N0 { -00 -00 - C00-0000046 } Attribut e VB_Nam e " Thi sWorkboo { 0020P819 $ } | Creatab False Predecla Tru @Expose emplateD0eriv stomiz .
+G { 00204EF-00-00-C00-0000046 } # #C : Program Files Common Files Microsoft Shared VBA VBA32.dll #Visual Basic For Applications G { -00 -00 - C00-0000046 } # #C : Program Files Microsoft Office Office EXCEL8.OLB #Microsoft Excel Object Library G { -00 -00 - C00-0000046 } # #C : WINNT System32 StdOle2.Tlb #OLE Automation G { 052674C1-6E2B-1D4-9143-0D0B743DF17 } # #C : WINNT System32 MSForms.TWD #Microsoft Forms Object Library G { 052674C2-6E2B-1D4-9143-0D0B743DF17 } # #C : TEMP VBE MSForms.EXD #Microsoft Forms Object Library G { 2DF8D04C-5BFA-101B-BDE5-0AA04DE52 } # #C : Program Files Microsoft Office Office MSO97.DLL #Microsoft Office Object Library ThisWorkbook e3a36494 Sheet1 f3a36494 DPR1210_finalZY stdole MSFormsC VBAProject Office ThisWorkbook | Evaluate Sheet1 Worksheet Workbookk .
+ID " { E801996-D03-1D4-9162-0D0B743DF17 } Document ThisWorkbook & H0000 Document Sheet1 & H0000 Name " VBAProject HelpContextID " CMG " D5D742A8CE6AD26AD26AD26AD2 DPB " 9B90CF6D3F7D3F7D3 GC " 6B69FCD0CDD1CDD132 [ Host Extender Info ] H00001 { 3832D640-CF90-1CF-8E43-0A0C9105A } ; VBE ; H0000 [ Workspace ] ThisWorkbook , , C Sheet1 , , C. ThisWorkbook ThisWorkbook Sheet1 Sheet1 .
+Document Properties Author : Hwang Last saved : Preston Arthur Ochsner Application : Microsoft Excel Last printed : / 12/12 :47:16 Created : / 08/02 :14:3 Company : Enron .
