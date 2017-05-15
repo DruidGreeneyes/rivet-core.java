@@ -1,1 +1,0 @@
-do delete organizer note table reminder
