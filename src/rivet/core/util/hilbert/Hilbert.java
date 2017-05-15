@@ -521,7 +521,7 @@ public final class Hilbert {
 
   // now do it fast.
 
-  private static int MASK = 1 << ORDER - 1;
+  private static int MASK = nthBit(ORDER - 1);
 
   private static int[] gmask = generateGMask();
 

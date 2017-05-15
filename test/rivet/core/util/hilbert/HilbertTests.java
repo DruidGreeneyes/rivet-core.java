@@ -142,12 +142,13 @@ public class HilbertTests {
     baseTest(ImmutableRIV::getHilbertKey);
   }
 
-  @Test
+  // @Test
   public void testFEncodeHilbertKey() throws IOException {
     System.out.println("Testing FHilbert Key:");
     baseTest(ImmutableRIV::getFHilbertKey);
   }
 
+  // @Test
   public void testSEncodeHilbertKey() throws IOException {
     System.out.println("Testing SHilbert Key:");
     baseTest(ImmutableRIV::getSHilbertKey);
