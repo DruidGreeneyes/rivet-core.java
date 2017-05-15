@@ -340,11 +340,11 @@ public final class Hilbert {
   }
 
   private static int gmask(final int n, final int dims) {
-    return gmask[(dims - n) % ORDER];
+    return gmask[(dims - 1 - n) % ORDER];
   }
 
   private static int _gmask(final int n, final int dims) {
-    final int m = (dims - n) % ORDER;
+    final int m = (dims - 1 - n) % ORDER;
     return 1 << m;
   }
 
