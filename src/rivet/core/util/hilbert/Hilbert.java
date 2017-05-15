@@ -1,5 +1,8 @@
 package rivet.core.util.hilbert;
 
+import static java.math.BigInteger.ZERO;
+import static java.math.BigInteger.ONE;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import rivet.core.labels.DenseRIV;
@@ -85,6 +88,196 @@ public final class Hilbert {
    * [A.i.1..A.i.n]
    */
 
+  private static final BigInteger TWO = BigInteger.valueOf(2L);
+  private static final BigInteger THREE = BigInteger.valueOf(3L);
+
+  private static BigInteger genHighBitMask(final int dims) {
+    return ONE.shiftLeft(dims).subtract(ONE);
+  }
+
+  private static BigInteger sigma_i(final BigInteger rho) {
+    return rho.xor(rho.shiftRight(1));
+  }
+
+  private static BigInteger tau_i(final BigInteger rho) {
+    if (rho.compareTo(THREE) < 0)
+      return ZERO;
+    else if (!rho.testBit(0))
+      return sigma_i(rho.subtract(ONE));
+    else
+      return sigma_i(rho.subtract(TWO));
+  }
+
+  private static int principlePosition(final BigInteger n, final int dims) {
+    final boolean atZero = n.testBit(0);
+    for (int i = 1; i < dims; i++)
+      if (atZero ^ n.testBit(i))
+        return dims - i;
+    return dims;
+  }
+
+  private static int J_i(final BigInteger rho, final int dims) {
+    return principlePosition(rho, dims);
+  }
+
+  private static BigInteger rotateRight(final BigInteger n, final int distance,
+                                        final int dimensions) {
+    BigInteger t = n;
+    for (int i = 0, b = dimensions; i < distance; i++, b++)
+      if (n.testBit(i))
+        t = t.setBit(b);
+    return t.shiftRight(distance);
+  }
+
+  private static BigInteger _rotateRight(final BigInteger n, final int distance,
+                                         final int dims,
+                                         final BigInteger highBitMask) {
+    return n.or(n.shiftLeft(dims)).shiftRight(distance).and(highBitMask);
+  }
+
+  private static BigInteger rotateLeft(final BigInteger n, final int distance,
+                                       final int dimensions) {
+    BigInteger t = n.shiftLeft(distance);
+    for (int i = dimensions, b = 0; b < distance; i++, b++)
+      if (t.testBit(i))
+        t = t.setBit(b).clearBit(i);
+    return t;
+  }
+
+  private static BigInteger _rotateLeft(final BigInteger n, final int distance,
+                                        final int dims,
+                                        final BigInteger highBitMask) {
+    return n.shiftLeft(distance)
+            .or(n.shiftRight(dims - distance))
+            .and(highBitMask);
+  }
+
+  private static BigInteger addHat_i(final BigInteger noHat, final int jMod,
+                                     final int dimensions,
+                                     final BigInteger highBitMask) {
+    return _rotateRight(noHat, jMod, dimensions, highBitMask);
+  }
+
+  private static BigInteger omega_i(final BigInteger omega,
+                                    final BigInteger tauHatPrev) {
+    return omega.xor(tauHatPrev);
+  }
+
+  private static BigInteger alpha_i(final BigInteger omega,
+                                    final BigInteger sigmaHat) {
+    return omega.xor(sigmaHat);
+  }
+
+  private static BigInteger trimHighBits(final BigInteger n, final int dims) {
+    BigInteger b = n;
+    final int end = n.bitLength();
+    for (int i = dims; i < end; i++)
+      b = b.clearBit(i);
+    return b;
+  }
+
+  private static BigInteger rho_i(final BigInteger key, final int dims,
+                                  final int i) {
+    return trimHighBits(key.shiftRight(i * dims), dims);
+  }
+
+  private static double[] decodePoints(final BigInteger[] alpha,
+                                       final int dimensions) {
+    final double[] points = new double[dimensions];
+    for (int n = 0; n < dimensions; n++) {
+      int i = 0;
+      for (int m = 0; m < ORDER; m++)
+        if (alpha[m].testBit(n))
+          i = setBit(i, m);
+      points[n] = i;
+    }
+    return points;
+  }
+
+  // Deriving a coordinate point from a hilbert key:
+  public static DenseRIV decodeHilbertKey(final BigInteger key,
+                                          final int dims) {
+    final BigInteger[] alpha = new BigInteger[ORDER];
+    final BigInteger highBitMask = genHighBitMask(dims);
+    BigInteger rho = rho_i(key, dims, 0);
+    int J = J_i(rho, dims);
+    int jMod = 0;
+    BigInteger sigma = rho;
+    BigInteger tau = tau_i(rho);
+    BigInteger sigmaHat = sigma;
+    BigInteger omega = ZERO;
+    BigInteger tauHat = tau;
+    alpha[0] = alpha_i(omega, sigmaHat);
+    for (int i = 1; i < ORDER; i++) {
+      rho = rho_i(key, dims, i);
+      jMod += J - 1;
+      J = J_i(rho, dims);
+      sigma = sigma_i(rho);
+      tau = tau_i(rho);
+      sigmaHat = addHat_i(sigma, jMod, dims, highBitMask);
+      omega = omega_i(omega, tauHat);
+      tauHat = addHat_i(tau, jMod, dims, highBitMask);
+      alpha[i] = alpha_i(omega, sigmaHat);
+    }
+    final double[] points = decodePoints(alpha, dims);
+    return new DenseRIV(points);
+  }
+
+  private static BigInteger rAlpha_i(final int[] point, final int i,
+                                     final int dims) {
+    BigInteger alpha = ZERO;
+    for (int n = 0; n < dims; n++)
+      if (testBit(point[n], i))
+        alpha = alpha.setBit(n);
+    return alpha;
+  }
+
+  private static BigInteger rSigmaHat_i(final BigInteger alpha,
+                                        final BigInteger omega) {
+    return alpha.xor(omega);
+  }
+
+  private static BigInteger rAddHat_i(final BigInteger n, final int jMod,
+                                      final int dims,
+                                      final BigInteger highBitMask) {
+    return _rotateLeft(n, jMod, dims, highBitMask);
+  }
+
+  private static BigInteger rRho_i(final BigInteger sigma) {
+    return sigma.xor(sigma.shiftRight(1));
+  }
+
+  public static BigInteger encodeHilbertKey(final RIV riv) {
+    final int dims = riv.size();
+    final BigInteger highBitMask = genHighBitMask(dims);
+    final int[] point = new int[dims];
+    for (int i = 0; i < dims; i++)
+      point[i] = (int) riv.get(i);
+    BigInteger alpha = rAlpha_i(point, 0, dims);
+    BigInteger omega = ZERO;
+    BigInteger sigmaHat = alpha;
+    BigInteger sigma = sigmaHat;
+    BigInteger rho = sigma;
+    int J = J_i(rho, dims);
+    int jMod = 0;
+    BigInteger tau = tau_i(rho);
+    BigInteger tauHat = tau;
+    BigInteger key = rho;
+    for (int i = 1; i < ORDER; i++) {
+      alpha = rAlpha_i(point, i, dims);
+      omega = omega_i(omega, tauHat);
+      sigmaHat = rSigmaHat_i(alpha, omega);
+      jMod += J - 1;
+      sigma = rAddHat_i(sigmaHat, jMod, dims, highBitMask);
+      rho = rRho_i(sigma);
+      J = J_i(rho, dims);
+      tau = tau_i(rho);
+      tauHat = rAddHat_i(tau, jMod, dims, highBitMask);
+      key = key.or(rho.shiftLeft(i * dims));
+    }
+    return key;
+  }
+
   // Second attempt
   // Do it sideways, so we don't have to deal with BigInts the whole way
   // through.
@@ -130,7 +323,7 @@ public final class Hilbert {
     final boolean lsb = testBit(sBits[0], bitLine);
     for (int n = 1; n < dims; n++)
       if (lsb ^ testBit(sBits[n], bitLine))
-        return dims - 1 - n;
+        return dims - n;
     return dims - 1;
   }
 
@@ -328,7 +521,7 @@ public final class Hilbert {
 
   // now do it fast.
 
-  private static int MASK = ones(ORDER);
+  private static int MASK = 1 << ORDER - 1;
 
   private static int[] gmask = generateGMask();
 

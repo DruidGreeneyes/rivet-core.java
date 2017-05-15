@@ -219,8 +219,16 @@ public class ImmutableRIV implements RIV {
 
   public BigInteger getHilbertKey() {
     if (keyType != "hilbert") {
-      key = Hilbert.fEncodeHilbertKey(this);
+      key = Hilbert.encodeHilbertKey(this);
       keyType = "hilbert";
+    }
+    return key;
+  }
+
+  public BigInteger getFHilbertKey() {
+    if (keyType != "fHilbert") {
+      key = Hilbert.fEncodeHilbertKey(this);
+      keyType = "fHilbert";
     }
     return key;
   }
