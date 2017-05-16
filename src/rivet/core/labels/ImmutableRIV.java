@@ -331,8 +331,8 @@ public class ImmutableRIV implements RIV {
     if (times == 0)
       return this;
     final int[] permutation = times > 0
-                                        ? permutations.left
-                                        : permutations.right;
+                                        ? permutations.permute
+                                        : permutations.inverse;
     final int t = Math.abs(times);
     final VectorElement[] points = points();
     for (int i = 0; i < t; i++)
