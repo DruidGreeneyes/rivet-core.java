@@ -120,28 +120,10 @@ public final class Hilbert {
     return principlePosition(rho, dims);
   }
 
-  private static BigInteger rotateRight(final BigInteger n, final int distance,
-                                        final int dimensions) {
-    BigInteger t = n;
-    for (int i = 0, b = dimensions; i < distance; i++, b++)
-      if (n.testBit(i))
-        t = t.setBit(b);
-    return t.shiftRight(distance);
-  }
-
   private static BigInteger _rotateRight(final BigInteger n, final int distance,
                                          final int dims,
                                          final BigInteger highBitMask) {
     return n.or(n.shiftLeft(dims)).shiftRight(distance).and(highBitMask);
-  }
-
-  private static BigInteger rotateLeft(final BigInteger n, final int distance,
-                                       final int dimensions) {
-    BigInteger t = n.shiftLeft(distance);
-    for (int i = dimensions, b = 0; b < distance; i++, b++)
-      if (t.testBit(i))
-        t = t.setBit(b).clearBit(i);
-    return t;
   }
 
   private static BigInteger _rotateLeft(final BigInteger n, final int distance,

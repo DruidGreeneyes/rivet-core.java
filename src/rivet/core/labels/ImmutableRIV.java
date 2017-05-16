@@ -18,8 +18,6 @@ import rivet.core.vectorpermutations.Permutations;
 
 public class ImmutableRIV implements RIV {
 
-  private static BigInteger DEFAULT_KEY = BigInteger.valueOf(-1L);
-
   private static final DoubleBinaryOperator add = (a, b) -> a + b;
 
   private static final DoubleBinaryOperator subtract = (a, b) -> a - b;
@@ -80,10 +78,6 @@ public class ImmutableRIV implements RIV {
   private final int[] keys;
 
   private final double[] vals;
-
-  private BigInteger key = DEFAULT_KEY;
-
-  private String keyType = "";
 
   public ImmutableRIV(final int size) {
     this.size = size;
@@ -218,43 +212,23 @@ public class ImmutableRIV implements RIV {
   }
 
   public BigInteger getHilbertKey() {
-    if (keyType != "hilbert") {
-      key = Hilbert.encodeHilbertKey(this);
-      keyType = "hilbert";
-    }
-    return key;
+    return Hilbert.encodeHilbertKey(this);
   }
 
   public BigInteger getFHilbertKey() {
-    if (keyType != "fHilbert") {
-      key = Hilbert.fEncodeHilbertKey(this);
-      keyType = "fHilbert";
-    }
-    return key;
+    return Hilbert.fEncodeHilbertKey(this);
   }
 
   public BigInteger getHilbillyKey() {
-    if (keyType != "hilbilly") {
-      key = Hilbert.encodeHilbillyKey(this);
-      keyType = "hilbilly";
-    }
-    return key;
+    return Hilbert.encodeHilbillyKey(this);
   }
 
   public BigInteger getSHilbertKey() {
-    if (keyType != "sHilbert") {
-      key = Hilbert.sEncodeHilbertKey(this);
-      keyType = "sHilbert";
-    }
-    return key;
+    return Hilbert.sEncodeHilbertKey(this);
   }
 
   public BigInteger getSHilbillyKey() {
-    if (keyType != "sHilbilly") {
-      key = Hilbert.sEncodeHilbillyKey(this);
-      keyType = "sHilbilly";
-    }
-    return key;
+    return Hilbert.sEncodeHilbillyKey(this);
   }
 
   // implements the String hashCode function;
