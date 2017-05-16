@@ -8,12 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 import rivet.core.extras.UntrainedWordsMap;
@@ -47,9 +47,7 @@ public class HilbertTests {
 
   public static void
          baseTest(final Function<ImmutableRIV, BigInteger> getKey) throws IOException {
-    final Comparator<ImmutableRIV> comp = (a, b) -> getKey.apply(a)
-                                                          .compareTo(getKey.apply(b));
-    final TreeMap<ImmutableRIV, Path> rivs = new TreeMap<>(comp);
+    final TreeMap<BigInteger, Pair<ImmutableRIV, Path>> rivs = new TreeMap<>();
     final TreeSet<RIVComparison> comparisons = new TreeSet<>();
     Files.walk(TEST_DATA, 1)
          .filter(p -> !Files.isDirectory(p) && fileSize(p, 50))
@@ -62,15 +60,16 @@ public class HilbertTests {
          })
          .filter(Optional::isPresent)
          .map(Optional::get)
-         .forEach(p -> rivs.put(p.getLeft(), p.getRight()));
+         .forEach(p -> rivs.put(getKey.apply(p.getLeft()), p));
 
-    rivs.keySet().forEach(riv -> {
-      final ImmutableRIV nextRIV = rivs.higherKey(riv);
+    rivs.keySet().forEach(k -> {
+      final BigInteger nextK = rivs.higherKey(k);
+      final ImmutableRIV nextRIV = rivs.get(nextK).getLeft();
       if (null != nextRIV)
-        comparisons.add(new RIVComparison(riv, nextRIV,
-                                          getKey.apply(nextRIV)
-                                                .subtract(getKey.apply(riv))
-                                                .abs()));
+        comparisons.add(new RIVComparison(rivs.get(k).getLeft(), nextRIV,
+                                          nextK
+                                               .subtract(k)
+                                               .abs()));
     });
 
     final RIVComparison[] top10 = comparisons.stream()
@@ -96,6 +95,18 @@ public class HilbertTests {
                           / 10;
     System.out.println("Best 10 average cosim: " + topAvg);
     System.out.println("Worst 10 average cosim: " + botAvg);
+    System.out.println("Average Key Distance: " + bigStr(comparisons.stream()
+                                                                    .map(c -> c.hilDist)
+                                                                    .reduce(BigInteger.ZERO,
+                                                                            BigInteger::add)
+                                                                    .divide(BigInteger.valueOf(comparisons.size())),
+                                                         4));
+    System.out.println("Median Key Distance: " + bigStr(comparisons.stream()
+                                                                   .map(c -> c.hilDist)
+                                                                   .reduce(BigInteger.ZERO,
+                                                                           BigInteger::add)
+                                                                   .divide(BigInteger.valueOf(comparisons.size())),
+                                                        4));
     assertEquals(1, Double.compare(topAvg, botAvg));
   }
 
@@ -106,10 +117,16 @@ public class HilbertTests {
   }
 
   public static String compToString(final RIVComparison comp,
-                                    final TreeMap<ImmutableRIV, Path> rivs) {
+                                    final TreeMap<BigInteger, Pair<ImmutableRIV, Path>> rivs) {
     return String.format("    File A: %s%n    File B: %s%n    Curve Distance: %s%n    Cosim: %.4f%n%n",
-                         rivs.get(comp.rivA).getFileName().toString(),
-                         rivs.get(comp.rivB).getFileName().toString(),
+                         rivs.get(comp.rivA)
+                             .getRight()
+                             .getFileName()
+                             .toString(),
+                         rivs.get(comp.rivB)
+                             .getRight()
+                             .getFileName()
+                             .toString(),
                          bigStr(comp.hilDist, 4),
                          comp.cosim);
   }
