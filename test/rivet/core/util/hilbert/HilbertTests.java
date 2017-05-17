@@ -8,12 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
 import rivet.core.extras.UntrainedWordsMap;
@@ -47,29 +46,29 @@ public class HilbertTests {
 
   public static void
          baseTest(final Function<ImmutableRIV, BigInteger> getKey) throws IOException {
-    final TreeMap<BigInteger, Pair<ImmutableRIV, Path>> rivs = new TreeMap<>();
+    final HashMap<ImmutableRIV, Path> paths = new HashMap<>();
+    final TreeMap<BigInteger, ImmutableRIV> rivs = new TreeMap<>();
     final TreeSet<RIVComparison> comparisons = new TreeSet<>();
     Files.walk(TEST_DATA, 1)
          .filter(p -> !Files.isDirectory(p) && fileSize(p, 50))
-         .map(p -> {
-           Optional<ImmutablePair<ImmutableRIV, Path>> o = Optional.empty();
-           try {
-             o = Optional.of(ImmutablePair.of(rivText(p), p));
-           } catch (final IOException e) {}
-           return o;
+         .map(path -> {
+           final Optional<ImmutableRIV> o = rivText(path);
+           final ImmutableRIV riv = o.orElseThrow(() -> new RuntimeException("IO FAILURE at path "
+                                                                             + path.toString()));
+           paths.put(riv, path);
+           return riv;
          })
-         .filter(Optional::isPresent)
-         .map(Optional::get)
-         .forEach(p -> rivs.put(getKey.apply(p.getLeft()), p));
+         .forEach(riv -> rivs.put(getKey.apply(riv), riv));
 
+    final BigInteger lastKey = rivs.lastKey();
     rivs.keySet().forEach(k -> {
+      if (k == lastKey) return;
       final BigInteger nextK = rivs.higherKey(k);
-      final ImmutableRIV nextRIV = rivs.get(nextK).getLeft();
-      if (null != nextRIV)
-        comparisons.add(new RIVComparison(rivs.get(k).getLeft(), nextRIV,
-                                          nextK
-                                               .subtract(k)
-                                               .abs()));
+      final ImmutableRIV nextRIV = rivs.get(nextK);
+      comparisons.add(new RIVComparison(rivs.get(k), nextRIV,
+                                        nextK
+                                             .subtract(k)
+                                             .abs()));
     });
 
     final RIVComparison[] top10 = comparisons.stream()
@@ -78,7 +77,7 @@ public class HilbertTests {
     System.out.println("Best 10 comparisons by curve distance:");
     final double topAvg = Arrays.stream(top10)
                                 .peek(c -> System.out.println(compToString(c,
-                                                                           rivs)))
+                                                                           paths)))
                                 .mapToDouble(c -> c.cosim)
                                 .sum()
                           / 10;
@@ -89,7 +88,7 @@ public class HilbertTests {
     System.out.println("Worst 10 comparisons by curve distance:");
     final double botAvg = Arrays.stream(bot10)
                                 .peek(c -> System.out.println(compToString(c,
-                                                                           rivs)))
+                                                                           paths)))
                                 .mapToDouble(c -> c.cosim)
                                 .sum()
                           / 10;
@@ -117,16 +116,14 @@ public class HilbertTests {
   }
 
   public static String compToString(final RIVComparison comp,
-                                    final TreeMap<BigInteger, Pair<ImmutableRIV, Path>> rivs) {
+                                    final HashMap<ImmutableRIV, Path> paths) {
     return String.format("    File A: %s%n    File B: %s%n    Curve Distance: %s%n    Cosim: %.4f%n%n",
-                         rivs.get(comp.rivA)
-                             .getRight()
-                             .getFileName()
-                             .toString(),
-                         rivs.get(comp.rivB)
-                             .getRight()
-                             .getFileName()
-                             .toString(),
+                         paths.get(comp.rivA)
+                              .getFileName()
+                              .toString(),
+                         paths.get(comp.rivB)
+                              .getFileName()
+                              .toString(),
                          bigStr(comp.hilDist, 4),
                          comp.cosim);
   }
@@ -140,11 +137,16 @@ public class HilbertTests {
     }
   }
 
-  public static ImmutableRIV rivText(final Path p) throws IOException {
-    final String[] words = Files.lines(p)
-                                .flatMap(line -> Arrays.stream(line.split("\\W+")))
-                                .toArray(String[]::new);
-    return UntrainedWordsMap.rivAndSumWords(words, size, nnz).toImmutable();
+  public static Optional<ImmutableRIV> rivText(final Path p) {
+    try {
+      final String[] words = Files.lines(p)
+                                  .flatMap(line -> Arrays.stream(line.split("\\W+")))
+                                  .toArray(String[]::new);
+      return Optional.of(UntrainedWordsMap.rivAndSumWords(words, size, nnz)
+                                          .toImmutable());
+    } catch (final IOException e) {
+      return Optional.empty();
+    }
   }
 
   @Test
