@@ -78,6 +78,7 @@ for (int r = 0; i < sims.length; i++)
           pairs[x][0] = r;
           pairs[x][1] = c;
           pairs[x][3] = sims[r][c];
+          break;
         }
     }
     
@@ -87,3 +88,33 @@ for(double[] pair : pairs) {
   String b = documents[(int)pair[1]].substring(0, 20) + "...";
   System.out.println(a + " <=> " + b + ": " + pair[2]);
 }
+
+```
+
+## BUT WHAT ABOUT THE GODDAMNED WIZARDRY!?!?!?
+
+There are a number of other things you can do, and other ways you can use RIVs to represent text. For example, you can build a lexicon (a map of words to the corpus-wide L2 RIV associated with each word, in turn built over time by adding together all words that occur within a 2- to 4-word window of the word in question), and use it to (say) find synonyms, or label documents with topics associated with words that have good similarity with the document in question. If you want to get wacky with it (and you don't mind the high compute cost of doing so), you can encode ordering to words within sentences or context windows by using RIV.permute(n), where n is the given word's location in the context relative to the word it's being added to. Among the things I am working on or have worked on include clustering documents based on cosine similarity, finding and eliminating near-duplicates across corpora, and inferring flat and heirarchical topic models from data. I stood up a small website using a Python version of this library, and was able to do similarity comparisons between 100k word texts in 2 and some change minutes on a 2nd generation raspberry pi. It would probably be faster if I had done it in Java, but I wanted to muck about with Python, so I did. I most recently implemented Hilbert Transformations on RIVs, so for big corpora you should be able to sort by hilbert key (using Hilbert.getHilbertKey(riv), or ImmutableRIV.getHilbertKey()) use that for some nifty tricks.
+
+## CHOICES, CHOICES, SO MANY F#%ING CHOICES!!!
+
+The first couple things you'll have to figure out, mostly through trial and error, will be what size and what nnz grant you the best balance between how accurate your RIVs are and how many your hardware can process within a suitable span of time. In general, 8000/4 seems to be an acceptable starting point; I know people who are using 16k/24, and I have heard of people using sizes as big as 100k. This will mostly depend on the size of your corpus and the power of your hardware. Beyond that, there are a number of decisions you can take to customize your RIV experience, so to speak. Permutations will allow you to (in theory) pack more real information into a RIV, but it has a sizable cost in terms of ram and cpu usage. If you build a lexicon, then you'll have to decide what will qualify as the surrounding context for your words; I have used windows of 2 and 3, and I have used the entire sentence, on the theory that every piece I leave out is lost information that could theoretically inflect the meaning of the word. I have found that within reasonably-sized rivs (8k to 16k wide), using the whole sentence seems to propagate too much noise into the data, and makes even utterly unrelated things have cosine similarities of 0.6 or greater.
+
+The importance of cleaning your input text cannot be overstated; I ran this on a collection of raw emails and the results were utter garbage, and no matter what tricks I tried when processing the RIVs, I didn't really get better results until I got cleaner texts to work with. I'm have mixed feelings about stopwording and lemmatizing. In theory, they reduce scale and noise from the input data, but ultimately some of the original information is lost in the process. In my ideal world, I would handle raw text and extract meaning from that, because theoretically that is the most accurate way to do this. But, stopwords especially add an incredible amount of noise, and so they kind of collide with everything, and as a result they tend to muddy up all the results. You can mitigate this somewhat by taking the mean vector of a lexicon or of a corpus (that is, the sum of all constituent RIVs divided by the number of constituent RIVs) and subtracting that from all constituents, but in practice this has not proven to be as helpful as I had originally hoped.
+
+Finally, be aware of the distinction between operations and their destructive counterparts. The destructive version will always be faster, but it is faster because it operates in place on the calling RIV, and the previous state of that RIV is lost. So, for example, if you want to find out if rivA is equal to rivB times 2 (I dunno why you would, but for the sake of example...), use `rivA.equals(rivB.multiply(2))` and **NOT** `rivA.equals(rivB.destructiveMult(2))`. Doing it the second way will permanently alter rivB, and throw all your further processing out of whack. If you're adding a bunch of RIVs together (and you will, because that's the whole point), the best compromise between speed and safety will be to do something like I did above: 
+
+```java
+RIV[] rivs;
+RIV res = MapRIV.empty();
+for(riv : rivs)
+  res.destructiveAdd(riv);
+```
+
+or, if your operation is big enough that it's worth using Java streams, you can just do a reduce operation:
+
+```java
+Stream<RIV> rivs;
+rivs.reduce(MapRIV.empty(); RIV::destructiveAdd);
+```
+
+either way, you're starting with an empty and making destructive modifications to that instead of to something else you might want to use later.
