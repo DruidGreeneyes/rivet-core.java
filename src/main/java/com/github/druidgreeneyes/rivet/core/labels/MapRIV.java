@@ -80,15 +80,6 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
     return new MapRIV(makeIndices(size, j, seed), makeVals(j, seed), size);
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
   public static MapRIV generateLabel(final int size, final int k,
                                      final CharSequence source,
                                      final int startIndex,
@@ -100,25 +91,11 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
                                               startIndex + tokenLength));
   }
 
-  /**
-   * GenerateLabel, enclosed in a lambda statement.
-   *
-   * @param size
-   * @param k
-   * @return
-   */
   public static Function<String, MapRIV> labelGenerator(final int size,
                                                         final int k) {
     return (word) -> generateLabel(size, k, word);
   }
 
-  /**
-   * GenerateLabel, enclosed in a lambda statement.
-   *
-   * @param size
-   * @param k
-   * @return
-   */
   public static Function<Integer, MapRIV> labelGenerator(final String source,
                                                          final int size,
                                                          final int k,

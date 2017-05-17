@@ -55,15 +55,6 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
                        size);
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
   public static HPPCRIV generateLabel(final int size, final int k,
                                       final CharSequence source,
                                       final int startIndex,

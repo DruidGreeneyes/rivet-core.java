@@ -38,7 +38,7 @@ public class DenseRIV implements RIV, Serializable {
    * the same input, generateLabel will always produce the same output.
    *
    * @param size
-   * @param k
+   * @param nnz
    * @param word
    * @return a MapRIV
    */
@@ -52,15 +52,6 @@ public class DenseRIV implements RIV, Serializable {
                         size);
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
   public static DenseRIV generateLabel(final int size, final int k,
                                        final CharSequence source,
                                        final int startIndex,
