@@ -3,6 +3,33 @@
   <groupId>rivet-core</groupId>
   <artifactId>rivet-core</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  
+  <name>Rivet</name>
+  <description>Random Index Vectoring library in Java</description>
+  <url>https://github.com/druidgreeneyes/rivet-core.java</url>
+  <licenses>
+    <license>
+      <name>The MIT License</name>
+      <url>https://mit-license.org/</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Josh Carton</name>
+      <email>druidgreeneyes@gmail.com</email>
+      <organizationUrl>https://github.com/druidgreeneyes</organizationUrl>
+    </developer>
+    <developer>
+      <name>Steve Carton</name>
+      <email></email>
+    </developer>
+  </developers>
+  
+  <scm>
+    <connection>scm:git:git://github.com/druidgreeneyes/rivet-core.java.git</connection>
+    <url>https://github.com/druidgreeneyes/rivet-core.java/tree/master</url>
+  </scm>
+  
   <build>
     <sourceDirectory>src</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
