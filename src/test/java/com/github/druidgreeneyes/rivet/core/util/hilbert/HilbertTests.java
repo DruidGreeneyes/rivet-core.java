@@ -43,6 +43,7 @@ public class HilbertTests {
   private static Path TEST_DATA = Paths.get("resources/test/hilbert/data");
   private static int size = 8000;
   private static int nnz = 4;
+  private static boolean console = false;
 
   public static void
          baseTest(final Function<ImmutableRIV, BigInteger> getKey) throws IOException {
@@ -74,10 +75,13 @@ public class HilbertTests {
     final RIVComparison[] top10 = comparisons.stream()
                                              .limit(10)
                                              .toArray(RIVComparison[]::new);
-    System.out.println("Best 10 comparisons by curve distance:");
+    if (console) System.out.println("Best 10 comparisons by curve distance:");
     final double topAvg = Arrays.stream(top10)
-                                .peek(c -> System.out.println(compToString(c,
-                                                                           paths)))
+                                .peek(c -> {
+                                  if (console)
+                                    System.out.println(compToString(c,
+                                                                    paths));
+                                })
                                 .mapToDouble(c -> c.cosim)
                                 .sum()
                           / 10;
@@ -85,27 +89,32 @@ public class HilbertTests {
                                              .stream()
                                              .limit(10)
                                              .toArray(RIVComparison[]::new);
-    System.out.println("Worst 10 comparisons by curve distance:");
+    if (console) System.out.println("Worst 10 comparisons by curve distance:");
     final double botAvg = Arrays.stream(bot10)
-                                .peek(c -> System.out.println(compToString(c,
-                                                                           paths)))
+                                .peek(c -> {
+                                  if (console)
+                                    System.out.println(compToString(c,
+                                                                    paths));
+                                })
                                 .mapToDouble(c -> c.cosim)
                                 .sum()
                           / 10;
-    System.out.println("Best 10 average cosim: " + topAvg);
-    System.out.println("Worst 10 average cosim: " + botAvg);
-    System.out.println("Average Key Distance: " + bigStr(comparisons.stream()
-                                                                    .map(c -> c.hilDist)
-                                                                    .reduce(BigInteger.ZERO,
-                                                                            BigInteger::add)
-                                                                    .divide(BigInteger.valueOf(comparisons.size())),
-                                                         4));
-    System.out.println("Median Key Distance: " + bigStr(comparisons.stream()
-                                                                   .map(c -> c.hilDist)
-                                                                   .reduce(BigInteger.ZERO,
-                                                                           BigInteger::add)
-                                                                   .divide(BigInteger.valueOf(comparisons.size())),
-                                                        4));
+    if (console) {
+      System.out.println("Best 10 average cosim: " + topAvg);
+      System.out.println("Worst 10 average cosim: " + botAvg);
+      System.out.println("Average Key Distance: " + bigStr(comparisons.stream()
+                                                                      .map(c -> c.hilDist)
+                                                                      .reduce(BigInteger.ZERO,
+                                                                              BigInteger::add)
+                                                                      .divide(BigInteger.valueOf(comparisons.size())),
+                                                           4));
+      System.out.println("Median Key Distance: " + bigStr(comparisons.stream()
+                                                                     .map(c -> c.hilDist)
+                                                                     .reduce(BigInteger.ZERO,
+                                                                             BigInteger::add)
+                                                                     .divide(BigInteger.valueOf(comparisons.size())),
+                                                          4));
+    }
     assertEquals(1, Double.compare(topAvg, botAvg));
   }
 
@@ -151,31 +160,31 @@ public class HilbertTests {
 
   @Test
   public void testEncodeHilbillyKey() throws IOException {
-    System.out.println("Testing Hilbilly Key:");
+    if (console) System.out.println("Testing Hilbilly Key:");
     baseTest(ImmutableRIV::getHilbillyKey);
   }
 
   @Test
   public void testEncodeHilbertKey() throws IOException {
-    System.out.println("Testing Hilbert Key:");
+    if (console) System.out.println("Testing Hilbert Key:");
     baseTest(ImmutableRIV::getHilbertKey);
   }
 
   // @Test
   public void testFEncodeHilbertKey() throws IOException {
-    System.out.println("Testing FHilbert Key:");
+    if (console) System.out.println("Testing FHilbert Key:");
     baseTest(ImmutableRIV::getFHilbertKey);
   }
 
   // @Test
   public void testSEncodeHilbertKey() throws IOException {
-    System.out.println("Testing SHilbert Key:");
+    if (console) System.out.println("Testing SHilbert Key:");
     baseTest(ImmutableRIV::getSHilbertKey);
   }
 
   @Test
   public void testSEncodeHilbillyKey() throws IOException {
-    System.out.println("Testing SHilbilly Key");
+    if (console) System.out.println("Testing SHilbilly Key");
     baseTest(ImmutableRIV::getSHilbillyKey);
   }
 
