@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>rivet-core</groupId>
+  <groupId>com.github.druidgreeneyes</groupId>
   <artifactId>rivet-core</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   
   <name>Rivet</name>
   <description>Random Index Vectoring library in Java</description>
@@ -21,7 +21,7 @@
     </developer>
     <developer>
       <name>Steve Carton</name>
-      <email></email>
+      <email>stephencarton@gmail.com</email>
     </developer>
   </developers>
   
@@ -32,16 +32,13 @@
   
   <profiles>
     <profile>
-      <id>default</id>
+      <id>test</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>test</name>
+          <value>!false</value>
+        </property>
       </activation>
-      <distributionManagement>
-        <snapshotRepository>
-          <id>ossrh</id>
-          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-      </distributionManagement>
 	  <build>
 	      <plugins>
 	        <plugin>
@@ -58,6 +55,57 @@
 	  </build>
     </profile>
     <profile>
+      <id>sign</id>
+      <activation>
+        <property>
+          <name>sign</name>
+          <value>!false</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-gpg-plugin</artifactId>
+	        <version>1.5</version>
+	        <executions>
+	          <execution>
+	            <id>sign-artifacts</id>
+	            <phase>verify</phase>
+	            <goals>
+	              <goal>sign</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	      </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>nexus</id>
+      <activation>
+        <property>
+          <name>nexus</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+		  <plugin>
+			<groupId>org.sonatype.plugins</groupId>
+			<artifactId>nexus-staging-maven-plugin</artifactId>
+			<version>1.6.7</version>
+			<extensions>true</extensions>
+			<configuration>
+			   <serverId>ossrh</serverId>
+			   <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+			   <autoReleaseAfterClose>true</autoReleaseAfterClose>
+			</configuration>
+		  </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>release</id>
       <activation>
         <property>
@@ -65,6 +113,16 @@
           <value>true</value>
         </property>
       </activation>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+    	  <id>ossrh</id>
+    	  <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+  		</repository>
+      </distributionManagement>
 	  <build>
         <plugins>
           <plugin>
@@ -93,31 +151,6 @@
               </execution>
             </executions>
           </plugin>
-	      <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-gpg-plugin</artifactId>
-	        <version>1.5</version>
-	        <executions>
-	          <execution>
-	            <id>sign-artifacts</id>
-	            <phase>verify</phase>
-	            <goals>
-	              <goal>sign</goal>
-	            </goals>
-	          </execution>
-	        </executions>
-	      </plugin>
-		  <plugin>
-			<groupId>org.sonatype.plugins</groupId>
-			<artifactId>nexus-staging-maven-plugin</artifactId>
-			<version>1.6.7</version>
-			<extensions>true</extensions>
-			<configuration>
-			   <serverId>ossrh</serverId>
-			   <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-			   <autoReleaseAfterClose>true</autoReleaseAfterClose>
-			</configuration>
-		  </plugin>
         </plugins>
 	  </build>
     </profile>

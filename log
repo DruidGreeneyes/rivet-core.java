@@ -1,0 +1,267 @@
+[INFO] Error stacktraces are turned on.
+[INFO] Scanning for projects...
+[INFO] Inspecting build with total of 1 modules...
+[INFO] Installing Nexus Staging features:
+[INFO]   ... total of 1 executions of maven-deploy-plugin replaced with nexus-staging-maven-plugin
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Rivet 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ rivet-core ---
+[INFO] Deleting /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ rivet-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/src/main/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.2:compile (default-compile) @ rivet-core ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 33 source files to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/classes
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ rivet-core ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/src/test/resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.2:testCompile (default-testCompile) @ rivet-core ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 7 source files to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.20:test (default-test) @ rivet-core ---
+[INFO] Surefire report directory: /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/surefire-reports
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.github.druidgreeneyes.rivet.core.util.hilbert.HilbertTests
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 21.573 s - in com.github.druidgreeneyes.rivet.core.util.hilbert.HilbertTests
+[INFO] Running com.github.druidgreeneyes.rivet.core.extras.UntrainedWordsTests
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.115 s - in com.github.druidgreeneyes.rivet.core.extras.UntrainedWordsTests
+[INFO] Running com.github.druidgreeneyes.rivet.core.extras.ShinglesTests
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.103 s - in com.github.druidgreeneyes.rivet.core.extras.ShinglesTests
+[INFO] Running com.github.druidgreeneyes.rivet.core.labels.DenseRIVTests
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.004 s - in com.github.druidgreeneyes.rivet.core.labels.DenseRIVTests
+[INFO] Running com.github.druidgreeneyes.rivet.core.labels.MapRIVTests
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.185 s - in com.github.druidgreeneyes.rivet.core.labels.MapRIVTests
+[INFO] Running com.github.druidgreeneyes.rivet.core.labels.RIVTests
+[INFO] Tests run: 145, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.212 s - in com.github.druidgreeneyes.rivet.core.labels.RIVTests
+[INFO] Running com.github.druidgreeneyes.rivet.core.labels.VectorElementTests
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 s - in com.github.druidgreeneyes.rivet.core.labels.VectorElementTests
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 194, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ rivet-core ---
+[INFO] Building jar: /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- maven-source-plugin:2.2.1:jar-no-fork (attach-sources) @ rivet-core ---
+[INFO] Building jar: /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-sources.jar
+[INFO] 
+[INFO] --- maven-javadoc-plugin:2.9.1:jar (attach-sources) @ rivet-core ---
+[INFO] 
+Loading source files for package com.github.druidgreeneyes.rivet.adapt...
+Loading source files for package com.github.druidgreeneyes.rivet.core.vectorpermutations...
+Loading source files for package com.github.druidgreeneyes.rivet.core.util...
+Loading source files for package com.github.druidgreeneyes.rivet.core.util.colt...
+Loading source files for package com.github.druidgreeneyes.rivet.core.util.hilbert...
+Loading source files for package com.github.druidgreeneyes.rivet.core.exceptions...
+Loading source files for package com.github.druidgreeneyes.rivet.core.lexicon...
+Loading source files for package com.github.druidgreeneyes.rivet.core.extras...
+Loading source files for package com.github.druidgreeneyes.rivet.core.extras.topicheirarchy...
+Loading source files for package com.github.druidgreeneyes.rivet.core.labels...
+Constructing Javadoc information...
+Standard Doclet version 1.8.0_131
+Building tree for all the packages and classes...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/adapt/SOLR.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/vectorpermutations/Permutations.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/IntDoubleConsumer.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/Triple.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/Util.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/VectorComputeFunction.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/colt/ColtConversions.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/HCode.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/Hilbert.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/Hilbert.ObjIntPredicate.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/HKey.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/Point.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/ShingleInfection.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/SizeMismatchException.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/Lexicon.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/LexiconEntry.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/LexiconInMemory.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/Shingles.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/UntrainedCachedWordsMap.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/UntrainedWordsArray.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/UntrainedWordsMap.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/NamedRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/NamedRIVMap.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/RIVTopicHeirarchy.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/WordLexicon.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/ArrayRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/ColtRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/DenseRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/HPPCRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/ImmutableRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/MapRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/RIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/RIVs.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/VectorElement.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/overview-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/adapt/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/adapt/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/adapt/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/colt/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/colt/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/colt/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/vectorpermutations/package-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/vectorpermutations/package-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/vectorpermutations/package-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/constant-values.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/serialized-form.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/adapt/class-use/SOLR.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/vectorpermutations/class-use/Permutations.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/class-use/VectorComputeFunction.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/class-use/Util.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/class-use/Triple.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/class-use/IntDoubleConsumer.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/colt/class-use/ColtConversions.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/class-use/Hilbert.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/class-use/Hilbert.ObjIntPredicate.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/class-use/HKey.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/class-use/HCode.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/class-use/Point.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/class-use/SizeMismatchException.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/class-use/ShingleInfection.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/class-use/LexiconInMemory.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/class-use/Lexicon.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/class-use/LexiconEntry.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/class-use/UntrainedWordsArray.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/class-use/UntrainedWordsMap.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/class-use/UntrainedCachedWordsMap.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/class-use/Shingles.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/class-use/NamedRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/class-use/RIVTopicHeirarchy.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/class-use/NamedRIVMap.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/class-use/WordLexicon.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/RIVs.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/DenseRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/ImmutableRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/VectorElement.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/ArrayRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/ColtRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/HPPCRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/RIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/class-use/MapRIV.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/adapt/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/exceptions/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/extras/topicheirarchy/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/labels/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/lexicon/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/colt/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/util/hilbert/package-use.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/com/github/druidgreeneyes/rivet/core/vectorpermutations/package-use.html...
+Building index for all the packages and classes...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/overview-tree.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/index-all.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/deprecated-list.html...
+Building index for all classes...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/allclasses-frame.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/allclasses-noframe.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/index.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/overview-summary.html...
+Generating /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/apidocs/help-doc.html...
+[INFO] Building jar: /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] 
+[INFO] --- maven-gpg-plugin:1.5:sign (sign-artifacts) @ rivet-core ---
+[INFO] 
+[INFO] --- maven-install-plugin:2.5.2:install (default-install) @ rivet-core ---
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.jar to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.jar
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/pom.xml to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.pom
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-sources.jar to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-sources.jar
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-javadoc.jar to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.jar.asc to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.jar.asc
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.pom.asc to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.pom.asc
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-sources.jar.asc to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-sources.jar.asc
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-javadoc.jar.asc to /home/josh/.m2/repository/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-javadoc.jar.asc
+[INFO] 
+[INFO] --- nexus-staging-maven-plugin:1.6.7:deploy (injected-nexus-deploy) @ rivet-core ---
+[INFO] Performing deferred deploys (gathering into "/home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred")...
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.jar to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.jar
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/pom.xml to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.pom
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-sources.jar to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-sources.jar
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-javadoc.jar to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-javadoc.jar
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.jar.asc to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.jar.asc
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT.pom.asc to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT.pom.asc
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-sources.jar.asc to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-sources.jar.asc
+[INFO] Installing /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/rivet-core-0.0.1-SNAPSHOT-javadoc.jar.asc to /home/josh/Dropbox/Programming/JAVA/src/rivet-core.java/target/nexus-staging/deferred/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-SNAPSHOT-javadoc.jar.asc
+[INFO] Deploying remotely...
+[INFO] Bulk deploying locally gathered artifacts from directory: 
+[INFO]  * Bulk deploying locally gathered snapshot artifacts
+Downloading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-sources.jar.asc
+473/473 B               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-sources.jar.asc (473 B at 1.8 KB/sec)
+Downloading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/maven-metadata.xml
+            Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+657/657 B               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (657 B at 1.7 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/maven-metadata.xml
+295/295 B               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/maven-metadata.xml (295 B at 0.9 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.jar
+2/91 KB     4/91 KB   6/91 KB   8/91 KB   10/91 KB   12/91 KB   14/91 KB   16/91 KB   18/91 KB   20/91 KB   22/91 KB   24/91 KB   26/91 KB   28/91 KB   30/91 KB   32/91 KB   34/91 KB   36/91 KB   38/91 KB   40/91 KB   42/91 KB   44/91 KB   46/91 KB   48/91 KB   50/91 KB   52/91 KB   54/91 KB   56/91 KB   58/91 KB   60/91 KB   62/91 KB   64/91 KB   66/91 KB   68/91 KB   70/91 KB   72/91 KB   74/91 KB   76/91 KB   78/91 KB   80/91 KB   82/91 KB   84/91 KB   86/91 KB   88/91 KB   90/91 KB   91/91 KB              Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.jar (91 KB at 206.8 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.pom
+2/6 KB     4/6 KB   6/6 KB            Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.pom (6 KB at 19.9 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+1003/1003 B                 Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (1003 B at 3.5 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-sources.jar
+2/1014 KB     4/1014 KB   6/1014 KB   8/1014 KB   10/1014 KB   12/1014 KB   14/1014 KB   16/1014 KB   18/1014 KB   20/1014 KB   22/1014 KB   24/1014 KB   26/1014 KB   28/1014 KB   30/1014 KB   32/1014 KB   34/1014 KB   36/1014 KB   38/1014 KB   40/1014 KB   42/1014 KB   44/1014 KB   46/1014 KB   48/1014 KB   50/1014 KB   52/1014 KB   54/1014 KB   56/1014 KB   58/1014 KB   60/1014 KB   62/1014 KB   64/1014 KB   66/1014 KB   68/1014 KB   70/1014 KB   72/1014 KB   74/1014 KB   76/1014 KB   78/1014 KB   80/1014 KB   82/1014 KB   84/1014 KB   86/1014 KB   88/1014 KB   90/1014 KB   92/1014 KB   94/1014 KB   96/1014 KB   98/1014 KB   100/1014 KB   102/1014 KB   104/1014 KB   106/1014 KB   108/1014 KB   110/1014 KB   112/1014 KB   114/1014 KB   116/1014 KB   118/1014 KB   120/1014 KB   122/1014 KB   124/1014 KB   126/1014 KB   128/1014 KB   130/1014 KB   132/1014 KB   134/1014 KB   136/1014 KB   138/1014 KB   140/1014 KB   142/1014 KB   144/1014 KB   146/1014 KB   148/1014 KB   150/1014 KB   152/1014 KB   154/1014 KB   156/1014 KB   158/1014 KB   160/1014 KB   162/1014 KB   164/1014 KB   166/1014 KB   168/1014 KB   170/1014 KB   172/1014 KB   174/1014 KB   176/1014 KB   178/1014 KB   180/1014 KB   182/1014 KB   184/1014 KB   186/1014 KB   188/1014 KB   190/1014 KB   192/1014 KB   194/1014 KB   196/1014 KB   198/1014 KB   200/1014 KB   202/1014 KB   204/1014 KB   206/1014 KB   208/1014 KB   210/1014 KB   212/1014 KB   214/1014 KB   216/1014 KB   218/1014 KB   220/1014 KB   222/1014 KB   224/1014 KB   226/1014 KB   228/1014 KB   230/1014 KB   232/1014 KB   234/1014 KB   236/1014 KB   238/1014 KB   240/1014 KB   242/1014 KB   244/1014 KB   246/1014 KB   248/1014 KB   250/1014 KB   252/1014 KB   254/1014 KB   256/1014 KB   258/1014 KB   260/1014 KB   262/1014 KB   264/1014 KB   266/1014 KB   268/1014 KB   270/1014 KB   272/1014 KB   274/1014 KB   276/1014 KB   278/1014 KB   280/1014 KB   282/1014 KB   284/1014 KB   286/1014 KB   288/1014 KB   290/1014 KB   292/1014 KB   294/1014 KB   296/1014 KB   298/1014 KB   300/1014 KB   302/1014 KB   304/1014 KB   306/1014 KB   308/1014 KB   310/1014 KB   312/1014 KB   314/1014 KB   316/1014 KB   318/1014 KB   320/1014 KB   322/1014 KB   324/1014 KB   326/1014 KB   328/1014 KB   330/1014 KB   332/1014 KB   334/1014 KB   336/1014 KB   338/1014 KB   340/1014 KB   342/1014 KB   344/1014 KB   346/1014 KB   348/1014 KB   350/1014 KB   352/1014 KB   354/1014 KB   356/1014 KB   358/1014 KB   360/1014 KB   362/1014 KB   364/1014 KB   366/1014 KB   368/1014 KB   370/1014 KB   372/1014 KB   374/1014 KB   376/1014 KB   378/1014 KB   380/1014 KB   382/1014 KB   384/1014 KB   386/1014 KB   388/1014 KB   390/1014 KB   392/1014 KB   394/1014 KB   396/1014 KB   398/1014 KB   400/1014 KB   402/1014 KB   404/1014 KB   406/1014 KB   408/1014 KB   410/1014 KB   412/1014 KB   414/1014 KB   416/1014 KB   418/1014 KB   420/1014 KB   422/1014 KB   424/1014 KB   426/1014 KB   428/1014 KB   430/1014 KB   432/1014 KB   434/1014 KB   436/1014 KB   438/1014 KB   440/1014 KB   442/1014 KB   444/1014 KB   446/1014 KB   448/1014 KB   450/1014 KB   452/1014 KB   454/1014 KB   456/1014 KB   458/1014 KB   460/1014 KB   462/1014 KB   464/1014 KB   466/1014 KB   468/1014 KB   470/1014 KB   472/1014 KB   474/1014 KB   476/1014 KB   478/1014 KB   480/1014 KB   482/1014 KB   484/1014 KB   486/1014 KB   488/1014 KB   490/1014 KB   492/1014 KB   494/1014 KB   496/1014 KB   498/1014 KB   500/1014 KB   502/1014 KB   504/1014 KB   506/1014 KB   508/1014 KB   510/1014 KB   512/1014 KB   514/1014 KB   516/1014 KB   518/1014 KB   520/1014 KB   522/1014 KB   524/1014 KB   526/1014 KB   528/1014 KB   530/1014 KB   532/1014 KB   534/1014 KB   536/1014 KB   538/1014 KB   540/1014 KB   542/1014 KB   544/1014 KB   546/1014 KB   548/1014 KB   550/1014 KB   552/1014 KB   554/1014 KB   556/1014 KB   558/1014 KB   560/1014 KB   562/1014 KB   564/1014 KB   566/1014 KB   568/1014 KB   570/1014 KB   572/1014 KB   574/1014 KB   576/1014 KB   578/1014 KB   580/1014 KB   582/1014 KB   584/1014 KB   586/1014 KB   588/1014 KB   590/1014 KB   592/1014 KB   594/1014 KB   596/1014 KB   598/1014 KB   600/1014 KB   602/1014 KB   604/1014 KB   606/1014 KB   608/1014 KB   610/1014 KB   612/1014 KB   614/1014 KB   616/1014 KB   618/1014 KB   620/1014 KB   622/1014 KB   624/1014 KB   626/1014 KB   628/1014 KB   630/1014 KB   632/1014 KB   634/1014 KB   636/1014 KB   638/1014 KB   640/1014 KB   642/1014 KB   644/1014 KB   646/1014 KB   648/1014 KB   650/1014 KB   652/1014 KB   654/1014 KB   656/1014 KB   658/1014 KB   660/1014 KB   662/1014 KB   664/1014 KB   666/1014 KB   668/1014 KB   670/1014 KB   672/1014 KB   674/1014 KB   676/1014 KB   678/1014 KB   680/1014 KB   682/1014 KB   684/1014 KB   686/1014 KB   688/1014 KB   690/1014 KB   692/1014 KB   694/1014 KB   696/1014 KB   698/1014 KB   700/1014 KB   702/1014 KB   704/1014 KB   706/1014 KB   708/1014 KB   710/1014 KB   712/1014 KB   714/1014 KB   716/1014 KB   718/1014 KB   720/1014 KB   722/1014 KB   724/1014 KB   726/1014 KB   728/1014 KB   730/1014 KB   732/1014 KB   734/1014 KB   736/1014 KB   738/1014 KB   740/1014 KB   742/1014 KB   744/1014 KB   746/1014 KB   748/1014 KB   750/1014 KB   752/1014 KB   754/1014 KB   756/1014 KB   758/1014 KB   760/1014 KB   762/1014 KB   764/1014 KB   766/1014 KB   768/1014 KB   770/1014 KB   772/1014 KB   774/1014 KB   776/1014 KB   778/1014 KB   780/1014 KB   782/1014 KB   784/1014 KB   786/1014 KB   788/1014 KB   790/1014 KB   792/1014 KB   794/1014 KB   796/1014 KB   798/1014 KB   800/1014 KB   802/1014 KB   804/1014 KB   806/1014 KB   808/1014 KB   810/1014 KB   812/1014 KB   814/1014 KB   816/1014 KB   818/1014 KB   820/1014 KB   822/1014 KB   824/1014 KB   826/1014 KB   828/1014 KB   830/1014 KB   832/1014 KB   834/1014 KB   836/1014 KB   838/1014 KB   840/1014 KB   842/1014 KB   844/1014 KB   846/1014 KB   848/1014 KB   850/1014 KB   852/1014 KB   854/1014 KB   856/1014 KB   858/1014 KB   860/1014 KB   862/1014 KB   864/1014 KB   866/1014 KB   868/1014 KB   870/1014 KB   872/1014 KB   874/1014 KB   876/1014 KB   878/1014 KB   880/1014 KB   882/1014 KB   884/1014 KB   886/1014 KB   888/1014 KB   890/1014 KB   892/1014 KB   894/1014 KB   896/1014 KB   898/1014 KB   900/1014 KB   902/1014 KB   904/1014 KB   906/1014 KB   908/1014 KB   910/1014 KB   912/1014 KB   914/1014 KB   916/1014 KB   918/1014 KB   920/1014 KB   922/1014 KB   924/1014 KB   926/1014 KB   928/1014 KB   930/1014 KB   932/1014 KB   934/1014 KB   936/1014 KB   938/1014 KB   940/1014 KB   942/1014 KB   944/1014 KB   946/1014 KB   948/1014 KB   950/1014 KB   952/1014 KB   954/1014 KB   956/1014 KB   958/1014 KB   960/1014 KB   962/1014 KB   964/1014 KB   966/1014 KB   968/1014 KB   970/1014 KB   972/1014 KB   974/1014 KB   976/1014 KB   978/1014 KB   980/1014 KB   982/1014 KB   984/1014 KB   986/1014 KB   988/1014 KB   990/1014 KB   992/1014 KB   994/1014 KB   996/1014 KB   998/1014 KB   1000/1014 KB   1002/1014 KB   1004/1014 KB   1006/1014 KB   1008/1014 KB   1010/1014 KB   1012/1014 KB   1014/1014 KB                  Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-sources.jar (1014 KB at 327.0 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+2/2 KB                  Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (2 KB at 3.3 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.pom.asc
+473/473 B               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.pom.asc (473 B at 1.2 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+2/2 KB               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (2 KB at 4.1 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-javadoc.jar
+2/294 KB   4/294 KB   6/294 KB   8/294 KB   10/294 KB   12/294 KB   14/294 KB   16/294 KB   18/294 KB   20/294 KB   22/294 KB   24/294 KB   26/294 KB   28/294 KB   30/294 KB   32/294 KB   34/294 KB   36/294 KB   38/294 KB   40/294 KB   42/294 KB   44/294 KB   46/294 KB   48/294 KB   50/294 KB   52/294 KB   54/294 KB   56/294 KB   58/294 KB   60/294 KB   62/294 KB   64/294 KB   66/294 KB   68/294 KB   70/294 KB   72/294 KB   74/294 KB   76/294 KB   78/294 KB   80/294 KB   82/294 KB   84/294 KB   86/294 KB   88/294 KB   90/294 KB   92/294 KB   94/294 KB   96/294 KB   98/294 KB   100/294 KB   102/294 KB   104/294 KB   106/294 KB   108/294 KB   110/294 KB   112/294 KB   114/294 KB   116/294 KB   118/294 KB   120/294 KB   122/294 KB   124/294 KB   126/294 KB   128/294 KB   130/294 KB   132/294 KB   134/294 KB   136/294 KB   138/294 KB   140/294 KB   142/294 KB   144/294 KB   146/294 KB   148/294 KB   150/294 KB   152/294 KB   154/294 KB   156/294 KB   158/294 KB   160/294 KB   162/294 KB   164/294 KB   166/294 KB   168/294 KB   170/294 KB   172/294 KB   174/294 KB   176/294 KB   178/294 KB   180/294 KB   182/294 KB   184/294 KB   186/294 KB   188/294 KB   190/294 KB   192/294 KB   194/294 KB   196/294 KB   198/294 KB   200/294 KB   202/294 KB   204/294 KB   206/294 KB   208/294 KB   210/294 KB   212/294 KB   214/294 KB   216/294 KB   218/294 KB   220/294 KB   222/294 KB   224/294 KB   226/294 KB   228/294 KB   230/294 KB   232/294 KB   234/294 KB   236/294 KB   238/294 KB   240/294 KB   242/294 KB   244/294 KB   246/294 KB   248/294 KB   250/294 KB   252/294 KB   254/294 KB   256/294 KB   258/294 KB   260/294 KB   262/294 KB   264/294 KB   266/294 KB   268/294 KB   270/294 KB   272/294 KB   274/294 KB   276/294 KB   278/294 KB   280/294 KB   282/294 KB   284/294 KB   286/294 KB   288/294 KB   290/294 KB   292/294 KB   294/294 KB                Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-javadoc.jar (294 KB at 262.4 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+2/2 KB                Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (2 KB at 4.8 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.jar.asc
+473/473 B               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1.jar.asc (473 B at 4.5 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+2/2 KB               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (2 KB at 6.4 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-javadoc.jar.asc
+473/473 B               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/rivet-core-0.0.1-20170518.163728-1-javadoc.jar.asc (473 B at 4.1 KB/sec)
+Uploading: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml
+2/2 KB               Uploaded: https://oss.sonatype.org/content/repositories/snapshots/com/github/druidgreeneyes/rivet-core/0.0.1-SNAPSHOT/maven-metadata.xml (2 KB at 5.8 KB/sec)
+[INFO]  * Bulk deploy of locally gathered snapshot artifacts finished.
+[INFO] Remote deploy finished with success.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 51.694 s
+[INFO] Finished at: 2017-05-18T11:37:36-05:00
+[INFO] Final Memory: 33M/347M
+[INFO] ------------------------------------------------------------------------
