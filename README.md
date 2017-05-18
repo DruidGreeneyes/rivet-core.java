@@ -18,7 +18,49 @@ If that doesn't give you enough of a primer, do the google. Sahlgren has done a 
 
 ## SOUNDS LIKE A JOYSPLOSION!! HOW CAN I GET IN ON THIS S&@T!?!?
 
-I'm working to get on maven, but in the mean time you can use jitpack.io if you like.
+If you want to peg to a particular release, you can get it from Maven:
+
+```
+
+<dependency>
+  <groupId>com.github.druidgreeneyes</groupId>
+  <artifactId>rivet-core</artifactId>
+  <version>1.0.0</version>
+</dependency>
+
+```
+
+You can also get it from jitpack.io, if you prefer:
+
+
+```
+
+<repository>
+  <id>jitpack.io</id>
+  <url>https://jitpack.io</url>
+</repository>
+
+...
+
+<dependency>
+  <groupId>com.github.druidgreeneyes</groupId>
+  <artifactId>rivet-core.java</artifactId>
+  <version>v1.0.0</version>
+</dependency>
+
+```
+
+And if you want to pull whatever's currently in development, you can do that too, though it's guaranteed to break sometimes.
+
+```
+
+<dependency>
+  <groupId>com.github.druidgreeneyes</groupId>
+  <artifactId>rivet-core.java</artifactId>
+  <version>-SNAPSHOT</version>
+</dependency>
+
+```
 
 The core functionality is in `rivet.core.labels`, where you'll probably use `MapRIV`. There are a number of other implementations of the RIV interface, but MapRIV has so far proven to be the fastest by a pretty significant margin, so you may as well start there. If you see flaws in that or in one of the other implementations, and/or you know how they can be done better, feel free to create an issue with your suggestion, or a pr with a fix. 
 
