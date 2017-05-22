@@ -50,7 +50,7 @@ You can also get it from jitpack.io, if you prefer:
 
 ```
 
-And if you want to pull whatever's currently in development, you can do that too, though it's guaranteed to break sometimes.
+And if you want to pull whatever's currently in development, you can do that too (through jitpack), though it's guaranteed to break sometimes.
 
 ```
 
@@ -74,62 +74,71 @@ Random Index Vectors give you a conveniently scalable way to mathematically repr
 
 ```java
 
-final String[] documents = //import your documents here.
-
-final int size = 8000;     //this is the width of the sparse vectors we'll be making
-final int nnz = 4;         //this is the number of non-zero elements you want each one to start with
-
-RIV[] rivs = new RIV[documents.length];
-int fill = 0;
-for(String text : document) {
-  RIV riv = MapRIV.empty();
-  for(String word : text.split("\\W+"))
-  	riv.destructiveAdd(MapRIV.generateLabel(size, nnz, word));
-  rivs[fill++] = riv;
-}
-
-/**
- * Now we have a collection of rivs, each of which represents a document 
- * at the same index in the original collection of texts.
- * 
- * Using this, we can go through the list and see which are most similar to eachother.
- **/
-
-double[][] sims = new double[rivs.length][rivs.length];
-
-fill = 0;
-int fill2 = 0;
-for(RIV rivA : rivs) {
-  fill2 = 0;
-  for(RIV rivB : rivs)
-    sims[fill++][fill2++] = rivA.similarityTo(rivB);
-}
-
-/**
- * We technically don't need a square matrix for this, because a.similarityTo(b) == b.similarityTo(a) always.
- * But f#$k it, you can deal. Anyway, now we can go through the matrix and find the (say) 10 pairs 
- * of documents that are most similar to one another without being identical (a.similarityTo(b) != 1)
- **/
- 
-double[][] pairs = new double[10][3]; //this is a collection of [index, index, similarity] triples
-for (int r = 0; i < sims.length; i++)
-  for (int c = 0; n < row.length; n++)
-    if(!Util.doubleEquals(sims[r][c], 1.0)) {
-      for (int x = 0; x < 10; x++)
-        if((pairs[x][2] == null) || (pairs[x][2] < sims[r][c])) {
-          pairs[x][0] = r;
-          pairs[x][1] = c;
-          pairs[x][3] = sims[r][c];
-          break;
-        }
-    }
+public void example() {
+    final String[] documents = DOCUMENTS;// import your documents here.
     
-System.out.println("Top 10 most similar documents:");
-for(double[] pair : pairs) {
-  String a = documents[(int)pair[0]].substring(0, 20) + "...";
-  String b = documents[(int)pair[1]].substring(0, 20) + "...";
-  System.out.println(a + " <=> " + b + ": " + pair[2]);
-}
+    final int size = 8000; // this is the width of the sparse vectors we'll be
+                           // making
+    final int nnz = 4; // this is the number of non-zero elements you want each
+                       // one to start with
+    
+    final RIV[] rivs = new RIV[documents.length];
+    int fill = 0;
+    
+    for (final String text : documents) {
+      final RIV riv = MapRIV.empty(size);
+      for (final String word : text.split("\\W+"))
+        riv.destructiveAdd(MapRIV.generateLabel(size, nnz, word));
+      rivs[fill++] = riv;
+    }
+
+    /**
+     * Now we have a collection of rivs, each of which represents a document at
+     * the same index in the original collection of texts.
+     *
+     * Using this, we can go through the list and see which are most similar to
+     * eachother.
+     **/
+
+    final double[][] sims = new double[rivs.length][rivs.length];
+
+    fill = 0;
+    int fill2 = 0;
+    for (final RIV rivA : rivs) {
+      fill2 = 0;
+      for (final RIV rivB : rivs)
+        sims[fill][fill2++] = rivA.similarityTo(rivB);
+      fill++;
+    }
+
+    /**
+     * We technically don't need a square matrix for this, because
+     * a.similarityTo(b) == b.similarityTo(a) always. But f#$k it, you can deal.
+     * Anyway, now we can go through the matrix and find the (say) 10 pairs of
+     * documents that are most similar to one another without being identical
+     * (a.similarityTo(b) != 1)
+     **/
+
+    final double[][] pairs = new double[10][3]; // this is a collection of
+                                                // [index, index, similarity]
+                                                // triples
+    for (int r = 0; r < sims.length; r++)
+      for (int c = 0; c < sims[r].length; c++)
+        if (!Util.doubleEquals(sims[r][c], 1.0)) for (int x = 0; x < 10; x++)
+          if (pairs[x][2] == 0.0 || pairs[x][2] < sims[r][c]) {
+            pairs[x][0] = r;
+            pairs[x][1] = c;
+            pairs[x][2] = sims[r][c];
+            break;
+          }
+
+    System.out.println("Top 10 most similar documents:");
+    for (final double[] pair : pairs) {
+      final String a = documents[(int) pair[0]].substring(0, 20) + "...";
+      final String b = documents[(int) pair[1]].substring(0, 20) + "...";
+      System.out.println(a + " <=> " + b + ": " + pair[2]);
+    }
+  }
 
 ```
 
