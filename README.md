@@ -124,13 +124,14 @@ public void example() {
                                                 // triples
     for (int r = 0; r < sims.length; r++)
       for (int c = 0; c < sims[r].length; c++)
-        if (!Util.doubleEquals(sims[r][c], 1.0)) for (int x = 0; x < 10; x++)
-          if (pairs[x][2] == 0.0 || pairs[x][2] < sims[r][c]) {
-            pairs[x][0] = r;
-            pairs[x][1] = c;
-            pairs[x][2] = sims[r][c];
-            break;
-          }
+        if (!Util.doubleEquals(sims[r][c], 1.0)) 
+          for (int x = 0; x < 10; x++)
+            if (pairs[x][2] == 0.0 || pairs[x][2] < sims[r][c]) {
+              pairs[x][0] = r;
+              pairs[x][1] = c;
+              pairs[x][2] = sims[r][c];
+              break;
+            }
 
     System.out.println("Top 10 most similar documents:");
     for (final double[] pair : pairs) {
@@ -144,7 +145,7 @@ public void example() {
 
 ## BUT WHAT ABOUT THE GODDAMNED WIZARDRY!?!?!?
 
-There are a number of other things you can do, and other ways you can use RIVs to represent text. For example, you can build a lexicon (a map of words to the corpus-wide L2 RIV associated with each word, in turn built over time by adding together all words that occur within a 2- to 4-word window of the word in question), and use it to (say) find synonyms, or label documents with topics associated with words that have good similarity with the document in question. If you want to get wacky with it (and you don't mind the high compute cost of doing so), you can encode ordering to words within sentences or context windows by using RIV.permute(n), where n is the given word's location in the context relative to the word it's being added to. Among the things I am working on or have worked on include clustering documents based on cosine similarity, finding and eliminating near-duplicates across corpora, and inferring flat and heirarchical topic models from data. I stood up a small website using a Python version of this library, and was able to do similarity comparisons between 100k word texts in 2 and some change minutes on a 2nd generation raspberry pi. It would probably be faster if I had done it in Java, but I wanted to muck about with Python, so I did. I most recently implemented Hilbert Transformations on RIVs, so for big corpora you should be able to sort by hilbert key (using Hilbert.getHilbertKey(riv), or ImmutableRIV.getHilbertKey()) use that for some nifty tricks.
+There are a number of other things you can do, and other ways you can use RIVs to represent text. For example, you can build a lexicon (a map of words to the corpus-wide L2 RIV associated with each word, in turn built over time by adding together all words that occur within a 2- to 4-word window of the word in question), and use it to (say) find synonyms, or label documents with topics associated with words that have good similarity with the document in question. If you want to get wacky with it (and you don't mind the high compute cost of doing so), you can encode ordering to words within sentences or context windows by using RIV.permute(n), where n is the given word's location in the context relative to the word it's being added to. Among the things I am working on or have worked on include clustering documents based on cosine similarity, finding and eliminating near-duplicates across corpora, and inferring flat and heirarchical topic models from data. I stood up a small website using a Python version of this library, and was able to do similarity comparisons between 100k word texts in 2 and some change minutes on a 2nd generation raspberry pi. It would probably be faster if I had done it in Java, but I wanted to muck about with Python, so I did. I most recently implemented Hilbert Transformations on RIVs, so for big corpora you should be able to sort by hilbert key (using Hilbert.getHilbertKey(riv), or ImmutableRIV.getHilbertKey()) and use that for some nifty tricks.
 
 ## CHOICES, CHOICES, SO MANY F#%ING CHOICES!!!
 
