@@ -48,7 +48,8 @@ public class RIVTests {
         ColtRIV.class,
         HPPCRIV.class,
         ImmutableRIV.class,
-        MapRIV.class
+        MapRIV.class,
+        MTJRIV.class
     });
   }
 
@@ -346,10 +347,10 @@ public class RIVTests {
     final RIV rivA = invokeDefaultConstructor();
     final RIV rivB = rivA.copy();
     final RIV riv2 = rivA.add(rivA);
-    final Integer rivNot = 5;
+    final Integer notARIV = 5;
     assertTrue(rivA.equals(rivB));
     assertFalse(rivA.equals(riv2));
-    assertFalse(rivA.equals(rivNot));
+    assertFalse(rivA.equals(notARIV));
   }
 
   @Test
