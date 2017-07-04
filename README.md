@@ -1,6 +1,7 @@
 # Rivet.java
 
-[![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/master/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/master)
+Master: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/master/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/master)
+Dev: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/dev/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/dev)
 
 Random-Index Vectoring in Java. Written in the voice of Mister Torgue.
 
