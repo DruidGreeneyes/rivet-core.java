@@ -145,7 +145,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
   public ColtRIV(final RIV riv) {
     this(riv.size());
-    riv.forEach(this::put);
+    riv.forEachNZ(this::put);
   }
 
   public ColtRIV(final VectorElement[] points, final int size) {
@@ -354,7 +354,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
+  public void forEachNZ(final IntDoubleConsumer fun) {
     super.forEachPair(procedurize(fun));
   }
 }

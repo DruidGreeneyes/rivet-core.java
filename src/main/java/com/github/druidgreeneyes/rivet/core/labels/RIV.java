@@ -168,7 +168,12 @@ public interface RIV {
     return fun.apply(this);
   }
 
-  void forEach(IntDoubleConsumer fun);
+  void forEachNZ(IntDoubleConsumer fun);
+  
+  default void forEach(IntDoubleConsumer fun) {
+    for (int i = 0; i < size(); i++)
+      fun.accept(i, get(i));
+  }
 
   /**
    * @param index

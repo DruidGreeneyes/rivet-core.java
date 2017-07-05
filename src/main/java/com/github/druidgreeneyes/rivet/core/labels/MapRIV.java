@@ -246,7 +246,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
   @Override
   public MapRIV destructiveAdd(final RIV other) throws SizeMismatchException {
     // assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
-    other.forEach(this::addPoint);
+    other.forEachNZ(this::addPoint);
     return this;
   }
 
@@ -284,7 +284,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
   @Override
   public MapRIV destructiveSub(final RIV other) throws SizeMismatchException {
     // assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
-    other.forEach(this::subtractPoint);
+    other.forEachNZ(this::subtractPoint);
     return this;
   }
 
@@ -478,7 +478,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble>
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
+  public void forEachNZ(final IntDoubleConsumer fun) {
     super.forEach((i, v) -> fun.accept(i, v.getValue()));
   }
 }

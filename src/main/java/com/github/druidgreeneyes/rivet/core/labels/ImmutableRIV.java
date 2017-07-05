@@ -194,21 +194,20 @@ public class ImmutableRIV implements RIV {
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
+  public void forEachNZ(final IntDoubleConsumer fun) {
     for (int i = 0; i < keys.length; i++)
       fun.accept(keys[i], vals[i]);
   }
 
   @Override
   public double get(final int index) throws IndexOutOfBoundsException {
-    try {
-      return vals[ArrayUtils.indexOf(keys, index)];
-    } catch (final ArrayIndexOutOfBoundsException e) {
-      if (0 <= index && index < size)
-        return 0;
-      else
-        throw new ArrayIndexOutOfBoundsException(index);
-    }
+    if (index < 0 || index >= size)
+      throw new IndexOutOfBoundsException();
+    int i = ArrayUtils.indexOf(keys, index);
+    if (i == ArrayUtils.INDEX_NOT_FOUND)
+      return 0;
+    else
+      return vals[i];
   }
 
   public BigInteger getHilbertKey() {

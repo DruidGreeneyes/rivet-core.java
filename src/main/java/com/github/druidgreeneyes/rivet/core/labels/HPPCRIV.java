@@ -104,7 +104,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
   public HPPCRIV(final RIV riv) {
     this(riv.size());
-    riv.forEach(this::put);
+    riv.forEachNZ(this::put);
   }
 
   @Override
@@ -281,10 +281,8 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
-    final IntDoubleProcedure f = (a, b) -> {
-      fun.accept(a, b);
-    };
+  public void forEachNZ(final IntDoubleConsumer fun) {
+    final IntDoubleProcedure f = fun::accept;
     super.forEach(f);
   }
 

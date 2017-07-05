@@ -134,7 +134,7 @@ public class DenseRIV implements RIV, Serializable {
 
   public DenseRIV(final RIV source) {
     this(source.size());
-    source.forEach((IntDoubleConsumer) this::put);
+    source.forEachNZ((IntDoubleConsumer) this::put);
   }
 
   private DenseRIV(final int size) {
@@ -348,5 +348,10 @@ public class DenseRIV implements RIV, Serializable {
   public void forEach(final IntDoubleConsumer fun) {
     for (int i = 0; i < vector.length; i++)
       fun.accept(i, vector[i]);
+  }
+  
+  @Override
+  public void forEachNZ(final IntDoubleConsumer fun) {
+    forEach(fun);
   }
 }

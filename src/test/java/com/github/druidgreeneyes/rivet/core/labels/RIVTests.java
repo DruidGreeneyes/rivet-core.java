@@ -357,7 +357,7 @@ public class RIVTests {
   public void testForEach() {
     final RIV riv = invokeDefaultConstructor();
     final Stream.Builder<VectorElement> s = Stream.builder();
-    riv.forEach((IntDoubleConsumer) (i, v) -> {
+    riv.forEachNZ((IntDoubleConsumer) (i, v) -> {
       s.accept(VectorElement.elt(i, v));
     });
     final VectorElement[] points = s.build()

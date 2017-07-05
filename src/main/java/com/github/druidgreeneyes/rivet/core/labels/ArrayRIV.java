@@ -383,7 +383,7 @@ public final class ArrayRIV implements RIV, Serializable {
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
+  public void forEachNZ(final IntDoubleConsumer fun) {
     for (final VectorElement elt : points)
       fun.accept(elt.index(), elt.value());
   }

@@ -153,7 +153,7 @@ public final class MTJRIV extends SparseVector
   @Override
   public MTJRIV destructiveAdd(final RIV other) throws SizeMismatchException {
     // assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
-    other.forEach(this::add);
+    other.forEachNZ(this::add);
     return this;
   }
 
@@ -178,7 +178,7 @@ public final class MTJRIV extends SparseVector
 
   @Override
   public MTJRIV destructiveSub(final RIV other) throws SizeMismatchException {
-    other.forEach(this::sub);
+    other.forEachNZ(this::sub);
     return this;
   }
 
@@ -310,14 +310,14 @@ public final class MTJRIV extends SparseVector
   public VectorElement[] points() {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
-    forEach((a,
+    forEachNZ((a,
              b) -> points[c.getAndIncrement()] = VectorElement.elt(a, b));
     Arrays.sort(points);
     return points;
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
+  public void forEachNZ(final IntDoubleConsumer fun) {
     super.forEach((e) -> fun.accept(e.index(), e.get()));
   }
 }
