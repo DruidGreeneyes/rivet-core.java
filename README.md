@@ -7,7 +7,7 @@ Random-Index Vectoring in Java. Written in the voice of Mister Torgue.
 
 ## WHAT THE F$%K IS THIS!?!?
 
-Random-Index Vectoring is a memory efficient way to perform textual analysis across corpora of extreme scale. It enables this by using contextual word co-occurrence as a stand-in for word meaning.
+Random-Index Vectoring is a memory efficient way to perform textual analysis across corpora of extreme scale. It enables this by using contextual word co-occurrence as a stand-in for word meaning. 
 
 ## WHAT THE HELL DOES THAT MEAN!?!?
 
