@@ -22,57 +22,6 @@ public class ImmutableRIV implements RIV {
 
   private static final DoubleBinaryOperator subtract = (a, b) -> a - b;
 
-  private static DoubleUnaryOperator divideBy(final double scalar) {
-    return a -> a / scalar;
-  }
-
-  public static ImmutableRIV empty(final int size) {
-    return new ImmutableRIV(ArrayUtils.EMPTY_INT_ARRAY,
-                            ArrayUtils.EMPTY_DOUBLE_ARRAY, size);
-  }
-
-  public static ImmutableRIV fromString(final String str) {
-    final String[] parts = str.split(" ");
-    final int size = Integer.parseInt(parts[parts.length - 1]);
-    final int[] keys = new int[parts.length - 1];
-    final double[] vals = new double[parts.length - 1];
-    for (int i = 0; i < parts.length - 1; i++) {
-      final String[] bits = parts[i].split("\\|");
-      keys[i] = Integer.parseInt(bits[0]);
-      vals[i] = Double.parseDouble(bits[1]);
-    }
-    return new ImmutableRIV(keys, vals, size);
-  }
-
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
-  public static ImmutableRIV generateLabel(final int size, final int k,
-                                           final CharSequence word) {
-    final long seed = RIVs.makeSeed(word);
-    final int j = k % 2 == 0
-                             ? k
-                             : k + 1;
-    return new ImmutableRIV(RIVs.makeIndices(size, j, seed),
-                            RIVs.makeVals(j, seed), size);
-  }
-
-  private static DoubleUnaryOperator multiplyBy(final double scalar) {
-    return a -> a * scalar;
-  }
-
-  private static void permute(final VectorElement[] points,
-                              final int[] permutation) {
-    for (final VectorElement point : points)
-      point.destructiveSet(permutation[point.index()]);
-  }
-
   private final int size;
 
   private final int[] keys;
@@ -83,21 +32,6 @@ public class ImmutableRIV implements RIV {
     this.size = size;
     keys = new int[0];
     vals = new double[0];
-  }
-
-  private ImmutableRIV(final int size, final VectorElement[] points) {
-    this.size = size;
-    final int[] ks = new int[points.length];
-    final double[] vs = new double[points.length];
-    int[] zeros = new int[0];
-    for (int i = 0; i < points.length; i++) {
-      ks[i] = points[i].index();
-      vs[i] = points[i].value();
-      if (vs[i] == 0)
-        zeros = ArrayUtils.add(zeros, i);
-    }
-    keys = ArrayUtils.removeAll(ks, zeros);
-    vals = ArrayUtils.removeAll(vs, zeros);
   }
 
   public ImmutableRIV(final int[] keys, final double[] vals,
@@ -139,43 +73,43 @@ public class ImmutableRIV implements RIV {
   @Override
   public ImmutableRIV destructiveAdd(final RIV other) {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
   public ImmutableRIV destructiveAdd(final RIV... rivs) {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
   public ImmutableRIV destructiveDiv(final double scalar) {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
   public ImmutableRIV destructiveMult(final double scalar) {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
   public ImmutableRIV destructiveRemoveZeros() {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
   public ImmutableRIV destructiveSub(final RIV other) {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
   public ImmutableRIV destructiveSub(final RIV... rivs) {
     throw new NotImplementedException(
-                                      "Destructive methods not available on Immutable RIV.");
+        "Destructive methods not available on Immutable RIV.");
   }
 
   @Override
@@ -185,7 +119,7 @@ public class ImmutableRIV implements RIV {
 
   public boolean equals(final ImmutableRIV other) {
     return size == other.size && Arrays.equals(keys, other.keys)
-           && Arrays.equals(vals, other.vals);
+        && Arrays.equals(vals, other.vals);
   }
 
   @Override
@@ -203,19 +137,19 @@ public class ImmutableRIV implements RIV {
   public double get(final int index) throws IndexOutOfBoundsException {
     if (index < 0 || index >= size)
       throw new IndexOutOfBoundsException();
-    int i = ArrayUtils.indexOf(keys, index);
+    final int i = ArrayUtils.indexOf(keys, index);
     if (i == ArrayUtils.INDEX_NOT_FOUND)
       return 0;
     else
       return vals[i];
   }
 
-  public BigInteger getHilbertKey() {
-    return Hilbert.encodeHilbertKey(this);
-  }
-
   public BigInteger getFHilbertKey() {
     return Hilbert.fEncodeHilbertKey(this);
+  }
+
+  public BigInteger getHilbertKey() {
+    return Hilbert.encodeHilbertKey(this);
   }
 
   public BigInteger getHilbillyKey() {
@@ -280,9 +214,9 @@ public class ImmutableRIV implements RIV {
   private ImmutableRIV merge(final DoubleBinaryOperator mergeFunction,
                              final RIV other) {
     int[] newKeys = IntStream.concat(keyStream(), other.keyStream())
-                             .distinct()
-                             .sorted()
-                             .toArray();
+        .distinct()
+        .sorted()
+        .toArray();
     double[] newVals = new double[newKeys.length];
     int[] zeros = new int[0];
     for (int i = 0; i < newKeys.length; i++) {
@@ -299,10 +233,10 @@ public class ImmutableRIV implements RIV {
   private ImmutableRIV merge(final DoubleBinaryOperator mergeFunction,
                              final RIV... others) {
     int[] newKeys = Stream.concat(Stream.of(this), Arrays.stream(others))
-                          .flatMapToInt(RIV::keyStream)
-                          .distinct()
-                          .sorted()
-                          .toArray();
+        .flatMapToInt(RIV::keyStream)
+        .distinct()
+        .sorted()
+        .toArray();
     double[] newVals = new double[newKeys.length];
     int[] zeros = new int[0];
     for (int i = 0; i < newKeys.length; i++) {
@@ -329,15 +263,11 @@ public class ImmutableRIV implements RIV {
                               final int times) {
     if (times == 0)
       return this;
-    final int[] permutation = times > 0
-                                        ? permutations.permute
-                                        : permutations.inverse;
-    final int t = Math.abs(times);
-    final VectorElement[] points = points();
-    for (int i = 0; i < t; i++)
-      permute(points, permutation);
-    Arrays.sort(points);
-    return new ImmutableRIV(size, points);
+    return new ImmutableRIV(times > 0
+                            ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
+                            : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                            valArr(),
+                            size);
   }
 
   @Override
@@ -351,7 +281,7 @@ public class ImmutableRIV implements RIV {
   @Override
   public Stream<VectorElement> pointStream() {
     return IntStream.range(0, keys.length)
-                    .mapToObj(i -> VectorElement.elt(keys[i], vals[i]));
+        .mapToObj(i -> VectorElement.elt(keys[i], vals[i]));
   }
 
   @Override
@@ -391,5 +321,50 @@ public class ImmutableRIV implements RIV {
   @Override
   public DoubleStream valStream() {
     return Arrays.stream(vals);
+  }
+
+  private static DoubleUnaryOperator divideBy(final double scalar) {
+    return a -> a / scalar;
+  }
+
+  public static ImmutableRIV empty(final int size) {
+    return new ImmutableRIV(ArrayUtils.EMPTY_INT_ARRAY,
+                            ArrayUtils.EMPTY_DOUBLE_ARRAY, size);
+  }
+
+  public static ImmutableRIV fromString(final String str) {
+    final String[] parts = str.split(" ");
+    final int size = Integer.parseInt(parts[parts.length - 1]);
+    final int[] keys = new int[parts.length - 1];
+    final double[] vals = new double[parts.length - 1];
+    for (int i = 0; i < parts.length - 1; i++) {
+      final String[] bits = parts[i].split("\\|");
+      keys[i] = Integer.parseInt(bits[0]);
+      vals[i] = Double.parseDouble(bits[1]);
+    }
+    return new ImmutableRIV(keys, vals, size);
+  }
+
+  /**
+   * Uses Java's seeded RNG to generate a random index vector such that, given
+   * the same input, generateLabel will always produce the same output.
+   *
+   * @param size
+   * @param k
+   * @param word
+   * @return a MapRIV
+   */
+  public static ImmutableRIV generateLabel(final int size, final int k,
+                                           final CharSequence word) {
+    final long seed = RIVs.makeSeed(word);
+    final int j = k % 2 == 0
+        ? k
+        : k + 1;
+    return new ImmutableRIV(RIVs.makeIndices(size, j, seed),
+                            RIVs.makeVals(j, seed), size);
+  }
+
+  private static DoubleUnaryOperator multiplyBy(final double scalar) {
+    return a -> a * scalar;
   }
 }

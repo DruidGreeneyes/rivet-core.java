@@ -58,6 +58,13 @@ public class RIVs {
       keys = keys.map((k) -> permutation[k]);
     return keys.toArray();
   }
+  
+  protected static int[] permuteKeys(int[] keys, final int[] permutation, final int times) {
+    for (int i = 0; i < times; i++)
+      for (int c = 0; c < keys.length; c++)
+        keys[c] = permutation[keys[c]];
+    return keys;
+  }
 
   protected static boolean equals(final RIV riv, final Object other) {
     if (riv == other)

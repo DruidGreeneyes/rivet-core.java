@@ -152,8 +152,8 @@ public interface RIV {
       return false;
     else
       for (int i = 0; i < size(); i++)
-      if (!Util.doubleEquals(get(i), other.get(i)))
-        return false;
+        if (!Util.doubleEquals(get(i), other.get(i)))
+          return false;
     return true;
   }
 
