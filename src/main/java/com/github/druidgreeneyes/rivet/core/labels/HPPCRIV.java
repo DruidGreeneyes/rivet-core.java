@@ -3,7 +3,6 @@ package com.github.druidgreeneyes.rivet.core.labels;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -71,7 +70,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     for (final int i : other.keyArr()) {
       final double v = other.get(i);
       if (!Util.doubleEquals(v, 0))
-        addTo(i, v);
+                                    addTo(i, v);
     }
     return this;
   }
@@ -86,7 +85,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
       if (!Util.doubleEquals(v, 0))
         put(i, v);
       else if (!Util.doubleEquals(vv, 0))
-        remove(i);
+                                          remove(i);
     }
     return this;
   }
@@ -144,9 +143,9 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
   @Override
   public double get(final int index) throws IndexOutOfBoundsException {
     if (size <= index || index < 0)
-      throw new IndexOutOfBoundsException(
-                                          index
-                                          + " is outside the bounds of this RIV");
+                                    throw new IndexOutOfBoundsException(
+                                                                        index
+                                                                        + " is outside the bounds of this RIV");
     return getOrDefault(index, 0);
   }
 
@@ -160,7 +159,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     final int[] keys = new int[count()];
     for (int i = 0, j = 0; i < size; i++)
       if (!Util.doubleEquals(get(i), 0))
-        keys[j++] = i;
+                                         keys[j++] = i;
     return keys;
   }
 
@@ -180,8 +179,8 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
       return this;
     else
       return new HPPCRIV(times > 0
-                         ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                         : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                   ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
+                                   : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
                          valArr(),
                          size);
   }
@@ -191,8 +190,8 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
     forEach((IntDoubleProcedure) (k,
-        v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
-                                                              v));
+                                  v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
+                                                                                        v));
     Arrays.sort(points);
     return points;
   }
@@ -235,50 +234,20 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     final int size = Integer.parseInt(bits[bits.length - 1]);
     bits = Arrays.copyOf(bits, bits.length - 1);
     final VectorElement[] elements = Arrays.stream(bits)
-        .map(VectorElement::fromString)
-        .toArray(VectorElement[]::new);
+                                           .map(VectorElement::fromString)
+                                           .toArray(VectorElement[]::new);
     return new HPPCRIV(elements, size);
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
-  public static HPPCRIV generateLabel(final int size, final int k,
-                                      final CharSequence word) {
-    final long seed = RIVs.makeSeed(word);
-    final int j = k % 2 == 0
-        ? k
-        : k + 1;
-    return new HPPCRIV(RIVs.makeIndices(size, j, seed), RIVs.makeVals(j, seed),
-                       size);
+  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+    return RIVs.generateRIV(size, nnz, token, HPPCRIV::new);
   }
 
-  public static HPPCRIV generateLabel(final int size, final int k,
-                                      final CharSequence source,
-                                      final int startIndex,
-                                      final int tokenLength) {
-    return generateLabel(size,
-                         k,
-                         Util.safeSubSequence(source,
-                                              startIndex,
-                                              startIndex + tokenLength));
-  }
-
-  public static Function<String, HPPCRIV> labelGenerator(final int size,
-                                                         final int nnz) {
-    return word -> generateLabel(size, nnz, word);
-  }
-
-  public static Function<Integer, HPPCRIV> labelGenerator(final int size,
-                                                          final int nnz,
-                                                          final CharSequence source,
-                                                          final int tokenLength) {
-    return i -> generateLabel(size, nnz, source, i, tokenLength);
+  public static RIV generate(final int size,
+                             final int nnz,
+                             final CharSequence text,
+                             final int tokenStart,
+                             final int tokenEnd) {
+    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
   }
 }

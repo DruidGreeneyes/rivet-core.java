@@ -89,7 +89,7 @@ public void example() {
     for (final String text : documents) {
       final RIV riv = MapRIV.empty(size);
       for (final String word : text.split("\\W+"))
-        riv.destructiveAdd(MapRIV.generateLabel(size, nnz, word));
+        riv.destructiveAdd(MapRIV.generate(size, nnz, word));
       rivs[fill++] = riv;
     }
 

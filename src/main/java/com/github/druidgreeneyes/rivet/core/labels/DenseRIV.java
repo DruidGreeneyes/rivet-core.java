@@ -2,14 +2,11 @@ package com.github.druidgreeneyes.rivet.core.labels;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
-import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 public class DenseRIV implements RIV, Serializable {
@@ -19,93 +16,15 @@ public class DenseRIV implements RIV, Serializable {
    */
   private static final long serialVersionUID = -4215652990755933410L;
 
-  public static DenseRIV empty(final int size) {
-    return new DenseRIV(size);
-  }
-
-  public static DenseRIV fromString(final String string) {
-    String[] bits = string.split(" ");
-    final int size = Integer.parseInt(bits[bits.length - 1]);
-    bits = Arrays.copyOf(bits, bits.length - 1);
-    final VectorElement[] points = Arrays.stream(bits)
-                                         .map(VectorElement::fromString)
-                                         .toArray(VectorElement[]::new);
-    return new DenseRIV(points, size);
-  }
-
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param nnz
-   * @param word
-   * @return a MapRIV
-   */
-  public static DenseRIV generateLabel(final int size, final int nnz,
-                                       final CharSequence word) {
-    final long seed = makeSeed(word);
-    final int j = nnz % 2 == 0
-                               ? nnz
-                               : nnz + 1;
-    return new DenseRIV(makeIndices(size, j, seed), makeVals(j, seed),
-                        size);
-  }
-
-  public static DenseRIV generateLabel(final int size, final int k,
-                                       final CharSequence source,
-                                       final int startIndex,
-                                       final int tokenLength) {
-    return generateLabel(size,
-                         k,
-                         Util.safeSubSequence(source,
-                                              startIndex,
-                                              startIndex + tokenLength));
-  }
-
-  public static Function<String, DenseRIV> labelGenerator(final int size,
-                                                          final int nnz) {
-    return word -> generateLabel(size, nnz, word);
-  }
-
-  /*
-   * @Override public DenseRIV add(final RIV other) { return
-   * copy().destructiveAdd(other); }
-   */
-
-  public static Function<Integer, DenseRIV> labelGenerator(final int size,
-                                                           final int nnz,
-                                                           final CharSequence source,
-                                                           final int tokenLength) {
-    return i -> generateLabel(size, nnz, source, i, tokenLength);
-  }
-
-  static int[] makeIndices(final int size, final int count, final long seed) {
-    return Util.randInts(size, count, seed)
-               .toArray();
-  }
-
-  static long makeSeed(final CharSequence word) {
-    final AtomicInteger c = new AtomicInteger();
-    return word.chars()
-               .mapToLong(ch -> ch
-                                * (long) Math.pow(10, c.incrementAndGet()))
-               .sum();
-  }
-
-  static double[] makeVals(final int count, final long seed) {
-    final double[] l = new double[count];
-    for (int i = 0; i < count; i += 2) {
-      l[i] = 1;
-      l[i + 1] = -1;
-    }
-    return Util.shuffleDoubleArray(l, seed);
-  }
-
   private final double[] vector;
 
   public DenseRIV(final double[] densePoints) {
     vector = Arrays.copyOf(densePoints, densePoints.length);
+  }
+
+  private DenseRIV(final int size) {
+    vector = new double[size];
+    Arrays.fill(vector, 0);
   }
 
   public DenseRIV(final int[] densePoints) {
@@ -114,7 +33,8 @@ public class DenseRIV implements RIV, Serializable {
       vector[i] = densePoints[i];
   }
 
-  public DenseRIV(final int[] indices, final double[] values,
+  public DenseRIV(final int[] indices,
+                  final double[] values,
                   final int size) {
     this(size);
     for (int i = 0; i < indices.length; i++)
@@ -122,24 +42,13 @@ public class DenseRIV implements RIV, Serializable {
   }
 
   /*
-   * @Override public DenseRIV divide(final double scalar) { return
-   * copy().destructiveDiv(scalar); }
+   * @Override public DenseRIV add(final RIV other) { return
+   * copy().destructiveAdd(other); }
    */
-
-  public double put(final int index, final double value) {
-    final double v = vector[index];
-    vector[index] = value;
-    return v;
-  }
 
   public DenseRIV(final RIV source) {
     this(source.size());
     source.forEachNZ((IntDoubleConsumer) this::put);
-  }
-
-  private DenseRIV(final int size) {
-    vector = new double[size];
-    Arrays.fill(vector, 0);
   }
 
   public DenseRIV(final VectorElement[] points, final int size) {
@@ -147,20 +56,6 @@ public class DenseRIV implements RIV, Serializable {
     for (final VectorElement point : points)
       vector[point.index()] = point.value();
   }
-
-  /*
-   * @Override public double magnitude() { double sum = 0; for (final double v :
-   * vector) sum += (v * v); return Math.sqrt(sum); }
-   *
-   * @Override public DenseRIV multiply(final double scalar) { return
-   * copy().destructiveMult(scalar); }
-   *
-   * private DenseRIV destructiveNorm() { double sum = 0; for (final double v :
-   * vector) sum += v; for (int i = 0; i < vector.length; i++) vector[i] =
-   * vector[i] / sum; return this; }
-   *
-   * @Override public DenseRIV normalize() { return copy().destructiveNorm(); }
-   */
 
   @Override
   public boolean contains(final int index) {
@@ -176,11 +71,6 @@ public class DenseRIV implements RIV, Serializable {
   public int count() {
     return size();
   }
-
-  /*
-   * @Override public DenseRIV subtract(final RIV other) throws
-   * SizeMismatchException { return copy().destructiveSub(other); }
-   */
 
   @Override
   public DenseRIV destructiveAdd(final RIV other) {
@@ -206,6 +96,11 @@ public class DenseRIV implements RIV, Serializable {
       vector[i] = vector[i] / scalar;
     return this;
   }
+
+  /*
+   * @Override public DenseRIV divide(final double scalar) { return
+   * copy().destructiveDiv(scalar); }
+   */
 
   @Override
   public DenseRIV destructiveMult(final double scalar) {
@@ -241,18 +136,61 @@ public class DenseRIV implements RIV, Serializable {
     return this;
   }
 
-  @Override
-  public boolean equals(final Object obj) {
-    return RIVs.equals(this, obj);
-  }
+  /*
+   * @Override public double magnitude() { double sum = 0; for (final double v :
+   * vector) sum += (v * v); return Math.sqrt(sum); }
+   *
+   * @Override public DenseRIV multiply(final double scalar) { return
+   * copy().destructiveMult(scalar); }
+   *
+   * private DenseRIV destructiveNorm() { double sum = 0; for (final double v :
+   * vector) sum += v; for (int i = 0; i < vector.length; i++) vector[i] =
+   * vector[i] / sum; return this; }
+   *
+   * @Override public DenseRIV normalize() { return copy().destructiveNorm(); }
+   */
 
   public boolean equals(final DenseRIV riv) {
     return Arrays.equals(vector, riv.vector);
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    return RIVs.equals(this, obj);
+  }
+
+  @Override
+  public void forEach(final IntDoubleConsumer fun) {
+    for (int i = 0; i < vector.length; i++)
+      fun.accept(i, vector[i]);
+  }
+
+  /*
+   * @Override public DenseRIV subtract(final RIV other) throws
+   * SizeMismatchException { return copy().destructiveSub(other); }
+   */
+
+  @Override
+  public void forEachNZ(final IntDoubleConsumer fun) {
+    forEach(fun);
+  }
+
+  @Override
   public double get(final int index) {
     return vector[index];
+  }
+
+  @Override
+  public int hashCode() {
+    return RIVs.hashcode(this);
+  }
+
+  @Override
+  public int[] keyArr() {
+    final int[] keys = new int[vector.length];
+    for (int i = 0; i < keys.length; i++)
+      keys[i] = i;
+    return keys;
   }
 
   @Override
@@ -281,8 +219,22 @@ public class DenseRIV implements RIV, Serializable {
   }
 
   @Override
+  public VectorElement[] points() {
+    final VectorElement[] points = new VectorElement[vector.length];
+    for (int i = 0; i < vector.length; i++)
+      points[i] = VectorElement.elt(i, vector[i]);
+    return points;
+  }
+
+  @Override
   public Stream<VectorElement> pointStream() {
     return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i]));
+  }
+
+  public double put(final int index, final double value) {
+    final double v = vector[index];
+    vector[index] = value;
+    return v;
   }
 
   /**
@@ -314,44 +266,38 @@ public class DenseRIV implements RIV, Serializable {
   }
 
   @Override
-  public DoubleStream valStream() {
-    return Arrays.stream(vector);
-  }
-
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
-  }
-
-  @Override
-  public VectorElement[] points() {
-    final VectorElement[] points = new VectorElement[vector.length];
-    for (int i = 0; i < vector.length; i++)
-      points[i] = VectorElement.elt(i, vector[i]);
-    return points;
-  }
-
-  @Override
-  public int[] keyArr() {
-    final int[] keys = new int[vector.length];
-    for (int i = 0; i < keys.length; i++)
-      keys[i] = i;
-    return keys;
-  }
-
-  @Override
   public double[] valArr() {
     return Arrays.copyOf(vector, vector.length);
   }
 
   @Override
-  public void forEach(final IntDoubleConsumer fun) {
-    for (int i = 0; i < vector.length; i++)
-      fun.accept(i, vector[i]);
+  public DoubleStream valStream() {
+    return Arrays.stream(vector);
   }
-  
-  @Override
-  public void forEachNZ(final IntDoubleConsumer fun) {
-    forEach(fun);
+
+  public static DenseRIV empty(final int size) {
+    return new DenseRIV(size);
+  }
+
+  public static DenseRIV fromString(final String string) {
+    String[] bits = string.split(" ");
+    final int size = Integer.parseInt(bits[bits.length - 1]);
+    bits = Arrays.copyOf(bits, bits.length - 1);
+    final VectorElement[] points = Arrays.stream(bits)
+                                         .map(VectorElement::fromString)
+                                         .toArray(VectorElement[]::new);
+    return new DenseRIV(points, size);
+  }
+
+  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+    return RIVs.generateRIV(size, nnz, token, DenseRIV::new);
+  }
+
+  public static RIV generate(final int size,
+                             final int nnz,
+                             final CharSequence text,
+                             final int tokenStart,
+                             final int tokenEnd) {
+    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
   }
 }

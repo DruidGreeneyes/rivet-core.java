@@ -4,13 +4,11 @@ import static com.github.druidgreeneyes.rivet.core.util.colt.ColtConversions.pro
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
-import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 import cern.colt.map.tdouble.OpenIntDoubleHashMap;
@@ -113,8 +111,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   }
 
   /*
-   * @Override public ColtRIV add(final RIV other) throws SizeMismatchException
-   * { return copy().destructiveAdd(other); }
+   * @Override public ColtRIV add(final RIV other) throws SizeMismatchException {
+   * return copy().destructiveAdd(other); }
    */
 
   @Override
@@ -180,8 +178,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   }
 
   /*
-   * @Override public double magnitude() { return Math.sqrt(valStream().map(x ->
-   * x * x) .sum()); }
+   * @Override public double magnitude() { return Math.sqrt(valStream().map(x -> x
+   * * x) .sum()); }
    *
    * @Override public ColtRIV multiply(final double scalar) { return
    * copy().destructiveMult(scalar); }
@@ -193,15 +191,15 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
       return this;
     else
       return new ColtRIV(times > 0
-                         ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                         : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                   ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
+                                   : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
                          valArr(),
                          size);
   }
 
   /*
-   * @Override public ColtRIV normalize() { final double mag = magnitude();
-   * final ColtRIV res = copy(); res.assign(x -> x / mag); return res; }
+   * @Override public ColtRIV normalize() { final double mag = magnitude(); final
+   * ColtRIV res = copy(); res.assign(x -> x / mag); return res; }
    */
 
   @Override
@@ -209,8 +207,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
     forEachPair(procedurize((k,
-        v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
-                                                              v)));
+                             v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
+                                                                                   v)));
     Arrays.sort(points);
     return points;
   }
@@ -270,81 +268,20 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     final int size = Integer.parseInt(bits[bits.length - 1]);
     bits = Arrays.copyOf(bits, bits.length - 1);
     final VectorElement[] elements = Arrays.stream(bits)
-        .map(VectorElement::fromString)
-        .toArray(VectorElement[]::new);
+                                           .map(VectorElement::fromString)
+                                           .toArray(VectorElement[]::new);
     return new ColtRIV(elements, size);
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
-  public static ColtRIV generateLabel(final int size, final int k,
-                                      final CharSequence word) {
-    final long seed = makeSeed(word);
-    final int j = k % 2 == 0
-        ? k
-        : k + 1;
-    return new ColtRIV(makeIndices(size, j, seed), makeVals(j, seed), size);
+  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+    return RIVs.generateRIV(size, nnz, token, ColtRIV::new);
   }
 
-  public static ColtRIV generateLabel(final int size, final int k,
-                                      final CharSequence source,
-                                      final int startIndex,
-                                      final int tokenLength) {
-    return generateLabel(size,
-                         k,
-                         Util.safeSubSequence(source,
-                                              startIndex,
-                                              startIndex + tokenLength));
-  }
-
-  public static Function<String, ColtRIV> labelGenerator(final int size,
-                                                         final int nnz) {
-    return word -> generateLabel(size, nnz, word);
-  }
-
-  public static Function<Integer, ColtRIV> labelGenerator(final int size,
-                                                          final int nnz,
-                                                          final CharSequence source,
-                                                          final int tokenLength) {
-    return i -> generateLabel(size, nnz, source, i, tokenLength);
-  }
-
-  public static int[] makeIndices(final int size, final int count,
-                                  final long seed) {
-    return Util.randInts(size, count, seed)
-        .toArray();
-  }
-
-  /**
-   * @param word
-   * @return a probably-unique long, used to seed java's Random.
-   */
-  public static long makeSeed(final CharSequence word) {
-    final AtomicInteger c = new AtomicInteger();
-    return word.chars()
-        .mapToLong(ch -> ch
-                   * (long) Math.pow(10, c.incrementAndGet()))
-        .sum();
-  }
-
-  /**
-   * @param count
-   * @param seed
-   * @return an array of count/2 1s and count/2 -1s, in random order.
-   */
-  public static double[] makeVals(final int count, final long seed) {
-    final double[] vals = new double[count];
-    for (int i = 0; i < count; i += 2) {
-      vals[i] = 1;
-      vals[i + 1] = -1;
-    }
-    return Util.shuffleDoubleArray(vals, seed);
+  public static RIV generate(final int size,
+                             final int nnz,
+                             final CharSequence text,
+                             final int tokenStart,
+                             final int tokenEnd) {
+    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
   }
 }

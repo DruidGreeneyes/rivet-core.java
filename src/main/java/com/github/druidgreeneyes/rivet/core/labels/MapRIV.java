@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -240,8 +239,8 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble> impl
     else
       return new MapRIV(times > 0 ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
                                   : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
-                                  valArr(),
-                                  size);
+                        valArr(),
+                        size);
   }
 
   @Override
@@ -369,70 +368,15 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble> impl
     return new MapRIV(elts, size).destructiveRemoveZeros();
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given the
-   * same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
-  public static MapRIV generateLabel(final int size, final int k, final CharSequence word) {
-    final long seed = makeSeed(word);
-    final int j = k % 2 == 0 ? k : k + 1;
-    return new MapRIV(makeIndices(size, j, seed), makeVals(j, seed), size);
+  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+    return RIVs.generateRIV(size, nnz, token, MapRIV::new);
   }
 
-  public static MapRIV generateLabel(final int size,
-                                     final int k,
-                                     final CharSequence source,
-                                     final int startIndex,
-                                     final int tokenLength) {
-    return generateLabel(size, k, Util.safeSubSequence(source, startIndex, startIndex + tokenLength));
-  }
-
-  public static Function<String, MapRIV> labelGenerator(final int size, final int k) {
-    return (word) -> generateLabel(size, k, word);
-  }
-
-  public static Function<Integer, MapRIV> labelGenerator(final String source,
-                                                         final int size,
-                                                         final int k,
-                                                         final int tokenLength) {
-    return (index) -> generateLabel(size, k, source, index, tokenLength);
-  }
-
-  /**
-   * @param size
-   * @param count
-   * @param seed
-   * @return an array of count random integers between 0 and size
-   */
-  static int[] makeIndices(final int size, final int count, final long seed) {
-    return Util.randInts(size, count, seed).toArray();
-  }
-
-  /**
-   * @param word
-   * @return a probably-unique long, used to seed java's Random.
-   */
-  static long makeSeed(final CharSequence word) {
-    final AtomicInteger c = new AtomicInteger();
-    return word.chars().mapToLong(ch -> ch * (long) Math.pow(10, c.incrementAndGet())).sum();
-  }
-
-  /**
-   * @param count
-   * @param seed
-   * @return an array of count/2 1s and count/2 -1s, in random order.
-   */
-  static double[] makeVals(final int count, final long seed) {
-    final double[] l = new double[count];
-    for (int i = 0; i < count; i += 2) {
-      l[i] = 1;
-      l[i + 1] = -1;
-    }
-    return Util.shuffleDoubleArray(l, seed);
+  public static RIV generate(final int size,
+                             final int nnz,
+                             final CharSequence text,
+                             final int tokenStart,
+                             final int tokenEnd) {
+    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
   }
 }

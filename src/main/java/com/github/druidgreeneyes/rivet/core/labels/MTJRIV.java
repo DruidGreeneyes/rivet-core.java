@@ -3,7 +3,6 @@ package com.github.druidgreeneyes.rivet.core.labels;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -14,7 +13,6 @@ import no.uib.cipr.matrix.sparse.SparseVector;
 
 import com.github.druidgreeneyes.rivet.core.exceptions.SizeMismatchException;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
-import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 /**
@@ -25,7 +23,9 @@ import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
  * @author josh
  */
 public final class MTJRIV extends SparseVector
-implements RIV, Serializable {
+                          implements
+                          RIV,
+                          Serializable {
 
   /**
    * CEREAL
@@ -141,9 +141,9 @@ implements RIV, Serializable {
   }
 
   /**
-   * Implements the hash function found in java.lang.String, using values in
-   * place of characters. Modifying the RIV is virtually guaranteed to change
-   * the hashcode.
+   * Implements the hash function found in java.lang.String, using values in place
+   * of characters. Modifying the RIV is virtually guaranteed to change the
+   * hashcode.
    */
   @Override
   public int hashCode() {
@@ -166,15 +166,15 @@ implements RIV, Serializable {
       return this;
     else
       return new MTJRIV(times > 0
-                        ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                        : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                  ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
+                                  : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
                         valArr(),
                         size);
   }
 
   /*
-   * @Override public double magnitude() { return Math.sqrt(valStream().map(x ->
-   * x * x) .sum()); }
+   * @Override public double magnitude() { return Math.sqrt(valStream().map(x -> x
+   * * x) .sum()); }
    *
    * @Override public MapRIV multiply(final double scalar) { return
    * copy().destructiveMult(scalar); }
@@ -187,7 +187,7 @@ implements RIV, Serializable {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
     forEachNZ((a,
-        b) -> points[c.getAndIncrement()] = VectorElement.elt(a, b));
+               b) -> points[c.getAndIncrement()] = VectorElement.elt(a, b));
     Arrays.sort(points);
     return points;
   }
@@ -203,7 +203,6 @@ implements RIV, Serializable {
   public Stream<VectorElement> pointStream() {
     return stream().map(e -> VectorElement.elt(e.index(), e.get()));
   }
-
 
   /*
    * @Override public MapRIV subtract(final RIV other) throws
@@ -272,44 +271,15 @@ implements RIV, Serializable {
     return res.destructiveRemoveZeros();
   }
 
-  /**
-   * Uses Java's seeded RNG to generate a random index vector such that, given
-   * the same input, generateLabel will always produce the same output.
-   *
-   * @param size
-   * @param k
-   * @param word
-   * @return a MapRIV
-   */
-  public static MTJRIV generateLabel(final int size, final int k,
-                                     final CharSequence word) {
-    final long seed = RIVs.makeSeed(word);
-    final int j = k % 2 == 0
-        ? k
-        : k + 1;
-    return new MTJRIV(RIVs.makeIndices(size, j, seed), RIVs.makeVals(j, seed), size);
+  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+    return RIVs.generateRIV(size, nnz, token, MTJRIV::new);
   }
 
-  public static MTJRIV generateLabel(final int size, final int k,
-                                     final CharSequence source,
-                                     final int startIndex,
-                                     final int tokenLength) {
-    return generateLabel(size,
-                         k,
-                         Util.safeSubSequence(source,
-                                              startIndex,
-                                              startIndex + tokenLength));
-  }
-
-  public static Function<String, MTJRIV> labelGenerator(final int size,
-                                                        final int k) {
-    return (word) -> generateLabel(size, k, word);
-  }
-
-  public static Function<Integer, MTJRIV> labelGenerator(final String source,
-                                                         final int size,
-                                                         final int k,
-                                                         final int tokenLength) {
-    return (index) -> generateLabel(size, k, source, index, tokenLength);
+  public static RIV generate(final int size,
+                             final int nnz,
+                             final CharSequence text,
+                             final int tokenStart,
+                             final int tokenEnd) {
+    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
   }
 }
