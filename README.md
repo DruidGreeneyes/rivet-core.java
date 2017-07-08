@@ -1,13 +1,13 @@
 # Rivet.java
 
-Master: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/master/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/master)
+Master: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/master/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/master)  
 Dev: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/dev/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/dev)
 
 Random-Index Vectoring in Java. Written in the voice of Mister Torgue.
 
 ## WHAT THE F$%K IS THIS!?!?
 
-Random-Index Vectoring is a memory efficient way to perform textual analysis across corpora of extreme scale. It enables this by using contextual word co-occurrence as a stand-in for word meaning.
+Random-Index Vectoring is a memory efficient way to perform textual analysis across corpora of extreme scale. It enables this by using contextual word co-occurrence as a stand-in for word meaning. 
 
 ## WHAT THE HELL DOES THAT MEAN!?!?
 
@@ -89,7 +89,7 @@ public void example() {
     for (final String text : documents) {
       final RIV riv = MapRIV.empty(size);
       for (final String word : text.split("\\W+"))
-        riv.destructiveAdd(MapRIV.generateLabel(size, nnz, word));
+        riv.destructiveAdd(MapRIV.generate(size, nnz, word));
       rivs[fill++] = riv;
     }
 
