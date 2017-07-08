@@ -54,7 +54,11 @@ public class RIVs {
                                    final int point,
                                    final int width,
                                    final RIVConstructor rivConstructor) {
-    return generateRIV(size, k, text.subSequence(point, width), rivConstructor);
+    return generateRIV(size,
+                       k,
+                       text.subSequence(Integer.max(0, point),
+                                        Integer.min(text.length(), point + width)),
+                       rivConstructor);
   }
 
   protected static RIV generateRIV(final int size,

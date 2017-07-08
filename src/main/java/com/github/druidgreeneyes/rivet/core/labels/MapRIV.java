@@ -376,7 +376,7 @@ public final class MapRIV extends ConcurrentHashMap<Integer, MutableDouble> impl
                              final int nnz,
                              final CharSequence text,
                              final int tokenStart,
-                             final int tokenEnd) {
-    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
+                             final int tokenWidth) {
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, MapRIV::new);
   }
 }

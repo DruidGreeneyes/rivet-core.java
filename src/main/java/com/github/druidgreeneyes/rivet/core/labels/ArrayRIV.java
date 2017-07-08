@@ -295,7 +295,7 @@ public final class ArrayRIV implements RIV, Serializable {
                              final int nnz,
                              final CharSequence text,
                              final int tokenStart,
-                             final int tokenEnd) {
-    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
+                             final int tokenWidth) {
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, ArrayRIV::new);
   }
 }

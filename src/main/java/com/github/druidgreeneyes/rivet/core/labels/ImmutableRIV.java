@@ -328,6 +328,27 @@ public class ImmutableRIV implements RIV {
     return a -> a / scalar;
   }
 
+  public static ImmutableRIV empty(final int size) {
+    return new ImmutableRIV(size);
+  }
+
+  public static ImmutableRIV fromString(final String rivString) {
+    String[] entries = rivString.split(" ");
+    final int end = entries.length - 1;
+    final int size = Integer.parseInt(entries[end]);
+    entries = Arrays.copyOf(entries, end);
+    final int[] indices = new int[end];
+    final double[] vals = new double[end];
+    int c = 0;
+    for (final String entry : entries) {
+      final String[] e = entry.split("\\|");
+      indices[c] = Integer.parseInt(e[0]);
+      vals[c] = Double.parseDouble(e[1]);
+      c++;
+    }
+    return new ImmutableRIV(indices, vals, size);
+  }
+
   public static RIV generate(final int size, final int nnz, final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, ImmutableRIV::new);
   }
@@ -336,8 +357,8 @@ public class ImmutableRIV implements RIV {
                              final int nnz,
                              final CharSequence text,
                              final int tokenStart,
-                             final int tokenEnd) {
-    return generate(size, nnz, text.subSequence(tokenStart, tokenEnd));
+                             final int tokenWidth) {
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, ImmutableRIV::new);
   }
 
   private static DoubleUnaryOperator multiplyBy(final double scalar) {
