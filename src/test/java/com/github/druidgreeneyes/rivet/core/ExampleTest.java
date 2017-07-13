@@ -45,7 +45,10 @@ public class ExampleTest {
      * same index in the original collection of texts.
      *
      * Using this, we can go through the list and see how similar each is to each
-     * other one.
+     * other one. This only builds half of matrix; a.similarityTo(a) will always be
+     * 1 and a.similarityTo(b) will always be equal to b.similarityTo(a), so we skip
+     * comparing rivs to themselves and we ensure that one riv is only ever compared
+     * to another riv once.
      **/
 
     final double[][] sims = new double[rivs.length][rivs.length];
@@ -54,10 +57,6 @@ public class ExampleTest {
         sims[c][i] = rivs[c].similarityTo(rivs[i]);
 
     /**
-     * This is a half matrix, because a.similarityTo(a) will always be 1 and
-     * a.similarityTo(b) will always be equal to b.similarityTo(a), so we can skip
-     * comparing rivs to themselves and we can skip comparisons we've already seen.
-     *
      * Now we can go through the matrix and find the (say) 10 pairs of documents
      * that are most similar to one another without being identical
      * (a.similarityTo(b) != 1)

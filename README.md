@@ -94,29 +94,24 @@ public void example() {
     }
 
     /**
-     * Now we have a collection of rivs, each of which represents a document at
-     * the same index in the original collection of texts.
+     * Now we have a collection of rivs, each of which represents a document at the
+     * same index in the original collection of texts.
      *
-     * Using this, we can go through the list and see which are most similar to
-     * eachother.
+     * Using this, we can go through the list and see how similar each is to each
+     * other one. This only builds half of matrix; a.similarityTo(a) will always be
+     * 1 and a.similarityTo(b) will always be equal to b.similarityTo(a), so we skip
+     * comparing rivs to themselves and we ensure that one riv is only ever compared
+     * to another riv once.
      **/
 
     final double[][] sims = new double[rivs.length][rivs.length];
-
-    fill = 0;
-    int fill2 = 0;
-    for (final RIV rivA : rivs) {
-      fill2 = 0;
-      for (final RIV rivB : rivs)
-        sims[fill][fill2++] = rivA.similarityTo(rivB);
-      fill++;
-    }
+    for (int c = 0; c < rivs.length; c++)
+      for (int i = c + 1; i < rivs.length; i++)
+        sims[c][i] = rivs[c].similarityTo(rivs[i]);
 
     /**
-     * We technically don't need a square matrix for this, because
-     * a.similarityTo(b) == b.similarityTo(a) always. But f#$k it, you can deal.
-     * Anyway, now we can go through the matrix and find the (say) 10 pairs of
-     * documents that are most similar to one another without being identical
+     * Now we can go through the matrix and find the (say) 10 pairs of documents
+     * that are most similar to one another without being identical
      * (a.similarityTo(b) != 1)
      **/
 
