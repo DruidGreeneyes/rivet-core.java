@@ -152,8 +152,8 @@ public interface RIV {
       return false;
     else
       for (int i = 0; i < size(); i++)
-      if (!Util.doubleEquals(get(i), other.get(i)))
-        return false;
+        if (!Util.doubleEquals(get(i), other.get(i)))
+          return false;
     return true;
   }
 
@@ -168,7 +168,12 @@ public interface RIV {
     return fun.apply(this);
   }
 
-  void forEach(IntDoubleConsumer fun);
+  void forEachNZ(IntDoubleConsumer fun);
+  
+  default void forEach(IntDoubleConsumer fun) {
+    for (int i = 0; i < size(); i++)
+      fun.accept(i, get(i));
+  }
 
   /**
    * @param index

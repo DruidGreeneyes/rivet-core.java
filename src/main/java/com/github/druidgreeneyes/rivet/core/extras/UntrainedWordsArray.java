@@ -3,41 +3,46 @@ package com.github.druidgreeneyes.rivet.core.extras;
 import static java.util.Arrays.stream;
 
 import com.github.druidgreeneyes.rivet.core.labels.ArrayRIV;
+import com.github.druidgreeneyes.rivet.core.labels.RIV;
 
 public final class UntrainedWordsArray {
 
-    public static ArrayRIV rivAndSumWords(final String[] words, final int size,
-            final int k) {
-        return stream(words).reduce(new ArrayRIV(size),
-                (identity, word) -> identity
-                        .destructiveAdd(ArrayRIV.generateLabel(size, k, word)),
-                (a, b) -> a.destructiveAdd(b));
-    }
+  private UntrainedWordsArray() {
+  }
 
-    public static ArrayRIV rivettizeText(final String text, final int size,
-            final int k) {
-        return rivAndSumWords(tokenizeText(text), size, k);
-    }
+  public static RIV rivAndSumWords(final String[] words,
+                                   final int size,
+                                   final int k) {
+    return stream(words).reduce(new ArrayRIV(size),
+                                (identity, word) -> identity.destructiveAdd(ArrayRIV.generate(size,
+                                                                                              k,
+                                                                                              word)),
+                                (a, b) -> a.destructiveAdd(b));
+  }
 
-    public static ArrayRIV[] rivWords(final String[] words, final int size,
-            final int k) {
-        final ArrayRIV[] res = new ArrayRIV[words.length];
-        for (int i = 0; i < words.length; i++) {
-            final ArrayRIV riv = ArrayRIV.generateLabel(size, k, words[i]);
-            res[i] = riv;
-        }
-        return res;
-    }
+  public static RIV rivettizeText(final String text,
+                                  final int size,
+                                  final int k) {
+    return rivAndSumWords(tokenizeText(text), size, k);
+  }
 
-    public static ArrayRIV sumArrayRIVs(final ArrayRIV[] rivs) {
-        return stream(rivs).reduce(new ArrayRIV(rivs[0].size()),
-                (i, r) -> i.destructiveAdd(r));
+  public static RIV[] rivWords(final String[] words,
+                               final int size,
+                               final int k) {
+    final RIV[] res = new RIV[words.length];
+    for (int i = 0; i < words.length; i++) {
+      final RIV riv = ArrayRIV.generate(size, k, words[i]);
+      res[i] = riv;
     }
+    return res;
+  }
 
-    public static String[] tokenizeText(final String text) {
-        return text.split("\\s+");
-    }
+  public static RIV sumArrayRIVs(final ArrayRIV[] rivs) {
+    return stream(rivs).reduce(new ArrayRIV(rivs[0].size()),
+                               (i, r) -> i.destructiveAdd(r));
+  }
 
-    private UntrainedWordsArray() {
-    }
+  public static String[] tokenizeText(final String text) {
+    return text.split("\\s+");
+  }
 }

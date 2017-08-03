@@ -1,12 +1,13 @@
 # Rivet.java
 
-[![Build Status](https://travis-ci.org/DruidGreeneyes/rivet-core.java.svg?branch=master)](https://travis-ci.org/DruidGreeneyes/rivet-core.java)
+Master: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/master/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/master)  
+Dev: [![build status](https://gitlab.com/druidgreeneyes/rivet-core.java/badges/dev/build.svg)](https://gitlab.com/druidgreeneyes/rivet-core.java/commits/dev)
 
 Random-Index Vectoring in Java. Written in the voice of Mister Torgue.
 
 ## WHAT THE F$%K IS THIS!?!?
 
-Random-Index Vectoring is a memory efficient way to perform textual analysis across corpora of extreme scale. It enables this by using contextual word co-occurrence as a stand-in for word meaning.
+Random-Index Vectoring is a memory efficient way to perform textual analysis across corpora of extreme scale. It enables this by using contextual word co-occurrence as a stand-in for word meaning. 
 
 ## WHAT THE HELL DOES THAT MEAN!?!?
 
@@ -18,7 +19,49 @@ If that doesn't give you enough of a primer, do the google. Sahlgren has done a 
 
 ## SOUNDS LIKE A JOYSPLOSION!! HOW CAN I GET IN ON THIS S&@T!?!?
 
-I'm working to get on maven, but in the mean time you can use jitpack.io if you like.
+If you want to peg to a particular release, you can get it from Maven:
+
+```
+
+<dependency>
+  <groupId>com.github.druidgreeneyes</groupId>
+  <artifactId>rivet-core</artifactId>
+  <version>1.0.0</version>
+</dependency>
+
+```
+
+You can also get it from jitpack.io, if you prefer:
+
+
+```
+
+<repository>
+  <id>jitpack.io</id>
+  <url>https://jitpack.io</url>
+</repository>
+
+...
+
+<dependency>
+  <groupId>com.github.druidgreeneyes</groupId>
+  <artifactId>rivet-core.java</artifactId>
+  <version>v1.0.0</version>
+</dependency>
+
+```
+
+And if you want to pull whatever's currently in development, you can do that too (through jitpack), though it's guaranteed to break sometimes.
+
+```
+
+<dependency>
+  <groupId>com.github.druidgreeneyes</groupId>
+  <artifactId>rivet-core.java</artifactId>
+  <version>-SNAPSHOT</version>
+</dependency>
+
+```
 
 The core functionality is in `rivet.core.labels`, where you'll probably use `MapRIV`. There are a number of other implementations of the RIV interface, but MapRIV has so far proven to be the fastest by a pretty significant margin, so you may as well start there. If you see flaws in that or in one of the other implementations, and/or you know how they can be done better, feel free to create an issue with your suggestion, or a pr with a fix. 
 
@@ -32,68 +75,78 @@ Random Index Vectors give you a conveniently scalable way to mathematically repr
 
 ```java
 
-final String[] documents = //import your documents here.
-
-final int size = 8000;     //this is the width of the sparse vectors we'll be making
-final int nnz = 4;         //this is the number of non-zero elements you want each one to start with
-
-RIV[] rivs = new RIV[documents.length];
-int fill = 0;
-for(String text : document) {
-  RIV riv = MapRIV.empty();
-  for(String word : text.split("\\W+"))
-  	riv.destructiveAdd(MapRIV.generateLabel(size, nnz, word));
-  rivs[fill++] = riv;
-}
-
-/**
- * Now we have a collection of rivs, each of which represents a document 
- * at the same index in the original collection of texts.
- * 
- * Using this, we can go through the list and see which are most similar to eachother.
- **/
-
-double[][] sims = new double[rivs.length][rivs.length];
-
-fill = 0;
-int fill2 = 0;
-for(RIV rivA : rivs) {
-  fill2 = 0;
-  for(RIV rivB : rivs)
-    sims[fill++][fill2++] = rivA.similarityTo(rivB);
-}
-
-/**
- * We technically don't need a square matrix for this, because a.similarityTo(b) == b.similarityTo(a) always.
- * But f#$k it, you can deal. Anyway, now we can go through the matrix and find the (say) 10 pairs 
- * of documents that are most similar to one another without being identical (a.similarityTo(b) != 1)
- **/
- 
-double[][] pairs = new double[10][3]; //this is a collection of [index, index, similarity] triples
-for (int r = 0; i < sims.length; i++)
-  for (int c = 0; n < row.length; n++)
-    if(!Util.doubleEquals(sims[r][c], 1.0)) {
-      for (int x = 0; x < 10; x++)
-        if((pairs[x][2] == null) || (pairs[x][2] < sims[r][c])) {
-          pairs[x][0] = r;
-          pairs[x][1] = c;
-          pairs[x][3] = sims[r][c];
-          break;
-        }
-    }
+public void example() {
+    final String[] documents = DOCUMENTS;// import your documents here.
     
-System.out.println("Top 10 most similar documents:");
-for(double[] pair : pairs) {
-  String a = documents[(int)pair[0]].substring(0, 20) + "...";
-  String b = documents[(int)pair[1]].substring(0, 20) + "...";
-  System.out.println(a + " <=> " + b + ": " + pair[2]);
-}
+    final int size = 8000; // this is the width of the sparse vectors we'll be
+                           // making
+    final int nnz = 4; // this is the number of non-zero elements you want each
+                       // one to start with
+    
+    final RIV[] rivs = new RIV[documents.length];
+    int fill = 0;
+    
+    for (final String text : documents) {
+      final RIV riv = MapRIV.empty(size);
+      for (final String word : text.split("\\W+"))
+        riv.destructiveAdd(MapRIV.generate(size, nnz, word));
+      rivs[fill++] = riv;
+    }
+
+    /**
+     * Now we have a collection of rivs, each of which represents a document at
+     * the same index in the original collection of texts.
+     *
+     * Using this, we can go through the list and see which are most similar to
+     * eachother.
+     **/
+
+    final double[][] sims = new double[rivs.length][rivs.length];
+
+    fill = 0;
+    int fill2 = 0;
+    for (final RIV rivA : rivs) {
+      fill2 = 0;
+      for (final RIV rivB : rivs)
+        sims[fill][fill2++] = rivA.similarityTo(rivB);
+      fill++;
+    }
+
+    /**
+     * We technically don't need a square matrix for this, because
+     * a.similarityTo(b) == b.similarityTo(a) always. But f#$k it, you can deal.
+     * Anyway, now we can go through the matrix and find the (say) 10 pairs of
+     * documents that are most similar to one another without being identical
+     * (a.similarityTo(b) != 1)
+     **/
+
+    final double[][] pairs = new double[10][3]; // this is a collection of
+                                                // [index, index, similarity]
+                                                // triples
+    for (int r = 0; r < sims.length; r++)
+      for (int c = 0; c < sims[r].length; c++)
+        if (!Util.doubleEquals(sims[r][c], 1.0)) 
+          for (int x = 0; x < 10; x++)
+            if (pairs[x][2] == 0.0 || pairs[x][2] < sims[r][c]) {
+              pairs[x][0] = r;
+              pairs[x][1] = c;
+              pairs[x][2] = sims[r][c];
+              break;
+            }
+
+    System.out.println("Top 10 most similar documents:");
+    for (final double[] pair : pairs) {
+      final String a = documents[(int) pair[0]].substring(0, 20) + "...";
+      final String b = documents[(int) pair[1]].substring(0, 20) + "...";
+      System.out.println(a + " <=> " + b + ": " + pair[2]);
+    }
+  }
 
 ```
 
 ## BUT WHAT ABOUT THE GODDAMNED WIZARDRY!?!?!?
 
-There are a number of other things you can do, and other ways you can use RIVs to represent text. For example, you can build a lexicon (a map of words to the corpus-wide L2 RIV associated with each word, in turn built over time by adding together all words that occur within a 2- to 4-word window of the word in question), and use it to (say) find synonyms, or label documents with topics associated with words that have good similarity with the document in question. If you want to get wacky with it (and you don't mind the high compute cost of doing so), you can encode ordering to words within sentences or context windows by using RIV.permute(n), where n is the given word's location in the context relative to the word it's being added to. Among the things I am working on or have worked on include clustering documents based on cosine similarity, finding and eliminating near-duplicates across corpora, and inferring flat and heirarchical topic models from data. I stood up a small website using a Python version of this library, and was able to do similarity comparisons between 100k word texts in 2 and some change minutes on a 2nd generation raspberry pi. It would probably be faster if I had done it in Java, but I wanted to muck about with Python, so I did. I most recently implemented Hilbert Transformations on RIVs, so for big corpora you should be able to sort by hilbert key (using Hilbert.getHilbertKey(riv), or ImmutableRIV.getHilbertKey()) use that for some nifty tricks.
+There are a number of other things you can do, and other ways you can use RIVs to represent text. For example, you can build a lexicon (a map of words to the corpus-wide L2 RIV associated with each word, in turn built over time by adding together all words that occur within a 2- to 4-word window of the word in question), and use it to (say) find synonyms, or label documents with topics associated with words that have good similarity with the document in question. If you want to get wacky with it (and you don't mind the high compute cost of doing so), you can encode ordering to words within sentences or context windows by using RIV.permute(n), where n is the given word's location in the context relative to the word it's being added to. Among the things I am working on or have worked on include clustering documents based on cosine similarity, finding and eliminating near-duplicates across corpora, and inferring flat and heirarchical topic models from data. I stood up a small website using a Python version of this library, and was able to do similarity comparisons between 100k word texts in 2 and some change minutes on a 2nd generation raspberry pi. It would probably be faster if I had done it in Java, but I wanted to muck about with Python, so I did. I most recently implemented Hilbert Transformations on RIVs, so for big corpora you should be able to sort by hilbert key (using Hilbert.getHilbertKey(riv), or ImmutableRIV.getHilbertKey()) and use that for some nifty tricks.
 
 ## CHOICES, CHOICES, SO MANY F#%ING CHOICES!!!
 
