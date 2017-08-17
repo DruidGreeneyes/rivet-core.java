@@ -28,10 +28,13 @@ public class ImmutableRIV implements RIV {
 
   private final double[] vals;
 
+  private final double magnitude;
+
   public ImmutableRIV(final int size) {
     this.size = size;
     keys = new int[0];
     vals = new double[0];
+    magnitude = computeMagnitude();
   }
 
   public ImmutableRIV(final int[] keys,
@@ -40,6 +43,14 @@ public class ImmutableRIV implements RIV {
     this.size = size;
     this.keys = Arrays.copyOf(keys, keys.length);
     this.vals = Arrays.copyOf(vals, vals.length);
+    magnitude = computeMagnitude();
+  }
+
+  private double computeMagnitude() {
+    double sum = 0;
+    for (final double val : vals)
+      sum += val * val;
+    return Math.sqrt(sum);
   }
 
   public ImmutableRIV(final RIV riv) {
@@ -137,7 +148,7 @@ public class ImmutableRIV implements RIV {
   @Override
   public double get(final int index) throws IndexOutOfBoundsException {
     if (index < 0 || index >= size)
-                                    throw new IndexOutOfBoundsException();
+      throw new IndexOutOfBoundsException();
     final int i = ArrayUtils.indexOf(keys, index);
     if (i == ArrayUtils.INDEX_NOT_FOUND)
       return 0;
@@ -193,10 +204,7 @@ public class ImmutableRIV implements RIV {
 
   @Override
   public double magnitude() {
-    double sum = 0;
-    for (final double v : vals)
-      sum += v * v;
-    return Math.sqrt(sum);
+    return magnitude;
   }
 
   private ImmutableRIV map(final DoubleUnaryOperator operation) {
@@ -205,7 +213,7 @@ public class ImmutableRIV implements RIV {
     for (int i = 0; i < vals.length; i++) {
       newVals[i] = operation.applyAsDouble(vals[i]);
       if (newVals[i] == 0)
-                           zeros = ArrayUtils.add(zeros, i);
+        zeros = ArrayUtils.add(zeros, i);
     }
     final int[] newKeys = ArrayUtils.removeAll(keys, zeros);
     newVals = ArrayUtils.removeAll(newVals, zeros);
@@ -224,7 +232,7 @@ public class ImmutableRIV implements RIV {
       final int k = newKeys[i];
       newVals[i] = mergeFunction.applyAsDouble(get(k), other.get(k));
       if (newVals[i] == 0)
-                           zeros = ArrayUtils.add(zeros, i);
+        zeros = ArrayUtils.add(zeros, i);
     }
     newKeys = ArrayUtils.removeAll(newKeys, zeros);
     newVals = ArrayUtils.removeAll(newVals, zeros);
@@ -246,7 +254,7 @@ public class ImmutableRIV implements RIV {
       for (final RIV riv : others)
         v = mergeFunction.applyAsDouble(v, riv.get(k));
       if (Util.doubleEquals(v, 0, Util.roundingError))
-                                                       zeros = ArrayUtils.add(zeros, i);
+        zeros = ArrayUtils.add(zeros, i);
       newVals[i] = v;
     }
     newKeys = ArrayUtils.removeAll(newKeys, zeros);
@@ -263,10 +271,14 @@ public class ImmutableRIV implements RIV {
   public ImmutableRIV permute(final Permutations permutations,
                               final int times) {
     if (times == 0)
-                    return this;
+      return this;
     return new ImmutableRIV(times > 0
-                                      ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                                      : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                      ? RIVs.permuteKeys(keyArr(),
+                                                         permutations.permute,
+                                                         times)
+                                      : RIVs.permuteKeys(keyArr(),
+                                                         permutations.inverse,
+                                                         -times),
                             valArr(),
                             size);
   }
@@ -349,7 +361,8 @@ public class ImmutableRIV implements RIV {
     return new ImmutableRIV(indices, vals, size);
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, ImmutableRIV::new);
   }
 
@@ -358,7 +371,8 @@ public class ImmutableRIV implements RIV {
                              final CharSequence text,
                              final int tokenStart,
                              final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, ImmutableRIV::new);
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            ImmutableRIV::new);
   }
 
   private static DoubleUnaryOperator multiplyBy(final double scalar) {
