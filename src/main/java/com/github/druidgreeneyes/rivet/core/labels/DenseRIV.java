@@ -141,6 +141,7 @@ public class DenseRIV extends AbstractRIV implements RIV, Serializable {
     if (other instanceof DenseRIV)
       return equals((DenseRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 

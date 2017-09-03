@@ -119,6 +119,7 @@ public class HPPCRIV extends AbstractRIV implements RIV, Serializable {
     if (other instanceof HPPCRIV)
       return equals((HPPCRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 

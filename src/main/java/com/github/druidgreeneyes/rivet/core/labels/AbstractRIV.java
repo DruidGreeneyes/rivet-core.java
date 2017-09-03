@@ -64,19 +64,20 @@ public abstract class AbstractRIV implements RIV, Serializable {
     if (this == other)
       return true;
     else if (ArrayUtils.contains(other.getClass().getInterfaces(), RIV.class))
-      return equals(other);
+      return equals((RIV) other);
     else
       return false;
   }
 
-  public abstract boolean equals(final RIV other);
-
   public boolean equals(final AbstractRIV other) {
-    for (int i = 0; i < other.size(); i++)
+    for (int i = 0; i < size(); i++)
       if (get(i) != other.get(i))
         return false;
     return true;
   }
+
+  @Override
+  public abstract boolean equals(final RIV other);
 
   @Override
   public void forEach(final IntDoubleConsumer fun) {

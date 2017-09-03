@@ -189,6 +189,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
     if (other instanceof MapRIV)
       return equals((MapRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 

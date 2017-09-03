@@ -142,6 +142,7 @@ public class ColtRIV extends AbstractRIV implements RIV, Serializable {
     if (other instanceof ColtRIV)
       return equals((ColtRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 

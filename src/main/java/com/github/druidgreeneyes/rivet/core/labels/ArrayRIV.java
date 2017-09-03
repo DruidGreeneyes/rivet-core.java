@@ -152,6 +152,7 @@ public final class ArrayRIV extends AbstractRIV implements RIV, Serializable {
     if (other instanceof ArrayRIV)
       return equals((ArrayRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 

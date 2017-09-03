@@ -140,8 +140,6 @@ public interface RIV {
   @Override
   boolean equals(Object other);
 
-  boolean equals(AbstractRIV other);
-
   boolean equals(RIV other);
 
   /**

@@ -140,6 +140,7 @@ public class ImmutableRIV extends AbstractRIV implements RIV, Serializable {
     if (other instanceof ImmutableRIV)
       return equals((ImmutableRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 

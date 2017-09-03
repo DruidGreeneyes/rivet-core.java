@@ -111,4 +111,12 @@ public class RIVs {
                                final int times) {
     return riv.permute(permutations, times);
   }
+
+  @Deprecated
+  protected static boolean equals(final RIV a, final RIV b) {
+    for (int i = 0; i < a.size(); i++)
+      if (a.get(i) != b.get(i))
+        return false;
+    return true;
+  }
 }

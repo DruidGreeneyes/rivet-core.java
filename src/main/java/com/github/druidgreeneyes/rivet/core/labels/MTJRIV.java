@@ -125,10 +125,12 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
     return this;
   }
 
+  @Override
   public boolean equals(final RIV other) {
     if (other instanceof MTJRIV)
       return equals((MTJRIV) other);
     else
+      // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 
