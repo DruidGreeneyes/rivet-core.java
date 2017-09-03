@@ -140,7 +140,9 @@ public interface RIV {
   @Override
   boolean equals(Object other);
 
-  boolean equals(final RIV other);
+  boolean equals(AbstractRIV other);
+
+  boolean equals(RIV other);
 
   /**
    * Written for the sake of making it easier to string dot-chains together.
@@ -255,6 +257,8 @@ public interface RIV {
    * @return RIVs.similarity(this, riv)
    */
   double similarityTo(final RIV riv);
+
+  double dot(final RIV riv);
 
   /**
    * @return the number of dimensions in this random index vector

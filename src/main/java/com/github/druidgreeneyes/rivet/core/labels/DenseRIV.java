@@ -1,5 +1,6 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -8,7 +9,7 @@ import java.util.stream.Stream;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public class DenseRIV extends AbstractRIV {
+public class DenseRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    *
@@ -135,27 +136,16 @@ public class DenseRIV extends AbstractRIV {
     return this;
   }
 
-  /*
-   * @Override public double magnitude() { double sum = 0; for (final double v :
-   * vector) sum += (v * v); return Math.sqrt(sum); }
-   *
-   * @Override public DenseRIV multiply(final double scalar) { return
-   * copy().destructiveMult(scalar); }
-   *
-   * private DenseRIV destructiveNorm() { double sum = 0; for (final double v :
-   * vector) sum += v; for (int i = 0; i < vector.length; i++) vector[i] =
-   * vector[i] / sum; return this; }
-   *
-   * @Override public DenseRIV normalize() { return copy().destructiveNorm(); }
-   */
+  @Override
+  public boolean equals(final RIV other) {
+    if (other instanceof DenseRIV)
+      return equals((DenseRIV) other);
+    else
+      return equals((AbstractRIV) other);
+  }
 
   public boolean equals(final DenseRIV riv) {
     return Arrays.equals(vector, riv.vector);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return RIVs.equals(this, obj);
   }
 
   @Override
@@ -177,11 +167,6 @@ public class DenseRIV extends AbstractRIV {
   @Override
   public double get(final int index) {
     return vector[index];
-  }
-
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
   }
 
   @Override

@@ -2,7 +2,9 @@ package com.github.druidgreeneyes.rivet.core.labels;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -27,29 +29,29 @@ public class Speed {
       MapRIV.class,
       ArrayRIV.class,
       ColtRIV.class,
-      //HPPCRIV.class,
+      // HPPCRIV.class,
       MTJRIV.class,
-      //DenseRIV.class
   };
 
   @Test
   public void test() {
-      IntStream.iterate(0, i -> (i + 1) % classes.length)
-                .limit((long) iterations)
-                .parallel()
-                .mapToObj(i -> classes[i])
-                .map(c -> {
-                  final double start = System.nanoTime();
-                  example(c);
-                  final double time = (System.nanoTime() - start) / 1000000000;
-                  return ImmutablePair.of(c, time);
-                })
-                .collect(Collectors.groupingByConcurrent(p -> p.left,
-                                                         Collectors.averagingDouble(p -> p.right)))
-                .entrySet()
-                .stream()
-                .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
-                .forEachOrdered(e -> System.out.format("%s:\t%fs\n", e.getKey(), e.getValue()));
+    IntStream.iterate(0, i -> (i + 1) % classes.length)
+             .limit((long) iterations)
+             .parallel()
+             .mapToObj(i -> classes[i])
+             .map(c -> {
+               final double start = System.nanoTime();
+               example(c);
+               return ImmutablePair.of(c, (System.nanoTime() - start)
+                                          / 1000000000);
+             })
+             .collect(Collectors.groupingByConcurrent(p -> p.left,
+                                                      Collectors.averagingDouble(p -> p.right)))
+             .entrySet()
+             .stream()
+             .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
+             .forEachOrdered(e -> System.out.format("%s:\t%fs\n", e.getKey(),
+                                                    e.getValue()));
   }
 
   private void example(final Class<?> rivClass) {
@@ -63,9 +65,9 @@ public class Speed {
 
     for (final String text : documents) {
       final RIV riv = invokeEmptyConstructor(rivClass, size);
-      final Function<CharSequence, RIV> rivGenerator = RIVs.makeRIVGenerator(size,
-                                                                             nnz,
-                                                                             getDefaultConstructor(rivClass));
+      final Function<CharSequence, RIV> rivGenerator = RIVs.generator(size,
+                                                                      nnz,
+                                                                      getDefaultConstructor(rivClass));
       for (final String word : text.split("\\W+"))
         riv.destructiveAdd(rivGenerator.apply(word));
       rivs[fill++] = riv;
@@ -88,11 +90,15 @@ public class Speed {
             break;
           }
 
-    // System.out.println("Top 10 most similar documents:");
-    for (final double[] pair : pairs) {
-      final String a = documents[(int) pair[0]].substring(0, 20) + "...";
-      final String b = documents[(int) pair[1]].substring(0, 20) + "...";
-      // System.out.println(a + " <=> " + b + ": " + pair[2]);
+    try (PrintStream out = new PrintStream("/dev/null")) {
+      out.println("Top 10 most similar documents:");
+      for (final double[] pair : pairs) {
+        final String a = documents[(int) pair[0]].substring(0, 20) + "...";
+        final String b = documents[(int) pair[1]].substring(0, 20) + "...";
+        out.println(a + " <=> " + b + ": " + pair[2]);
+      }
+    } catch (final FileNotFoundException e) {
+      e.printStackTrace();
     }
   }
 

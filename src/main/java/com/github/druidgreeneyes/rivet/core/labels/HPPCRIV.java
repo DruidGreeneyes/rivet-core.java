@@ -1,5 +1,6 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.DoubleStream;
@@ -9,11 +10,12 @@ import java.util.stream.Stream;
 import com.carrotsearch.hppc.IntDoubleHashMap;
 import com.carrotsearch.hppc.predicates.IntDoublePredicate;
 import com.carrotsearch.hppc.procedures.IntDoubleProcedure;
+import com.carrotsearch.hppc.cursors.IntDoubleCursor;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public class HPPCRIV extends AbstractRIV {
+public class HPPCRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    *
@@ -64,7 +66,7 @@ public class HPPCRIV extends AbstractRIV {
   public int count() {
     return data.size();
   }
-  
+
   @Override
   public HPPCRIV destructiveAdd(final RIV other) {
     other.forEachNZ(data::addTo);
@@ -73,8 +75,8 @@ public class HPPCRIV extends AbstractRIV {
 
   @Override
   public HPPCRIV destructiveAdd(final RIV... rivs) {
-    for (int i = 0; i < rivs.length; i++)
-      destructiveAdd(rivs[i]);
+    for (final RIV riv : rivs)
+      destructiveAdd(riv);
     return this;
   }
 
@@ -106,22 +108,28 @@ public class HPPCRIV extends AbstractRIV {
 
   @Override
   public HPPCRIV destructiveSub(final RIV... rivs) {
-    for (int i = 0; i < rivs.length; i++)
-      destructiveSub(rivs[i]);
+    for (final RIV riv : rivs)
+      destructiveSub(riv);
     return this;
   }
 
   @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final RIV other) {
+    if (other instanceof HPPCRIV)
+      return equals((HPPCRIV) other);
+    else
+      return equals((AbstractRIV) other);
+  }
+
+  public boolean equals(final HPPCRIV other) {
+    return size == other.size && data.equals(other.data);
   }
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
-    for (int i = 0; i < data.keys.length; i++)
-      fun.accept(data.keys[i], data.values[i]);
+    data.forEach((final IntDoubleCursor c) -> fun.accept(c.key, c.value));
   }
-  
+
   @Override
   public void forEach(final IntDoubleConsumer fun) {
     for (int i = 0; i < size; i++)
@@ -135,11 +143,6 @@ public class HPPCRIV extends AbstractRIV {
                                           index
                                           + " is outside the bounds of this RIV");
     return data.getOrDefault(index, 0);
-  }
-
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
   }
 
   @Override
@@ -196,11 +199,6 @@ public class HPPCRIV extends AbstractRIV {
   @Override
   public int size() {
     return size;
-  }
-
-  @Override
-  public String toString() {
-    return RIVs.toString(this);
   }
 
   @Override

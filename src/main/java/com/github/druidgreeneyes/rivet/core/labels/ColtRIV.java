@@ -2,6 +2,7 @@ package com.github.druidgreeneyes.rivet.core.labels;
 
 import static com.github.druidgreeneyes.rivet.core.util.colt.ColtConversions.procedurize;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.DoubleStream;
@@ -21,7 +22,7 @@ import cern.jet.math.tdouble.DoubleMult;
  * @author josh
  *
  */
-public class ColtRIV extends AbstractRIV {
+public class ColtRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    *
@@ -136,23 +137,21 @@ public class ColtRIV extends AbstractRIV {
     return this;
   }
 
-  public boolean equals(final ColtRIV other) {
-    return size == other.size() && super.equals(other);
+  @Override
+  public boolean equals(final RIV other) {
+    if (other instanceof ColtRIV)
+      return equals((ColtRIV) other);
+    else
+      return equals((AbstractRIV) other);
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final ColtRIV other) {
+    return size == other.size() && data.equals(other.data);
   }
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
     data.forEachPair(procedurize(fun));
-  }
-
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
   }
 
   /*
@@ -234,11 +233,6 @@ public class ColtRIV extends AbstractRIV {
   @Override
   public int size() {
     return size;
-  }
-
-  @Override
-  public String toString() {
-    return RIVs.toString(this);
   }
 
   @Override

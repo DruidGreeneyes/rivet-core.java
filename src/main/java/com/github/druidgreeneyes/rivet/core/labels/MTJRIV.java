@@ -1,5 +1,6 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.DoubleStream;
@@ -21,7 +22,7 @@ import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
  *
  * @author josh
  */
-public final class MTJRIV extends AbstractRIV {
+public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    * CEREAL
@@ -124,28 +125,22 @@ public final class MTJRIV extends AbstractRIV {
     return this;
   }
 
-  public boolean equals(final MTJRIV other) {
-    return super.equals(other);
+  public boolean equals(final RIV other) {
+    if (other instanceof MTJRIV)
+      return equals((MTJRIV) other);
+    else
+      return equals((AbstractRIV) other);
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final MTJRIV other) {
+    return data.size() == other.data.size()
+           && Arrays.equals(data.getData(), other.data.getData())
+           && Arrays.equals(data.getIndex(), other.data.getIndex());
   }
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
     data.forEach(e -> fun.accept(e.index(), e.get()));
-  }
-
-  /**
-   * Implements the hash function found in java.lang.String, using values in
-   * place of characters. Modifying the RIV is virtually guaranteed to change
-   * the hashcode.
-   */
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
   }
 
   @Override

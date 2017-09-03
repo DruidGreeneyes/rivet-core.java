@@ -1,5 +1,6 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -11,7 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public final class ArrayRIV extends AbstractRIV {
+public final class ArrayRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    *
@@ -146,13 +147,16 @@ public final class ArrayRIV extends AbstractRIV {
     return this;
   }
 
-  public boolean equals(final ArrayRIV other) {
-    return size == other.size && Arrays.deepEquals(points, other.points);
+  @Override
+  public boolean equals(final RIV other) {
+    if (other instanceof ArrayRIV)
+      return equals((ArrayRIV) other);
+    else
+      return equals((AbstractRIV) other);
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final ArrayRIV other) {
+    return size == other.size && Arrays.deepEquals(points, other.points);
   }
 
   @Override
@@ -177,11 +181,6 @@ public final class ArrayRIV extends AbstractRIV {
       throw new IndexOutOfBoundsException(
                                           "Index " + index
                                           + " is outside the bounds of this vector.");
-  }
-
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
   }
 
   @Override

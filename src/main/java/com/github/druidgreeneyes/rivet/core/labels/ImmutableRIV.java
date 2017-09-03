@@ -1,5 +1,6 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.function.DoubleBinaryOperator;
@@ -16,7 +17,7 @@ import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.util.hilbert.Hilbert;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public class ImmutableRIV extends AbstractRIV {
+public class ImmutableRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    *
@@ -134,14 +135,17 @@ public class ImmutableRIV extends AbstractRIV {
     return map(divideBy(scalar));
   }
 
+  @Override
+  public boolean equals(final RIV other) {
+    if (other instanceof ImmutableRIV)
+      return equals((ImmutableRIV) other);
+    else
+      return equals((AbstractRIV) other);
+  }
+
   public boolean equals(final ImmutableRIV other) {
     return size == other.size && Arrays.equals(keys, other.keys)
            && Arrays.equals(vals, other.vals);
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    return RIVs.equals(this, obj);
   }
 
   @Override

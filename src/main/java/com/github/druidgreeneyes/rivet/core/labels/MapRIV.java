@@ -1,5 +1,6 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
+import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
  *
  * @author josh
  */
-public final class MapRIV extends AbstractRIV {
+public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    * CEREAL
@@ -183,13 +184,16 @@ public final class MapRIV extends AbstractRIV {
     return this;
   }
 
-  public boolean equals(final MapRIV other) {
-    return size == other.size() && super.equals(other);
+  @Override
+  public boolean equals(final RIV other) {
+    if (other instanceof MapRIV)
+      return equals((MapRIV) other);
+    else
+      return equals((AbstractRIV) other);
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final MapRIV other) {
+    return size == other.size() && data.equals(other.data);
   }
 
   @Override
@@ -207,16 +211,6 @@ public final class MapRIV extends AbstractRIV {
     final MutableDouble v = data.get(index);
     if (null == v) return otherVal;
     return v.getValue();
-  }
-
-  /**
-   * Implements the hash function found in java.lang.String, using values in
-   * place of characters. Modifying the RIV is virtually guaranteed to change
-   * the hashcode.
-   */
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
   }
 
   @Override
@@ -266,6 +260,7 @@ public final class MapRIV extends AbstractRIV {
     return stream().map(VectorElement::elt);
   }
 
+  @Override
   public double put(final int index, final double value) {
     return data.put(index, new MutableDouble(value)).getValue();
   }

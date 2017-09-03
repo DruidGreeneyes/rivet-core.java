@@ -1,12 +1,9 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
 import java.io.Serializable;
-import java.util.stream.DoubleStream;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import org.apache.commons.lang3.ArrayUtils;
 
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
-import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 public abstract class AbstractRIV implements RIV, Serializable {
@@ -26,13 +23,7 @@ public abstract class AbstractRIV implements RIV, Serializable {
   }
 
   @Override
-  public abstract boolean contains(final int index);
-
-  @Override
   public abstract AbstractRIV copy();
-
-  @Override
-  public abstract int count();
 
   @Override
   public abstract AbstractRIV destructiveAdd(final RIV other);
@@ -61,17 +52,28 @@ public abstract class AbstractRIV implements RIV, Serializable {
   }
 
   @Override
-  public abstract boolean equals(Object other);
+  public double dot(final RIV riv) {
+    double sum = 0;
+    for (final VectorElement p : points())
+      sum += p.value() * riv.get(p.index());
+    return sum;
+  }
 
   @Override
-  public boolean equals(final RIV other) {
+  public boolean equals(final Object other) {
     if (this == other)
       return true;
-    if (size() != other.size())
-      return false;
+    else if (ArrayUtils.contains(other.getClass().getInterfaces(), RIV.class))
+      return equals(other);
     else
-      for (int i = 0; i < size(); i++)
-      if (!Util.doubleEquals(get(i), other.get(i)))
+      return false;
+  }
+
+  public abstract boolean equals(final RIV other);
+
+  public boolean equals(final AbstractRIV other) {
+    for (int i = 0; i < other.size(); i++)
+      if (get(i) != other.get(i))
         return false;
     return true;
   }
@@ -80,22 +82,21 @@ public abstract class AbstractRIV implements RIV, Serializable {
   public void forEach(final IntDoubleConsumer fun) {
     for (int i = 0; i < size(); i++)
       fun.accept(i, get(i));
+  };
+
+  /**
+   * Implements the hash function found in java.lang.String, using values in
+   * place of characters. Modifying the RIV is virtually guaranteed to change
+   * the hashcode.
+   */
+  @Override
+  public int hashCode() {
+    int sum = 0;
+    final double[] vals = valArr();
+    for (int i = 0; i < vals.length; i++)
+      sum += vals[i] * (31 ^ vals.length - 1 - i);
+    return sum;
   }
-
-  @Override
-  public abstract void forEachNZ(IntDoubleConsumer fun);
-
-  @Override
-  public abstract double get(final int index) throws IndexOutOfBoundsException;
-
-  @Override
-  public abstract int hashCode();
-
-  @Override
-  public abstract int[] keyArr();
-
-  @Override
-  public abstract IntStream keyStream();
 
   @Override
   public double magnitude() {
@@ -117,15 +118,6 @@ public abstract class AbstractRIV implements RIV, Serializable {
                                       final int times);
 
   @Override
-  public abstract VectorElement[] points();
-
-  @Override
-  public abstract Stream<VectorElement> pointStream();
-
-  @Override
-  public abstract double put(final int index, final double value);
-
-  @Override
   public AbstractRIV removeZeros() {
     return copy().destructiveRemoveZeros();
   }
@@ -137,11 +129,11 @@ public abstract class AbstractRIV implements RIV, Serializable {
 
   @Override
   public double similarityTo(final RIV riv) {
-    return RIVs.similarity(this, riv);
+    final double mag = magnitude() * riv.magnitude();
+    return mag == 0
+                    ? 0
+                    : dot(riv) / mag;
   }
-
-  @Override
-  public abstract int size();
 
   @Override
   public AbstractRIV subtract(final RIV... rivs) {
@@ -165,17 +157,12 @@ public abstract class AbstractRIV implements RIV, Serializable {
 
   @Override
   public String toString() {
+    destructiveRemoveZeros();
     final StringBuilder sb = new StringBuilder();
-    forEachNZ((i, v) -> {
-      sb.append(String.format("%d|%f ", i, v));
-    });
+    for (int i = 0; i < size(); i++)
+      if (contains(i))
+        sb.append(String.format("%d|%f ", i, get(i)));
     sb.append(size());
     return sb.toString();
   }
-
-  @Override
-  public abstract double[] valArr();
-
-  @Override
-  public abstract DoubleStream valStream();
 }
