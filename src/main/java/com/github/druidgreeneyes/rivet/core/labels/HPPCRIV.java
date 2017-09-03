@@ -34,9 +34,9 @@ public class HPPCRIV extends AbstractRIV {
   }
 
   public HPPCRIV(final int[] indices, final double[] values, final int size) {
-    this(size);
-    for (int i = 0; i < indices.length; i++)
-      data.put(indices[i], values[i]);
+    this.size = size;
+    data = IntDoubleHashMap.from(indices, values);
+    data.ensureCapacity(size);
   }
 
   public HPPCRIV(final RIV riv) {
@@ -64,41 +64,31 @@ public class HPPCRIV extends AbstractRIV {
   public int count() {
     return data.size();
   }
-
+  
   @Override
   public HPPCRIV destructiveAdd(final RIV other) {
-    for (final int i : other.keyArr()) {
-      final double v = other.get(i);
-      if (!Util.doubleEquals(v, 0))
-        data.addTo(i, v);
-    }
+    other.forEachNZ(data::addTo);
     return this;
   }
 
   @Override
   public HPPCRIV destructiveAdd(final RIV... rivs) {
-    for (int i = 0; i < size; i++) {
-      double v = get(i);
-      final double vv = v;
-      for (final RIV riv : rivs)
-        v += riv.get(i);
-      if (!Util.doubleEquals(v, 0))
-        data.put(i, v);
-      else if (!Util.doubleEquals(vv, 0))
-        data.remove(i);
-    }
+    for (int i = 0; i < rivs.length; i++)
+      destructiveAdd(rivs[i]);
     return this;
   }
 
   @Override
   public HPPCRIV destructiveDiv(final double scalar) {
-    data.forEach((IntDoubleProcedure) (k, v) -> data.put(k, v / scalar));
+    for (int i = 0; i < data.values.length; i++)
+      data.values[i] /= scalar;
     return this;
   }
 
   @Override
   public HPPCRIV destructiveMult(final double scalar) {
-    data.forEach((IntDoubleProcedure) (k, v) -> data.put(k, v * scalar));
+    for (int i = 0; i < data.values.length; i++)
+      data.values[i] *= scalar;
     return this;
   }
 
@@ -110,22 +100,14 @@ public class HPPCRIV extends AbstractRIV {
 
   @Override
   public HPPCRIV destructiveSub(final RIV other) {
-    for (final int i : other.keyArr())
-      data.addTo(i, -other.get(i));
+    other.forEachNZ((i, v) -> data.addTo(i, -v));
     return this;
   }
 
   @Override
   public HPPCRIV destructiveSub(final RIV... rivs) {
-    for (int i = 0; i < size; i++) {
-      double v = get(i);
-      for (final RIV riv : rivs)
-        v -= riv.get(i);
-      if (v == 0)
-        data.remove(i);
-      else
-        data.put(i, v);
-    }
+    for (int i = 0; i < rivs.length; i++)
+      destructiveSub(rivs[i]);
     return this;
   }
 
@@ -136,8 +118,14 @@ public class HPPCRIV extends AbstractRIV {
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
-    final IntDoubleProcedure f = fun::accept;
-    data.forEach(f);
+    for (int i = 0; i < data.keys.length; i++)
+      fun.accept(data.keys[i], data.values[i]);
+  }
+  
+  @Override
+  public void forEach(final IntDoubleConsumer fun) {
+    for (int i = 0; i < size; i++)
+      fun.accept(i, get(i));
   }
 
   @Override
@@ -162,11 +150,6 @@ public class HPPCRIV extends AbstractRIV {
         keys[j++] = i;
     return keys;
   }
-
-  /*
-   * public boolean equals(final HPPCRIV other) { return size == other.size &&
-   * super.equals(other); }
-   */
 
   @Override
   public IntStream keyStream() {

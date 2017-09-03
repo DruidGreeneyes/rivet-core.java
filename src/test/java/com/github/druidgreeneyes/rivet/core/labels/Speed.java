@@ -8,11 +8,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Optional;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Test;
@@ -22,30 +21,35 @@ public class Speed {
 
   private static final Path path = Paths.get("resources/test/hilbert/data");
   private static final String[] DOCUMENTS = getDocuments(path);
+  private static final double iterations = 1000;
 
   private static Class<?>[] classes = new Class<?>[] {
       MapRIV.class,
       ArrayRIV.class,
       ColtRIV.class,
-      HPPCRIV.class,
+      //HPPCRIV.class,
       MTJRIV.class,
-      DenseRIV.class
+      //DenseRIV.class
   };
 
   @Test
   public void test() {
-    new Random()
-                .ints(0, classes.length)
-                .limit(1000000)
+      IntStream.iterate(0, i -> (i + 1) % classes.length)
+                .limit((long) iterations)
                 .parallel()
                 .mapToObj(i -> classes[i])
                 .map(c -> {
                   final double start = System.nanoTime();
                   example(c);
-                  final double time = (System.nanoTime() - start) / 1000000;
+                  final double time = (System.nanoTime() - start) / 1000000000;
                   return ImmutablePair.of(c, time);
                 })
-                .collect(Collectors.groupingBy((final ImmutablePair<Class<?>, Double> p) -> p.left));
+                .collect(Collectors.groupingByConcurrent(p -> p.left,
+                                                         Collectors.averagingDouble(p -> p.right)))
+                .entrySet()
+                .stream()
+                .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
+                .forEachOrdered(e -> System.out.format("%s:\t%fs\n", e.getKey(), e.getValue()));
   }
 
   private void example(final Class<?> rivClass) {
