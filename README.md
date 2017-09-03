@@ -166,3 +166,16 @@ rivs.reduce(MapRIV.empty(); RIV::destructiveAdd);
 ```
 
 either way, you're starting with an empty and making destructive modifications to that instead of to something else you might want to use later.
+
+## SRSLY THO, WHICH ONE DO I USE?
+
+I don't have a real answer for that; this library is a work in progress. MapRIV has had the most work done on it, but quantity of work doesn't bear a consistent relationship with quality of product. Test coverage is identical for each, so one should be as stable as the next. As far as speed goes, here are the most recent results of running the above example 250 times against each of the following riv classes and averaging the execution times:
+
+class com.github.druidgreeneyes.rivet.core.labels.MTJRIV:	1.217055s
+class com.github.druidgreeneyes.rivet.core.labels.ArrayRIV:	1.329052s
+class com.github.druidgreeneyes.rivet.core.labels.MapRIV:	3.252606s
+class com.github.druidgreeneyes.rivet.core.labels.ColtRIV:	4.813925s
+
+Note that HPPCRIV is not currently included in the speed tests because it tests at 30-50s/run, which is obscene and given the claims they make on their website (google 'carrotsearch hppc') it seems more likely to be cause by misuse rather than any quality inherent in the library itself. i.e. it's probably my fault, so I'm going to keep trying to get it right.
+
+Note that also that the size of the input data is the 500-odd text files found in resource/test/hilbert/data, most of which are pretty small.
