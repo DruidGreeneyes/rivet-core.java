@@ -23,12 +23,12 @@ public class Speed {
 
   private static final Path path = Paths.get("resources/test/hilbert/data");
   private static final String[] DOCUMENTS = getDocuments(path);
-  private static final double iterations = 1000;
+  private static final double iterations = 100;
 
   private static Class<?>[] classes = new Class<?>[] {
-      MapRIV.class,
+      // MapRIV.class,
       ArrayRIV.class,
-      ColtRIV.class,
+      // ColtRIV.class,
       // HPPCRIV.class,
       MTJRIV.class,
   };

@@ -3,6 +3,7 @@ package com.github.druidgreeneyes.rivet.core.labels;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -127,7 +128,8 @@ public class HPPCRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
-    data.forEach((final IntDoubleCursor c) -> fun.accept(c.key, c.value));
+    final Consumer<IntDoubleCursor> c = cur -> fun.accept(cur.key, cur.value);
+    data.forEach(c);
   }
 
   @Override
