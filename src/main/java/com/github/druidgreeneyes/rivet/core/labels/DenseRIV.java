@@ -1,6 +1,5 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -9,7 +8,7 @@ import java.util.stream.Stream;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public class DenseRIV implements RIV, Serializable {
+public class DenseRIV extends AbstractRIV {
 
   /**
    *
@@ -22,7 +21,7 @@ public class DenseRIV implements RIV, Serializable {
     vector = Arrays.copyOf(densePoints, densePoints.length);
   }
 
-  private DenseRIV(final int size) {
+  public DenseRIV(final int size) {
     vector = new double[size];
     Arrays.fill(vector, 0);
   }
@@ -231,6 +230,7 @@ public class DenseRIV implements RIV, Serializable {
     return keyStream().mapToObj(i -> VectorElement.elt(i, vector[i]));
   }
 
+  @Override
   public double put(final int index, final double value) {
     final double v = vector[index];
     vector[index] = value;
@@ -289,7 +289,8 @@ public class DenseRIV implements RIV, Serializable {
     return new DenseRIV(points, size);
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, DenseRIV::new);
   }
 
@@ -298,6 +299,11 @@ public class DenseRIV implements RIV, Serializable {
                              final CharSequence text,
                              final int tokenStart,
                              final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, DenseRIV::new);
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            DenseRIV::new);
+  }
+
+  public static RIVConstructor getConstructor() {
+    return DenseRIV::new;
   }
 }

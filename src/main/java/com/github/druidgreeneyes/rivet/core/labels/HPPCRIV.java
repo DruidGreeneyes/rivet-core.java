@@ -1,6 +1,5 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.DoubleStream;
@@ -14,7 +13,7 @@ import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
+public class HPPCRIV extends AbstractRIV {
 
   /**
    *
@@ -22,37 +21,38 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
   private static final long serialVersionUID = 7489480432514925162L;
 
   private final int size;
+  private final IntDoubleHashMap data;
 
   public HPPCRIV(final HPPCRIV riv) {
-    super(riv);
+    data = new IntDoubleHashMap(riv.data);
     size = riv.size;
   }
 
   public HPPCRIV(final int size) {
-    super();
+    data = new IntDoubleHashMap();
     this.size = size;
   }
 
   public HPPCRIV(final int[] indices, final double[] values, final int size) {
     this(size);
     for (int i = 0; i < indices.length; i++)
-      put(indices[i], values[i]);
+      data.put(indices[i], values[i]);
   }
 
   public HPPCRIV(final RIV riv) {
     this(riv.size());
-    riv.forEachNZ(this::put);
+    riv.forEachNZ(data::put);
   }
 
   public HPPCRIV(final VectorElement[] points, final int size) {
     this(size);
     for (final VectorElement point : points)
-      put(point.index(), point.value());
+      data.put(point.index(), point.value());
   }
 
   @Override
   public boolean contains(final int index) {
-    return super.containsKey(index);
+    return data.containsKey(index);
   }
 
   @Override
@@ -62,7 +62,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
 
   @Override
   public int count() {
-    return super.size();
+    return data.size();
   }
 
   @Override
@@ -70,7 +70,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     for (final int i : other.keyArr()) {
       final double v = other.get(i);
       if (!Util.doubleEquals(v, 0))
-                                    addTo(i, v);
+        data.addTo(i, v);
     }
     return this;
   }
@@ -83,35 +83,35 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
       for (final RIV riv : rivs)
         v += riv.get(i);
       if (!Util.doubleEquals(v, 0))
-        put(i, v);
+        data.put(i, v);
       else if (!Util.doubleEquals(vv, 0))
-                                          remove(i);
+        data.remove(i);
     }
     return this;
   }
 
   @Override
   public HPPCRIV destructiveDiv(final double scalar) {
-    forEach((IntDoubleProcedure) (k, v) -> put(k, v / scalar));
+    data.forEach((IntDoubleProcedure) (k, v) -> data.put(k, v / scalar));
     return this;
   }
 
   @Override
   public HPPCRIV destructiveMult(final double scalar) {
-    forEach((IntDoubleProcedure) (k, v) -> put(k, v * scalar));
+    data.forEach((IntDoubleProcedure) (k, v) -> data.put(k, v * scalar));
     return this;
   }
 
   @Override
   public HPPCRIV destructiveRemoveZeros() {
-    removeAll((IntDoublePredicate) (k, v) -> Util.doubleEquals(v, 0.0));
+    data.removeAll((IntDoublePredicate) (k, v) -> Util.doubleEquals(v, 0.0));
     return this;
   }
 
   @Override
   public HPPCRIV destructiveSub(final RIV other) {
     for (final int i : other.keyArr())
-      addTo(i, -other.get(i));
+      data.addTo(i, -other.get(i));
     return this;
   }
 
@@ -122,9 +122,9 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
       for (final RIV riv : rivs)
         v -= riv.get(i);
       if (v == 0)
-        remove(i);
+        data.remove(i);
       else
-        put(i, v);
+        data.put(i, v);
     }
     return this;
   }
@@ -137,16 +137,16 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
     final IntDoubleProcedure f = fun::accept;
-    super.forEach(f);
+    data.forEach(f);
   }
 
   @Override
   public double get(final int index) throws IndexOutOfBoundsException {
     if (size <= index || index < 0)
-                                    throw new IndexOutOfBoundsException(
-                                                                        index
-                                                                        + " is outside the bounds of this RIV");
-    return getOrDefault(index, 0);
+      throw new IndexOutOfBoundsException(
+                                          index
+                                          + " is outside the bounds of this RIV");
+    return data.getOrDefault(index, 0);
   }
 
   @Override
@@ -159,7 +159,7 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     final int[] keys = new int[count()];
     for (int i = 0, j = 0; i < size; i++)
       if (!Util.doubleEquals(get(i), 0))
-                                         keys[j++] = i;
+        keys[j++] = i;
     return keys;
   }
 
@@ -179,8 +179,12 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
       return this;
     else
       return new HPPCRIV(times > 0
-                                   ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                                   : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                   ? RIVs.permuteKeys(keyArr(),
+                                                      permutations.permute,
+                                                      times)
+                                   : RIVs.permuteKeys(keyArr(),
+                                                      permutations.inverse,
+                                                      -times),
                          valArr(),
                          size);
   }
@@ -189,9 +193,9 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
   public VectorElement[] points() {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
-    forEach((IntDoubleProcedure) (k,
-                                  v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
-                                                                                        v));
+    data.forEach((IntDoubleProcedure) (k,
+                                       v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
+                                                                                             v));
     Arrays.sort(points);
     return points;
   }
@@ -199,6 +203,11 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
   @Override
   public Stream<VectorElement> pointStream() {
     return Arrays.stream(points());
+  }
+
+  @Override
+  public double put(final int index, final double value) {
+    return data.put(index, value);
   }
 
   @Override
@@ -239,7 +248,8 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
     return new HPPCRIV(elements, size);
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, HPPCRIV::new);
   }
 
@@ -248,6 +258,11 @@ public class HPPCRIV extends IntDoubleHashMap implements RIV, Serializable {
                              final CharSequence text,
                              final int tokenStart,
                              final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, HPPCRIV::new);
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            HPPCRIV::new);
+  }
+
+  public static RIVConstructor getConstructor() {
+    return HPPCRIV::new;
   }
 }

@@ -21,7 +21,7 @@ import cern.jet.math.tdouble.DoubleMult;
  * @author josh
  *
  */
-public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
+public class ColtRIV extends AbstractRIV {
 
   /**
    *
@@ -29,34 +29,34 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   private static final long serialVersionUID = 7489480432514925162L;
 
   public final int size;
+  private final OpenIntDoubleHashMap data;
 
   public ColtRIV(final int size) {
-    super();
     this.size = size;
+    data = new OpenIntDoubleHashMap();
   }
 
   public ColtRIV(final int[] indices, final double[] values, final int size) {
-    super();
+    data = new OpenIntDoubleHashMap();
     for (int i = 0; i < indices.length; i++)
-      put(indices[i], values[i]);
+      data.put(indices[i], values[i]);
     this.size = size;
   }
 
   public ColtRIV(final RIV riv) {
     this(riv.size());
-    riv.forEachNZ(this::put);
+    riv.forEachNZ(data::put);
   }
 
   public ColtRIV(final VectorElement[] points, final int size) {
-    super();
-    this.size = size;
+    this(size);
     for (final VectorElement point : points)
-      put(point.index(), point.value());
+      data.put(point.index(), point.value());
   }
 
   @Override
   public boolean contains(final int index) throws IndexOutOfBoundsException {
-    return containsKey(index);
+    return data.containsKey(index);
   }
 
   @Override
@@ -66,13 +66,13 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
   @Override
   public int count() {
-    return super.size();
+    return data.size();
   }
 
   @Override
   public ColtRIV destructiveAdd(final RIV other) {
     for (final int i : other.keyArr())
-      put(i, get(i) + other.get(i));
+      data.put(i, get(i) + other.get(i));
     return this;
   }
 
@@ -83,42 +83,42 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
       for (final RIV riv : rivs)
         v += riv.get(i);
       if (v == 0)
-        removeKey(i);
+        data.removeKey(i);
       else
-        put(i, v);
+        data.put(i, v);
     }
     return this;
   }
 
   @Override
   public ColtRIV destructiveDiv(final double scalar) {
-    assign(DoubleMult.div(scalar));
+    data.assign(DoubleMult.div(scalar));
     return this;
   }
 
   @Override
   public ColtRIV destructiveMult(final double scalar) {
-    assign(DoubleMult.mult(scalar));
+    data.assign(DoubleMult.mult(scalar));
     return this;
   }
 
   @Override
   public ColtRIV destructiveRemoveZeros() {
     int i;
-    while (Integer.MIN_VALUE != (i = keyOf(0.0)))
-      removeKey(i);
+    while (Integer.MIN_VALUE != (i = data.keyOf(0.0)))
+      data.removeKey(i);
     return this;
   }
 
   /*
-   * @Override public ColtRIV add(final RIV other) throws SizeMismatchException {
-   * return copy().destructiveAdd(other); }
+   * @Override public ColtRIV add(final RIV other) throws SizeMismatchException
+   * { return copy().destructiveAdd(other); }
    */
 
   @Override
   public ColtRIV destructiveSub(final RIV other) {
     for (final int i : other.keyArr())
-      put(i, get(i) - other.get(i));
+      data.put(i, get(i) - other.get(i));
     return this;
   }
 
@@ -129,9 +129,9 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
       for (final RIV riv : rivs)
         v -= riv.get(i);
       if (v == 0)
-        removeKey(i);
+        data.removeKey(i);
       else
-        put(i, v);
+        data.put(i, v);
     }
     return this;
   }
@@ -147,7 +147,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
-    super.forEachPair(procedurize(fun));
+    data.forEachPair(procedurize(fun));
   }
 
   @Override
@@ -165,7 +165,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     final int[] keys = new int[count()];
     int c = 0;
     for (int i = 0; i < size; i++)
-      if (containsKey(i)) {
+      if (data.containsKey(i)) {
         keys[c] = i;
         c++;
       }
@@ -178,8 +178,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   }
 
   /*
-   * @Override public double magnitude() { return Math.sqrt(valStream().map(x -> x
-   * * x) .sum()); }
+   * @Override public double magnitude() { return Math.sqrt(valStream().map(x ->
+   * x * x) .sum()); }
    *
    * @Override public ColtRIV multiply(final double scalar) { return
    * copy().destructiveMult(scalar); }
@@ -191,24 +191,28 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
       return this;
     else
       return new ColtRIV(times > 0
-                                   ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                                   : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                   ? RIVs.permuteKeys(keyArr(),
+                                                      permutations.permute,
+                                                      times)
+                                   : RIVs.permuteKeys(keyArr(),
+                                                      permutations.inverse,
+                                                      -times),
                          valArr(),
                          size);
   }
 
   /*
-   * @Override public ColtRIV normalize() { final double mag = magnitude(); final
-   * ColtRIV res = copy(); res.assign(x -> x / mag); return res; }
+   * @Override public ColtRIV normalize() { final double mag = magnitude();
+   * final ColtRIV res = copy(); res.assign(x -> x / mag); return res; }
    */
 
   @Override
   public VectorElement[] points() {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
-    forEachPair(procedurize((k,
-                             v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
-                                                                                   v)));
+    data.forEachPair(procedurize((k,
+                                  v) -> points[c.getAndIncrement()] = VectorElement.elt(k,
+                                                                                        v)));
     Arrays.sort(points);
     return points;
   }
@@ -216,8 +220,15 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   @Override
   public Stream<VectorElement> pointStream() {
     final Stream.Builder<VectorElement> sb = Stream.builder();
-    forEachPair(procedurize((k, v) -> sb.accept(VectorElement.elt(k, v))));
+    data.forEachPair(procedurize((k, v) -> sb.accept(VectorElement.elt(k, v))));
     return sb.build();
+  }
+
+  @Override
+  public double put(final int index, final double value) {
+    final double v = get(index);
+    data.put(index, value);
+    return v;
   }
 
   @Override
@@ -235,7 +246,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     final double[] vals = new double[count()];
     int c = 0;
     for (int i = 0; i < size; i++)
-      if (containsKey(i)) {
+      if (data.containsKey(i)) {
         vals[c] = get(i);
         c++;
       }
@@ -250,7 +261,7 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
   @Override
   public DoubleStream valStream() {
     final DoubleStream.Builder sb = DoubleStream.builder();
-    forEachPair(procedurize((k, v) -> sb.accept(v)));
+    data.forEachPair(procedurize((k, v) -> sb.accept(v)));
     return sb.build();
   }
 
@@ -273,7 +284,8 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
     return new ColtRIV(elements, size);
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, ColtRIV::new);
   }
 
@@ -282,6 +294,19 @@ public class ColtRIV extends OpenIntDoubleHashMap implements RIV {
                              final CharSequence text,
                              final int tokenStart,
                              final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, ColtRIV::new);
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            ColtRIV::new);
+  }
+
+  @Override
+  public double get(final int index) {
+    if (data.containsKey(index))
+      return data.get(index);
+    else
+      return 0.0;
+  }
+
+  public static RIVConstructor getConstructor() {
+    return ColtRIV::new;
   }
 }

@@ -16,7 +16,12 @@ import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.util.hilbert.Hilbert;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public class ImmutableRIV implements RIV {
+public class ImmutableRIV extends AbstractRIV {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 7011804132968569416L;
 
   private static final DoubleBinaryOperator add = (a, b) -> a + b;
 
@@ -73,7 +78,7 @@ public class ImmutableRIV implements RIV {
   }
 
   @Override
-  public RIV copy() {
+  public ImmutableRIV copy() {
     return new ImmutableRIV(keys, vals, size);
   }
 
@@ -298,6 +303,11 @@ public class ImmutableRIV implements RIV {
   }
 
   @Override
+  public double put(final int index, final double value) {
+    throw new NotImplementedException("Cannot make destructive modifications to ImmutableRIV.");
+  }
+
+  @Override
   public ImmutableRIV removeZeros() {
     return this;
   }
@@ -373,6 +383,10 @@ public class ImmutableRIV implements RIV {
                              final int tokenWidth) {
     return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
                             ImmutableRIV::new);
+  }
+
+  public static RIVConstructor getConstructor() {
+    return ImmutableRIV::new;
   }
 
   private static DoubleUnaryOperator multiplyBy(final double scalar) {
