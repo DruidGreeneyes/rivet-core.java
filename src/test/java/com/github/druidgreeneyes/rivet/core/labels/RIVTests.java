@@ -488,6 +488,7 @@ public class RIVTests {
         ArrayRIV.class,
         ColtRIV.class,
         HPPCRIV.class,
+        KoloRIV.class,
         MapRIV.class,
         MTJRIV.class
     });

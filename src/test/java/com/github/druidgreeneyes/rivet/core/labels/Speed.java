@@ -26,11 +26,12 @@ public class Speed {
   private static final double iterations = 100;
 
   private static Class<?>[] classes = new Class<?>[] {
-      // MapRIV.class,
       ArrayRIV.class,
       // ColtRIV.class,
       // HPPCRIV.class,
-      MTJRIV.class,
+      KoloRIV.class,
+      MapRIV.class,
+      MTJRIV.class
   };
 
   @Test
