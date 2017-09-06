@@ -16,8 +16,9 @@ import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 /**
- * Implementation of RIV that uses ConcurrentHashMap<Integer, Double> to store data. Has proven to
- * be significantly faster than array-based representations of RIVs when doing vector arithmetic.
+ * Implementation of RIV that uses ConcurrentHashMap<Integer, Double> to store
+ * data. Has proven to be significantly faster than array-based representations
+ * of RIVs when doing vector arithmetic.
  *
  * @author josh
  */
@@ -71,7 +72,8 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   public MTJRIV destructiveAdd(final MTJRIV... rivs) {
-    for (int i = 0; i < rivs.length; i++) destructiveAdd(rivs[i]);
+    for (final MTJRIV riv : rivs)
+      destructiveAdd(riv);
     return this;
   }
 
@@ -84,7 +86,8 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public MTJRIV destructiveAdd(final RIV... rivs) {
-    for (int i = 0; i < rivs.length; i++) destructiveAdd(rivs[i]);
+    for (final RIV riv : rivs)
+      destructiveAdd(riv);
     return this;
   }
 
@@ -94,8 +97,8 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   /**
-   * An optimized, destructive, element-wise multiplier; do not use when you'll have to reference
-   * the original structure later.
+   * An optimized, destructive, element-wise multiplier; do not use when you'll
+   * have to reference the original structure later.
    *
    * @param scalar
    * @return multiplies every element in this by scalar, then returns this.
@@ -125,18 +128,20 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   public MTJRIV destructiveSub(final MTJRIV other) {
-    this.data.add(-1, other);
+    data.add(-1, other.data);
     return this;
   }
 
   @Override
   public MTJRIV destructiveSub(final RIV... rivs) {
-    for (int i = 0; i < rivs.length; i++) destructiveSub(rivs[i]);
+    for (final RIV riv : rivs)
+      destructiveSub(riv);
     return this;
   }
 
   public MTJRIV destructiveSub(final MTJRIV... rivs) {
-    for (int i = 0; i < rivs.length; i++) destructiveSub(rivs[i]);
+    for (final MTJRIV riv : rivs)
+      destructiveSub(riv);
     return this;
   }
 
@@ -150,8 +155,8 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
 
   public boolean equals(final MTJRIV other) {
     return data.size() == other.data.size()
-        && Arrays.equals(data.getData(), other.data.getData())
-        && Arrays.equals(data.getIndex(), other.data.getIndex());
+           && Arrays.equals(data.getData(), other.data.getData())
+           && Arrays.equals(data.getIndex(), other.data.getIndex());
   }
 
   @Override
@@ -174,11 +179,15 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
     if (times == 0) return this;
     else
       return new MTJRIV(
-          times > 0
-              ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-              : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
-          valArr(),
-          data.size());
+                        times > 0
+                                  ? RIVs.permuteKeys(keyArr(),
+                                                     permutations.permute,
+                                                     times)
+                                  : RIVs.permuteKeys(keyArr(),
+                                                     permutations.inverse,
+                                                     -times),
+                        valArr(),
+                        data.size());
   }
 
   /*
@@ -219,12 +228,6 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
     return v;
   }
 
-  /*
-   * @Override public MapRIV subtract(final RIV other) throws
-   * SizeMismatchException { return copy().destructiveSub(other)
-   * .destructiveRemoveZeros(); }
-   */
-
   @Override
   public int size() {
     return data.size();
@@ -243,7 +246,8 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
     // "0|1 1|3 4|2 5"
     // "I|V I|V I|V Size"
     final StringBuilder sb = new StringBuilder();
-    for (final VectorElement point : points()) sb.append(point.toString() + " ");
+    for (final VectorElement point : points())
+      sb.append(point.toString() + " ");
     sb.append(data.size());
     return sb.toString();
   }
@@ -263,7 +267,9 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   /**
-   * @param rivString : A string representation of a RIV, generally got by calling RIV.toString().
+   * @param rivString
+   *          : A string representation of a RIV, generally got by calling
+   *          RIV.toString().
    * @return a MapRIV
    */
   public static MTJRIV fromString(final String rivString) {
@@ -274,23 +280,26 @@ public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
     final MTJRIV res = new MTJRIV(size);
     for (final String s : pointStrings) {
       final String[] elt = s.split("\\|");
-      if (elt.length != 2) throw new IndexOutOfBoundsException("Wrong number of partitions: " + s);
+      if (elt.length != 2)
+        throw new IndexOutOfBoundsException("Wrong number of partitions: " + s);
       else res.data.add(Integer.parseInt(elt[0]), Double.parseDouble(elt[1]));
     }
     return res.destructiveRemoveZeros();
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, MTJRIV::new);
   }
 
   public static RIV generate(
-      final int size,
-      final int nnz,
-      final CharSequence text,
-      final int tokenStart,
-      final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, MTJRIV::new);
+                             final int size,
+                             final int nnz,
+                             final CharSequence text,
+                             final int tokenStart,
+                             final int tokenWidth) {
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            MTJRIV::new);
   }
 
   public static RIVConstructor getConstructor() {
