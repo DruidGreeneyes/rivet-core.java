@@ -27,7 +27,7 @@ public class Speed {
 
   private static Class<?>[] classes = new Class<?>[] {
       ArrayRIV.class,
-      // ColtRIV.class,
+      ColtRIV.class,
       // HPPCRIV.class,
       KoloRIV.class,
       MapRIV.class,
