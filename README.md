@@ -26,7 +26,7 @@ If you want to peg to a particular release, you can get it from Maven:
 <dependency>
   <groupId>com.github.druidgreeneyes</groupId>
   <artifactId>rivet-core</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
 </dependency>
 
 ```
@@ -46,7 +46,7 @@ You can also get it from jitpack.io, if you prefer:
 <dependency>
   <groupId>com.github.druidgreeneyes</groupId>
   <artifactId>rivet-core.java</artifactId>
-  <version>v1.0.0</version>
+  <version>v1.0.2</version>
 </dependency>
 
 ```
