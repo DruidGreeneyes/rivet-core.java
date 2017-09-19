@@ -9,9 +9,21 @@ import com.github.druidgreeneyes.rivet.core.labels.ArrayRIV;
 import com.github.druidgreeneyes.rivet.core.labels.ColtRIV;
 import com.github.druidgreeneyes.rivet.core.labels.DenseRIV;
 import com.github.druidgreeneyes.rivet.core.labels.HPPCRIV;
+import com.github.druidgreeneyes.rivet.core.labels.MTJRIV;
 import com.github.druidgreeneyes.rivet.core.labels.MapRIV;
 
 public class SOLR {
+  public static MTJRIV mtjRIVFromCollections(final Collection<Object> indices,
+                                             final Collection<Object> values,
+                                             final int size) {
+    final MTJRIV res = MTJRIV.empty(size);
+    final Iterator<Object> is = indices.iterator();
+    final Iterator<Object> vs = values.iterator();
+    while (is.hasNext() && vs.hasNext())
+      res.put((int) is.next(), (double) vs.next());
+    return res;
+  }
+  
   public static MapRIV mapRIVFromCollections(final Collection<Object> indices,
                                              final Collection<Object> values,
                                              final int size) {
