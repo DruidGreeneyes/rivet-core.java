@@ -19,11 +19,12 @@ public class WordLexicon {
 
   private final Function<CharSequence, RIV> rivMaker;
 
-  private final RIVTopicHeirarchy            topics;
+  private final RIVTopicHeirarchy topics;
   private final DualHashBidiMap<String, RIV> lexicon;
-  private final Permutations                 permutations;
+  private final Permutations permutations;
 
-  public WordLexicon(final int size, final int nnz, final Function<CharSequence, RIV> rivMaker,
+  public WordLexicon(final int size, final int nnz,
+                     final Function<CharSequence, RIV> rivMaker,
                      final RIVTopicHeirarchy topics,
                      final DualHashBidiMap<String, RIV> lexicon) {
     super();
@@ -35,19 +36,26 @@ public class WordLexicon {
     this.rivMaker = rivMaker;
   }
 
-  public WordLexicon(final int size, final int nnz, final RIVConstructor rivConstructor,
+  public WordLexicon(final int size, final int nnz,
+                     final RIVConstructor rivConstructor,
                      final double simThreshold) {
-    this(size, nnz, rivConstructor, RIVTopicHeirarchy.makeRoot(new NamedRIVMap(size),
-                                                               simThreshold));
+    this(size, nnz, rivConstructor,
+         RIVTopicHeirarchy.makeRoot(new NamedRIVMap(size),
+                                    simThreshold));
   }
 
-  public WordLexicon(final int size, final int nnz, final RIVConstructor rivConstructor,
+  public WordLexicon(final int size, final int nnz,
+                     final RIVConstructor rivConstructor,
                      final RIVTopicHeirarchy topics) {
     this(size, nnz, rivConstructor, topics, new DualHashBidiMap<>());
   }
 
-  public WordLexicon(final int size, final int nnz, final RIVConstructor rivConstructor, final RIVTopicHeirarchy topics, final DualHashBidiMap<String, RIV> lexicon) {
-    this(size, nnz, RIVs.makeRIVGenerator(size, nnz, rivConstructor), topics, lexicon);
+  public WordLexicon(final int size, final int nnz,
+                     final RIVConstructor rivConstructor,
+                     final RIVTopicHeirarchy topics,
+                     final DualHashBidiMap<String, RIV> lexicon) {
+    this(size, nnz, RIVs.generator(size, nnz, rivConstructor), topics,
+         lexicon);
   }
 
   public String[] assignTopicsToDocument(final RIV docRIV) {
@@ -55,7 +63,8 @@ public class WordLexicon {
   }
 
   public WordLexicon clear() {
-    return new WordLexicon(size, nnz, rivMaker, topics, new DualHashBidiMap<>());
+    return new WordLexicon(size, nnz, rivMaker, topics,
+                           new DualHashBidiMap<>());
   }
 
   public boolean contains(final String word) {
@@ -72,34 +81,35 @@ public class WordLexicon {
 
   public RIV meanVector() {
     return lexicon.values()
-        .stream()
-        .reduce(new ArrayRIV(size), RIV::destructiveAdd)
-        .divide(lexicon.size());
+                  .stream()
+                  .reduce(new ArrayRIV(size), RIV::destructiveAdd)
+                  .divide(lexicon.size());
   }
 
   public double nGramTest(final String[] parts) {
     final ArrayRIV[] rivs = Arrays.stream(parts)
-        .map(this::get)
-        .toArray(ArrayRIV[]::new);
+                                  .map(this::get)
+                                  .toArray(ArrayRIV[]::new);
     final double[][] sims = nSquaredSimilarity(rivs, true);
     return Arrays.stream(sims)
-        .flatMapToDouble(Arrays::stream)
-        .average()
-        .orElseGet(() -> 0);
+                 .flatMapToDouble(Arrays::stream)
+                 .average()
+                 .orElseGet(() -> 0);
   }
 
   private double[][] nSquaredSimilarity(final ArrayRIV[] rivs,
                                         final boolean permute) {
     final BiFunction<Integer, Integer, Double> sim = permute
-        ? (i, c) -> RIVs.similarity(rivs[i],
-                                    rivs[c].permute(permutations,
-                                                    c - i))
-        : (i, c) -> RIVs.similarity(rivs[i], rivs[c]);
-        return Util.range(rivs.length)
-            .mapToObj((i) -> Util.range(rivs.length)
-                      .mapToDouble((c) -> sim.apply(i, c))
-                      .toArray())
-            .toArray(double[][]::new);
+                                                             ? (i,
+                                                                c) -> rivs[i].similarityTo(rivs[c].permute(permutations,
+                                                                                                           c - i))
+                                                             : (i,
+                                                                c) -> rivs[i].similarityTo(rivs[c]);
+    return Util.range(rivs.length)
+               .mapToObj((i) -> Util.range(rivs.length)
+                                    .mapToDouble((c) -> sim.apply(i, c))
+                                    .toArray())
+               .toArray(double[][]::new);
   }
 
   public void set(final String word, final ArrayRIV riv) {

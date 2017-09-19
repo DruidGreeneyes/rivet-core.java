@@ -22,36 +22,33 @@ import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
  *
  * @author josh
  */
-public final class MTJRIV extends SparseVector
-                          implements
-                          RIV,
-                          Serializable {
+public final class MTJRIV extends AbstractRIV implements RIV, Serializable {
 
-  /**
-   * CEREAL
-   */
+  /** CEREAL */
   private static final long serialVersionUID = 3494261572186804173L;
 
+  private final SparseVector data;
+
   public MTJRIV(final int size) {
-    super(size);
+    data = new SparseVector(size);
   }
 
   public MTJRIV(final int[] keys, final double[] vals, final int size) {
-    super(size, keys, vals, true);
+    data = new SparseVector(size, keys, vals, true);
   }
 
   public MTJRIV(final MTJRIV riv) {
-    super(riv.size(), riv.count());
+    data = new SparseVector(riv.size(), riv.count());
     destructiveAdd(riv);
   }
 
   public MTJRIV(final RIV riv) {
-    super(riv.size(), riv.count());
+    data = new SparseVector(riv.size(), riv.count());
     destructiveAdd(riv);
   }
 
   MTJRIV(final SparseVector sv) {
-    super(sv);
+    data = new SparseVector(sv);
   }
 
   @Override
@@ -61,18 +58,29 @@ public final class MTJRIV extends SparseVector
 
   @Override
   public MTJRIV copy() {
-    return new MTJRIV(super.copy());
+    return new MTJRIV(data.copy());
   }
 
   @Override
   public int count() {
-    return super.getUsed();
+    return data.getUsed();
+  }
+
+  public MTJRIV destructiveAdd(final MTJRIV other) {
+    data.add(other.data);
+    return this;
+  }
+
+  public MTJRIV destructiveAdd(final MTJRIV... rivs) {
+    for (final MTJRIV riv : rivs)
+      destructiveAdd(riv);
+    return this;
   }
 
   @Override
   public MTJRIV destructiveAdd(final RIV other) throws SizeMismatchException {
     // assertSizeMatch(other, "Cannot add rivs of mismatched sizes.");
-    other.forEachNZ(this::add);
+    other.forEachNZ(data::add);
     return this;
   }
 
@@ -97,7 +105,7 @@ public final class MTJRIV extends SparseVector
    */
   @Override
   public MTJRIV destructiveMult(final double scalar) {
-    forEach(e -> e.set(e.get() * scalar));
+    data.scale(scalar);
     return this;
   }
 
@@ -109,13 +117,18 @@ public final class MTJRIV extends SparseVector
 
   @Override
   public MTJRIV destructiveRemoveZeros() {
-    super.compact();
+    data.compact();
     return this;
   }
 
   @Override
   public MTJRIV destructiveSub(final RIV other) throws SizeMismatchException {
     other.forEachNZ(this::sub);
+    return this;
+  }
+
+  public MTJRIV destructiveSub(final MTJRIV other) {
+    data.add(-1, other.data);
     return this;
   }
 
@@ -126,33 +139,34 @@ public final class MTJRIV extends SparseVector
     return this;
   }
 
-  public boolean equals(final MTJRIV other) {
-    return super.equals(other);
+  public MTJRIV destructiveSub(final MTJRIV... rivs) {
+    for (final MTJRIV riv : rivs)
+      destructiveSub(riv);
+    return this;
   }
 
   @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final RIV other) {
+    if (other instanceof MTJRIV) return equals((MTJRIV) other);
+    else
+      // return RIVs.equals(this, other);
+      return equals((AbstractRIV) other);
+  }
+
+  public boolean equals(final MTJRIV other) {
+    return data.size() == other.data.size()
+           && Arrays.equals(data.getData(), other.data.getData())
+           && Arrays.equals(data.getIndex(), other.data.getIndex());
   }
 
   @Override
   public void forEachNZ(final IntDoubleConsumer fun) {
-    super.forEach((e) -> fun.accept(e.index(), e.get()));
-  }
-
-  /**
-   * Implements the hash function found in java.lang.String, using values in place
-   * of characters. Modifying the RIV is virtually guaranteed to change the
-   * hashcode.
-   */
-  @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
+    data.forEach(e -> fun.accept(e.index(), e.get()));
   }
 
   @Override
   public int[] keyArr() {
-    return super.getIndex();
+    return data.getIndex();
   }
 
   @Override
@@ -162,19 +176,23 @@ public final class MTJRIV extends SparseVector
 
   @Override
   public MTJRIV permute(final Permutations permutations, final int times) {
-    if (times == 0)
-      return this;
+    if (times == 0) return this;
     else
-      return new MTJRIV(times > 0
-                                  ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                                  : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+      return new MTJRIV(
+                        times > 0
+                                  ? RIVs.permuteKeys(keyArr(),
+                                                     permutations.permute,
+                                                     times)
+                                  : RIVs.permuteKeys(keyArr(),
+                                                     permutations.inverse,
+                                                     -times),
                         valArr(),
-                        size);
+                        data.size());
   }
 
   /*
-   * @Override public double magnitude() { return Math.sqrt(valStream().map(x -> x
-   * * x) .sum()); }
+   * @Override public double magnitude() { return Math.sqrt(valStream().map(x ->
+   * x * x) .sum()); }
    *
    * @Override public MapRIV multiply(final double scalar) { return
    * copy().destructiveMult(scalar); }
@@ -186,8 +204,7 @@ public final class MTJRIV extends SparseVector
   public VectorElement[] points() {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
-    forEachNZ((a,
-               b) -> points[c.getAndIncrement()] = VectorElement.elt(a, b));
+    forEachNZ((a, b) -> points[c.getAndIncrement()] = VectorElement.elt(a, b));
     Arrays.sort(points);
     return points;
   }
@@ -204,23 +221,24 @@ public final class MTJRIV extends SparseVector
     return stream().map(e -> VectorElement.elt(e.index(), e.get()));
   }
 
-  /*
-   * @Override public MapRIV subtract(final RIV other) throws
-   * SizeMismatchException { return copy().destructiveSub(other)
-   * .destructiveRemoveZeros(); }
-   */
+  @Override
+  public double put(final int index, final double value) {
+    final double v = get(index);
+    data.set(index, value);
+    return v;
+  }
 
   @Override
   public int size() {
-    return size;
+    return data.size();
   }
 
   public Stream<VectorEntry> stream() {
-    return StreamSupport.stream(spliterator(), true);
+    return StreamSupport.stream(data.spliterator(), true);
   }
 
   private void sub(final int index, final double value) {
-    add(index, -value);
+    data.add(index, -value);
   }
 
   @Override
@@ -230,13 +248,13 @@ public final class MTJRIV extends SparseVector
     final StringBuilder sb = new StringBuilder();
     for (final VectorElement point : points())
       sb.append(point.toString() + " ");
-    sb.append(size);
+    sb.append(data.size());
     return sb.toString();
   }
 
   @Override
   public double[] valArr() {
-    return super.getData();
+    return data.getData();
   }
 
   @Override
@@ -263,23 +281,33 @@ public final class MTJRIV extends SparseVector
     for (final String s : pointStrings) {
       final String[] elt = s.split("\\|");
       if (elt.length != 2)
-        throw new IndexOutOfBoundsException(
-                                            "Wrong number of partitions: " + s);
-      else
-        res.add(Integer.parseInt(elt[0]), Double.parseDouble(elt[1]));
+        throw new IndexOutOfBoundsException("Wrong number of partitions: " + s);
+      else res.data.add(Integer.parseInt(elt[0]), Double.parseDouble(elt[1]));
     }
     return res.destructiveRemoveZeros();
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, MTJRIV::new);
   }
 
-  public static RIV generate(final int size,
+  public static RIV generate(
+                             final int size,
                              final int nnz,
                              final CharSequence text,
                              final int tokenStart,
                              final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, MTJRIV::new);
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            MTJRIV::new);
+  }
+
+  public static RIVConstructor getConstructor() {
+    return MTJRIV::new;
+  }
+
+  @Override
+  public double get(final int index) {
+    return data.get(index);
   }
 }

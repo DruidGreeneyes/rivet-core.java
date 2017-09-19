@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import com.github.druidgreeneyes.rivet.core.exceptions.SizeMismatchException;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
-import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 /**
@@ -28,13 +27,9 @@ public interface RIV {
    *          : A Random Index Vector of the same size as this one.
    * @return this + other
    */
-  default RIV add(final RIV other) {
-    return copy().destructiveAdd(other).destructiveRemoveZeros();
-  }
+  RIV add(final RIV other);
 
-  default RIV add(final RIV... rivs) {
-    return copy().destructiveAdd(rivs).destructiveRemoveZeros();
-  }
+  RIV add(final RIV... rivs);
 
   /**
    * @param index
@@ -140,22 +135,12 @@ public interface RIV {
    *          : A double
    * @return a copy of this, where each element has been divided by scalar
    */
-  default RIV divide(final double scalar) {
-    return copy().destructiveDiv(scalar).destructiveRemoveZeros();
-  }
+  RIV divide(final double scalar);
 
   @Override
   boolean equals(Object other);
 
-  default boolean equals(final RIV other) {
-    if (size() != other.size())
-      return false;
-    else
-      for (int i = 0; i < size(); i++)
-        if (!Util.doubleEquals(get(i), other.get(i)))
-          return false;
-    return true;
-  }
+  boolean equals(RIV other);
 
   /**
    * Written for the sake of making it easier to string dot-chains together.
@@ -164,16 +149,13 @@ public interface RIV {
    *          : A function that takes a RIV and returns a value.
    * @return fun.apply(this)
    */
-  default <T> T evert(final Function<RIV, T> fun) {
+  default <R> R evert(final Function<RIV, R> fun) {
     return fun.apply(this);
   }
 
+  void forEach(final IntDoubleConsumer fun);
+
   void forEachNZ(IntDoubleConsumer fun);
-  
-  default void forEach(IntDoubleConsumer fun) {
-    for (int i = 0; i < size(); i++)
-      fun.accept(i, get(i));
-  }
 
   /**
    * @param index
@@ -211,9 +193,7 @@ public interface RIV {
    *
    * @return Math.sqrt(this.valStream().map(x -> x * x).sum())
    */
-  default double magnitude() {
-    return Math.sqrt(valStream().map(x -> x * x).sum());
-  }
+  double magnitude();
 
   /**
    * Perform element-wise multiplication
@@ -222,9 +202,7 @@ public interface RIV {
    *          : A double
    * @return a copy of this, where each element has been multiplied by scalar
    */
-  default RIV multiply(final double scalar) {
-    return copy().destructiveMult(scalar);
-  }
+  RIV multiply(final double scalar);
 
   /**
    * Create a random index vector with the same proportions as this one, but
@@ -232,9 +210,7 @@ public interface RIV {
    *
    * @return this.divide(this.magnitude())
    */
-  default RIV normalize() {
-    return divide(magnitude());
-  }
+  RIV normalize();
 
   /**
    * Permute this random index vector using a specified permutation pair, one of
@@ -263,35 +239,31 @@ public interface RIV {
    */
   Stream<VectorElement> pointStream();
 
+  double put(final int index, final double value);
+
   /**
    *
    * @return a copy of this riv, sans zeros.
    */
-  default RIV removeZeros() {
-    return copy().destructiveRemoveZeros();
-  }
+  RIV removeZeros();
 
-  default double saturation() {
-    return count() / (double) size();
-  }
+  double saturation();
 
   /**
    *
    * @param riv
    * @return RIVs.similarity(this, riv)
    */
-  default double similarityTo(final RIV riv) {
-    return RIVs.similarity(this, riv);
-  }
+  double similarityTo(final RIV riv);
+
+  double dot(final RIV riv);
 
   /**
    * @return the number of dimensions in this random index vector
    */
   int size();
 
-  default RIV subtract(final RIV... rivs) {
-    return copy().destructiveSub(rivs).destructiveRemoveZeros();
-  }
+  RIV subtract(final RIV... rivs);
 
   /**
    * @param other
@@ -299,17 +271,11 @@ public interface RIV {
    * @return this - other
    * @throws SizeMismatchException
    */
-  default RIV subtract(final RIV other) {
-    return copy().destructiveSub(other).destructiveRemoveZeros();
-  }
+  RIV subtract(final RIV other);
 
-  default DenseRIV toDense() {
-    return new DenseRIV(this);
-  }
+  DenseRIV toDense();
 
-  default ImmutableRIV toImmutable() {
-    return new ImmutableRIV(this);
-  }
+  ImmutableRIV toImmutable();
 
   /**
    * <pre>

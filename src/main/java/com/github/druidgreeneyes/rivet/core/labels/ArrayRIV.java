@@ -12,7 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
-public final class ArrayRIV implements RIV, Serializable {
+public final class ArrayRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    *
@@ -32,8 +32,8 @@ public final class ArrayRIV implements RIV, Serializable {
     this.size = size;
     final int l = keys.length;
     if (l != vals.length)
-                          throw new IndexOutOfBoundsException(
-                                                              "Different quantity keys than values!");
+      throw new IndexOutOfBoundsException(
+                                          "Different quantity keys than values!");
     final VectorElement[] elts = new VectorElement[l];
     for (int i = 0; i < l; i++)
       elts[i] = VectorElement.elt(keys[i], vals[i]);
@@ -95,14 +95,14 @@ public final class ArrayRIV implements RIV, Serializable {
   }
 
   @Override
-  public RIV destructiveDiv(final double scalar) {
+  public ArrayRIV destructiveDiv(final double scalar) {
     Arrays.stream(points)
           .forEach(elt -> elt.destructiveDiv(scalar));
     return this;
   }
 
   @Override
-  public RIV destructiveMult(final double scalar) {
+  public ArrayRIV destructiveMult(final double scalar) {
     Arrays.stream(points)
           .forEach(elt -> elt.destructiveMult(scalar));
     return this;
@@ -140,20 +140,24 @@ public final class ArrayRIV implements RIV, Serializable {
   }
 
   @Override
-  public RIV destructiveSub(final RIV... rivs) {
+  public ArrayRIV destructiveSub(final RIV... rivs) {
     for (int i = 0; i < size; i++)
       for (final RIV riv : rivs)
         getPoint(i).destructiveSub(riv.get(i));
     return this;
   }
 
-  public boolean equals(final ArrayRIV other) {
-    return size == other.size && Arrays.deepEquals(points, other.points);
+  @Override
+  public boolean equals(final RIV other) {
+    if (other instanceof ArrayRIV)
+      return equals((ArrayRIV) other);
+    else
+      // return RIVs.equals(this, other);
+      return equals((AbstractRIV) other);
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    return RIVs.equals(this, other);
+  public boolean equals(final ArrayRIV other) {
+    return size == other.size && Arrays.deepEquals(points, other.points);
   }
 
   @Override
@@ -181,11 +185,6 @@ public final class ArrayRIV implements RIV, Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return RIVs.hashcode(this);
-  }
-
-  @Override
   public int[] keyArr() {
     final int[] keys = new int[points.length];
     for (int i = 0; i < points.length; i++)
@@ -210,8 +209,12 @@ public final class ArrayRIV implements RIV, Serializable {
       return this;
     else
       return new ArrayRIV(times > 0
-                                    ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
-                                    : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+                                    ? RIVs.permuteKeys(keyArr(),
+                                                       permutations.permute,
+                                                       times)
+                                    : RIVs.permuteKeys(keyArr(),
+                                                       permutations.inverse,
+                                                       -times),
                           valArr(),
                           size);
   }
@@ -224,6 +227,13 @@ public final class ArrayRIV implements RIV, Serializable {
   @Override
   public Stream<VectorElement> pointStream() {
     return Arrays.stream(points);
+  }
+
+  @Override
+  public double put(final int index, final double value) {
+    final double v = get(index);
+    destructiveSet(VectorElement.elt(index, value));
+    return v;
   }
 
   @Override
@@ -272,6 +282,10 @@ public final class ArrayRIV implements RIV, Serializable {
     return stream().mapToDouble(VectorElement::value);
   }
 
+  public static RIVConstructor getConstructor() {
+    return ArrayRIV::new;
+  }
+
   public static ArrayRIV empty(final int size) {
     return new ArrayRIV(size);
   }
@@ -287,7 +301,8 @@ public final class ArrayRIV implements RIV, Serializable {
     return new ArrayRIV(elts, size);
   }
 
-  public static RIV generate(final int size, final int nnz, final CharSequence token) {
+  public static RIV generate(final int size, final int nnz,
+                             final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, ArrayRIV::new);
   }
 
@@ -296,6 +311,7 @@ public final class ArrayRIV implements RIV, Serializable {
                              final CharSequence text,
                              final int tokenStart,
                              final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, ArrayRIV::new);
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
+                            ArrayRIV::new);
   }
 }
