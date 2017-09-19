@@ -1,24 +1,20 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
 import java.io.Serializable;
-import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.mutable.MutableDouble;
-
 import com.github.druidgreeneyes.rivet.core.exceptions.SizeMismatchException;
-import com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer;
 import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
+import com.koloboke.collect.map.hash.HashIntDoubleMap;
+import com.koloboke.collect.map.hash.HashIntDoubleMaps;
+import com.koloboke.function.IntDoubleConsumer;
+import com.koloboke.function.IntDoubleToDoubleFunction;
 
 /**
  * Implementation of RIV that uses ConcurrentHashMap<Integer, Double> to store
@@ -27,7 +23,7 @@ import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
  *
  * @author josh
  */
-public final class MapRIV extends AbstractRIV implements RIV, Serializable {
+public final class KoloRIV extends AbstractRIV implements RIV, Serializable {
 
   /**
    * CEREAL
@@ -38,58 +34,34 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    * The dimensionality of this riv.
    */
   private final int size;
-  private final ConcurrentHashMap<Integer, MutableDouble> data;
+  private final HashIntDoubleMap data;
 
-  public MapRIV(final ConcurrentHashMap<Integer, MutableDouble> points,
-                final int size) {
-    this(size);
-    points.forEach((i, v) -> _addPoint(i, v));
+  public KoloRIV(final HashIntDoubleMap points,
+                 final int size) {
+    this.size = size;
+    data = HashIntDoubleMaps.newMutableMap(points);
   }
 
-  public MapRIV(final int size) {
-    data = new ConcurrentHashMap<Integer, MutableDouble>();
+  public KoloRIV(final int size) {
+    data = HashIntDoubleMaps.newMutableMap();
     this.size = size;
   }
 
-  public MapRIV(final int[] keys, final double[] vals, final int size) {
-    this(size);
-    final int l = keys.length;
-    if (l != vals.length)
+  public KoloRIV(final int[] keys, final double[] vals, final int size) {
+    if (keys.length != vals.length)
       throw new SizeMismatchException("Different quantity keys than values!");
-    for (int i = 0; i < l; i++)
-      data.put(keys[i], new MutableDouble(vals[i]));
+    this.size = size;
+    data = HashIntDoubleMaps.newMutableMap(keys, vals);
   }
 
-  public MapRIV(final MapRIV riv) {
+  public KoloRIV(final KoloRIV riv) {
     this(riv.size);
     destructiveAdd(riv);
   }
 
-  public MapRIV(final RIV riv) {
+  public KoloRIV(final RIV riv) {
     this(riv.size());
     destructiveAdd(riv);
-  }
-
-  private void _addPoint(final Integer index, final MutableDouble value) {
-    data.compute(index, (i, v) -> {
-      if (v == null) v = new MutableDouble();
-      v.add(value);
-      return v;
-    });
-  }
-
-  private void addPoint(final int index, final double value) {
-    data.compute(index, (i, v) -> {
-      if (v == null) v = new MutableDouble();
-      v.add(value);
-      return v;
-    });
-  }
-
-  private void assertValidIndex(final int index) {
-    if (index > size || index < 0)
-      throw new IndexOutOfBoundsException("Index " + index
-                                          + " is outside the bounds of this vector.");
   }
 
   @Override
@@ -98,8 +70,8 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   @Override
-  public MapRIV copy() {
-    return new MapRIV(this);
+  public KoloRIV copy() {
+    return new KoloRIV(this);
   }
 
   @Override
@@ -107,32 +79,31 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
     return data.size();
   }
 
-  public MapRIV
-         destructiveAdd(final MapRIV other) {
-    other.data.forEach(this::_addPoint);
+  @Override
+  public KoloRIV destructiveAdd(final RIV other) {
+    other.forEachNZ(data::addValue);
     return this;
   }
 
   @Override
-  public MapRIV destructiveAdd(final RIV other) {
-    other.forEachNZ(this::addPoint);
-    return this;
-  }
-
-  @Override
-  public MapRIV destructiveAdd(final RIV... rivs) {
+  public KoloRIV destructiveAdd(final RIV... rivs) {
     for (final RIV riv : rivs)
       destructiveAdd(riv);
     return this;
   }
 
+  private static final IntDoubleToDoubleFunction div(final double scalar) {
+    return (i, v) -> v / scalar;
+  }
+
   @Override
-  public MapRIV destructiveDiv(final double scalar) {
-    data.replaceAll((k, v) -> {
-      v.setValue(v.getValue() / scalar);
-      return v;
-    });
+  public KoloRIV destructiveDiv(final double scalar) {
+    data.replaceAll(div(scalar));
     return this;
+  }
+
+  private static final IntDoubleToDoubleFunction mult(final double scalar) {
+    return (i, v) -> v * scalar;
   }
 
   /**
@@ -143,42 +114,26 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    * @return multiplies every element in this by scalar, then returns this.
    */
   @Override
-  public MapRIV destructiveMult(final double scalar) {
-    data.replaceAll((k, v) -> {
-      v.setValue(v.getValue() * scalar);
-      return v;
-    });
+  public KoloRIV destructiveMult(final double scalar) {
+    data.replaceAll(mult(scalar));
     return this;
   }
 
   @Override
-  public MapRIV destructiveRemoveZeros() {
-    for (final int i : new HashSet<>(data.keySet()))
-      data.compute(i, (k, v) -> Util.doubleEquals(v.getValue(), 0) ? null : v);
+  public KoloRIV destructiveRemoveZeros() {
+    data.removeIf((i, v) -> Util.doubleEquals(v, 0));
     return this;
   }
-
-  public MapRIV
-         destructiveSub(final MapRIV other) throws SizeMismatchException {
-    other.data.forEach((BiConsumer<Integer, MutableDouble>) this::subtractPoint);
-    return this;
-  }
-
-  /*
-   * private void assertSizeMatch(final RIV other, final String message) throws
-   * SizeMismatchException { if (size != other.size()) throw new
-   * SizeMismatchException(message); }
-   */
 
   @Override
-  public MapRIV destructiveSub(final RIV other) throws SizeMismatchException {
+  public KoloRIV destructiveSub(final RIV other) throws SizeMismatchException {
     // assertSizeMatch(other, "Cannot subtract rivs of mismatched sizes.");
     other.forEachNZ(this::subtractPoint);
     return this;
   }
 
   @Override
-  public MapRIV destructiveSub(final RIV... rivs) {
+  public KoloRIV destructiveSub(final RIV... rivs) {
     for (final RIV riv : rivs)
       destructiveSub(riv);
     return this;
@@ -186,42 +141,45 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public boolean equals(final RIV other) {
-    if (other instanceof MapRIV)
-      return equals((MapRIV) other);
+    if (other instanceof KoloRIV)
+      return equals((KoloRIV) other);
     else
       // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
   }
 
-  public boolean equals(final MapRIV other) {
+  public boolean equals(final KoloRIV other) {
     return size == other.size() && data.equals(other.data);
   }
 
   @Override
-  public void forEachNZ(final IntDoubleConsumer fun) {
-    data.forEach((i, v) -> fun.accept(i, v.getValue()));
+  public void
+         forEachNZ(final com.github.druidgreeneyes.rivet.core.util.IntDoubleConsumer fun) {
+    data.forEach((IntDoubleConsumer) (i, v) -> fun.accept(i, v));
+  }
+
+  private void
+          assertValidIndex(final int index) throws IndexOutOfBoundsException {
+    if (index < 0 || index >= size)
+      throw new IndexOutOfBoundsException("Invalid index: " + index);
   }
 
   @Override
   public double get(final int index) throws IndexOutOfBoundsException {
     assertValidIndex(index);
-    return getOrDefault(index, 0.0);
-  }
-
-  public double getOrDefault(final int index, final double otherVal) {
-    final MutableDouble v = data.get(index);
-    if (null == v) return otherVal;
-    return v.getValue();
+    return data.getOrDefault(index, 0.0);
   }
 
   @Override
   public int[] keyArr() {
-    return ArrayUtils.toPrimitive(data.keySet().toArray(new Integer[count()]));
+    final int[] res = data.keySet().toIntArray();
+    Arrays.sort(res);
+    return res;
   }
 
   @Override
   public IntStream keyStream() {
-    return data.keySet().stream().mapToInt(x -> x);
+    return Arrays.stream(keyArr());
   }
 
   /*
@@ -230,28 +188,27 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    */
 
   @Override
-  public MapRIV permute(final Permutations permutations, final int times) {
+  public KoloRIV permute(final Permutations permutations, final int times) {
     if (times == 0)
       return this;
     else
-      return new MapRIV(times > 0 ? RIVs.permuteKeys(keyArr(),
-                                                     permutations.permute,
-                                                     times)
-                                  : RIVs.permuteKeys(keyArr(),
-                                                     permutations.inverse,
-                                                     -times),
-                        valArr(),
-                        size);
+      return new KoloRIV(times > 0 ? RIVs.permuteKeys(keyArr(),
+                                                      permutations.permute,
+                                                      times)
+                                   : RIVs.permuteKeys(keyArr(),
+                                                      permutations.inverse,
+                                                      -times),
+                         valArr(),
+                         size);
   }
 
   @Override
   public VectorElement[] points() {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
-    data.forEach(10000,
-                 (a,
-                  b) -> points[c.getAndIncrement()] = VectorElement.elt(a,
-                                                                        b.getValue()));
+    data.forEach((IntDoubleConsumer) (a,
+                                      b) -> points[c.getAndIncrement()] = VectorElement.elt(a,
+                                                                                            b));
     Arrays.sort(points);
     return points;
   }
@@ -263,7 +220,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public double put(final int index, final double value) {
-    return data.put(index, new MutableDouble(value)).getValue();
+    return data.put(index, value);
   }
 
   @Override
@@ -285,10 +242,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    * @return all index/value pairs in this, as a stream
    */
   public Stream<Entry<Integer, Double>> stream() {
-    return data.entrySet().stream()
-               .map(e -> new AbstractMap.SimpleImmutableEntry<>(e.getKey(),
-                                                                e.getValue()
-                                                                 .getValue()));
+    return data.entrySet().stream();
   }
 
   /*
@@ -307,7 +261,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    * @return this - other
    * @throws SizeMismatchException
    */
-  public MapRIV subtract(final MapRIV other) {
+  public KoloRIV subtract(final KoloRIV other) {
     return copy().destructiveSub(other).destructiveRemoveZeros();
   }
   /*
@@ -317,14 +271,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    */
 
   private void subtractPoint(final int index, final double value) {
-    addPoint(index, -value);
-  }
-
-  private void subtractPoint(final Integer index, final MutableDouble value) {
-    data.compute(index, (i, v) -> {
-      v.subtract(value);
-      return v;
-    });
+    data.addValue(index, -value);
   }
 
   @Override
@@ -340,19 +287,20 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public double[] valArr() {
-    final double[] vals = new double[count()];
-    final AtomicInteger c = new AtomicInteger();
-    data.values().forEach(v -> vals[c.getAndIncrement()] = v.getValue());
+    final int[] keys = keyArr();
+    final double[] vals = new double[keys.length];
+    for (int i = 0; i < keys.length; i++)
+      vals[i] = data.get(keys[i]);
     return vals;
   }
 
   @Override
   public DoubleStream valStream() {
-    return data.values().stream().mapToDouble(x -> x.getValue());
+    return Arrays.stream(valArr());
   }
 
-  public static MapRIV empty(final int size) {
-    return new MapRIV(size);
+  public static KoloRIV empty(final int size) {
+    return new KoloRIV(size);
   }
 
   /**
@@ -361,26 +309,26 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    *          RIV.toString().
    * @return a MapRIV
    */
-  public static MapRIV fromString(final String rivString) {
+  public static KoloRIV fromString(final String rivString) {
     String[] pointStrings = rivString.split(" ");
     final int last = pointStrings.length - 1;
     final int size = Integer.parseInt(pointStrings[last]);
     pointStrings = Arrays.copyOf(pointStrings, last);
-    final ConcurrentHashMap<Integer, MutableDouble> elts = new ConcurrentHashMap<>();
+    final KoloRIV res = new KoloRIV(size);
     for (final String s : pointStrings) {
       final String[] elt = s.split("\\|");
       if (elt.length != 2)
         throw new IndexOutOfBoundsException("Wrong number of partitions: " + s);
       else
-        elts.put(Integer.parseInt(elt[0]),
-                 new MutableDouble(Double.parseDouble(elt[1])));
+        res.put(Integer.parseInt(elt[0]),
+                Double.parseDouble(elt[1]));
     }
-    return new MapRIV(elts, size).destructiveRemoveZeros();
+    return res;
   }
 
   public static RIV generate(final int size, final int nnz,
                              final CharSequence token) {
-    return RIVs.generateRIV(size, nnz, token, MapRIV::new);
+    return RIVs.generateRIV(size, nnz, token, KoloRIV::new);
   }
 
   public static RIV generate(final int size,
@@ -389,10 +337,10 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
                              final int tokenStart,
                              final int tokenWidth) {
     return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
-                            MapRIV::new);
+                            KoloRIV::new);
   }
 
   public static RIVConstructor getConstructor() {
-    return MapRIV::new;
+    return KoloRIV::new;
   }
 }

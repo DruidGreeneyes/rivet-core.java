@@ -34,8 +34,7 @@ public class RIVTests {
 
   public static final int DEFAULT_NNZ = 48;
 
-  private static final String base =
-                                   "0|1.000000 1|-1.000000 2|1.000000 3|-1.000000 4|1.000000 5|-1.000000 6|1.000000 7|-1.000000 8|1.000000 9|-1.000000 10|1.000000 11|-1.000000 12|1.000000 13|-1.000000 14|1.000000 15|-1.000000 16|1.000000 17|-1.000000 18|1.000000 19|-1.000000 20|1.000000 21|-1.000000 22|1.000000 23|-1.000000 24|1.000000 25|-1.000000 26|1.000000 27|-1.000000 28|1.000000 29|-1.000000 30|1.000000 31|-1.000000 32|1.000000 33|-1.000000 34|1.000000 35|-1.000000 36|1.000000 37|-1.000000 38|1.000000 39|-1.000000 40|1.000000 41|-1.000000 42|1.000000 43|-1.000000 44|1.000000 45|-1.000000 46|1.000000 47|-1.000000 ";
+  private static final String base = "0|1.000000 1|-1.000000 2|1.000000 3|-1.000000 4|1.000000 5|-1.000000 6|1.000000 7|-1.000000 8|1.000000 9|-1.000000 10|1.000000 11|-1.000000 12|1.000000 13|-1.000000 14|1.000000 15|-1.000000 16|1.000000 17|-1.000000 18|1.000000 19|-1.000000 20|1.000000 21|-1.000000 22|1.000000 23|-1.000000 24|1.000000 25|-1.000000 26|1.000000 27|-1.000000 28|1.000000 29|-1.000000 30|1.000000 31|-1.000000 32|1.000000 33|-1.000000 34|1.000000 35|-1.000000 36|1.000000 37|-1.000000 38|1.000000 39|-1.000000 40|1.000000 41|-1.000000 42|1.000000 43|-1.000000 44|1.000000 45|-1.000000 46|1.000000 47|-1.000000 ";
 
   public static final String DEFAULT_STRING = base + DEFAULT_SIZE;
   public static final String DEFAULT_DSTRING = base + generatePadding()
@@ -59,9 +58,9 @@ public class RIVTests {
 
   public static final double DEFAULT_SATURATION = 48 / 1600.0;
   private static final Class<?>[] DEFAULT_CPARAMTYPES = new Class<?>[] {
-                                                                         int[].class,
-                                                                         double[].class,
-                                                                         int.class
+      int[].class,
+      double[].class,
+      int.class
   };
 
   private final Class<?> rivClass;
@@ -87,7 +86,7 @@ public class RIVTests {
       fail(e.getStackTrace().toString());
     }
     if (cst == null)
-                     fail("No constructor found!");
+      fail("No constructor found!");
     try {
       res = cst.newInstance(DEFAULT_INDICES, DEFAULT_VALS, DEFAULT_SIZE);
     } catch (InstantiationException
@@ -100,9 +99,9 @@ public class RIVTests {
   }
 
   /**
-   * NOTE: No destructive methods are used here because: A) as defined in the RIV
-   * interface, all safe methods call this.copy().destructiveOp() B) except in
-   * ImmutableRIV, where the safe methods are overridden, and the destructive
+   * NOTE: No destructive methods are used here because: A) as defined in the
+   * RIV interface, all safe methods call this.copy().destructiveOp() B) except
+   * in ImmutableRIV, where the safe methods are overridden, and the destructive
    * methods all throw NotImplementedException.
    */
 
@@ -136,7 +135,7 @@ public class RIVTests {
       fail(e.getStackTrace().toString());
     }
     if (cst == null)
-                     fail("No constructor found!");
+      fail("No constructor found!");
     try {
       res = cst.newInstance(DEFAULT_SIZE);
     } catch (InstantiationException
@@ -196,7 +195,7 @@ public class RIVTests {
     final RIV riv2 = riv.add(riv);
     final RIV riv0 = invokeEmptyConstructor().add(riv);
     assertArrayEquals(vals2, riv2.valArr(), roundingError);
-    assertTrue(riv.equals(riv0));
+    assertEquals(riv, riv0);
     assertArrayEquals(DEFAULT_INDICES, riv0.keyArr());
     assertArrayEquals(DEFAULT_VALS, riv0.valArr(), roundingError);
   }
@@ -211,7 +210,7 @@ public class RIVTests {
     assertEquals(DEFAULT_NNZ, riv5.count());
     assertArrayEquals(DEFAULT_INDICES, riv5.keyArr());
     assertArrayEquals(vals5, riv5.valArr(), roundingError);
-    assertFalse(riv.equals(riv5));
+    assertNotEquals(riv, riv5);
   }
 
   // Test Constructors
@@ -271,13 +270,13 @@ public class RIVTests {
     final RIV rivB = rivA.copy();
     final RIV riv2 = rivA.add(rivA);
     final Integer notARIV = 5;
-    assertTrue(rivA.equals(rivB));
-    assertFalse(rivA.equals(riv2));
-    assertFalse(rivA.equals(notARIV));
+    assertEquals(rivA, rivB);
+    assertNotEquals(rivA, riv2);
+    assertNotEquals(rivA, notARIV);
   }
 
   @Test
-  public void testForEach() {
+  public void testForEachNZ() {
     final RIV riv = invokeDefaultConstructor();
     final Stream.Builder<VectorElement> s = Stream.builder();
     riv.forEachNZ((IntDoubleConsumer) (i, v) -> {
@@ -455,9 +454,9 @@ public class RIVTests {
     if (!error)
       fail("Expected exception but got none.");
     else if (!gotClass.equals(exceptionClass))
-                                               fail("Expected exception of type " + exceptionClass.getName()
-                                                    + ", but got "
-                                                    + gotClass.getName());
+      fail("Expected exception of type " + exceptionClass.getName()
+           + ", but got "
+           + gotClass.getName());
   }
 
   public static <T> void assertError(final Class<?> exceptionClass,
@@ -473,25 +472,25 @@ public class RIVTests {
     if (!error)
       fail("Expected exception but got none.");
     else if (!gotClass.equals(exceptionClass))
-                                               fail("Expected exception of type " + exceptionClass.getName()
-                                                    + ", but got "
-                                                    + gotClass.getName());
+      fail("Expected exception of type " + exceptionClass.getName()
+           + ", but got "
+           + gotClass.getName());
   }
 
   @Parameters
   public static Collection<Class<?>> classesUnderTest() {
     /*
-     * NOTE: DenseRIV is not included here because it is guaranteed to fail any test
-     * the compares against default values, and I am too lazy to write exceptions
-     * into the tests.
+     * NOTE: DenseRIV is not included here because it is guaranteed to fail any
+     * test the compares against default values, and I am too lazy to write
+     * exceptions into the tests.
      */
     return Arrays.asList(new Class<?>[] {
-                                          ArrayRIV.class,
-                                          ColtRIV.class,
-                                          HPPCRIV.class,
-                                          ImmutableRIV.class,
-                                          MapRIV.class,
-                                          MTJRIV.class
+        ArrayRIV.class,
+        ColtRIV.class,
+        HPPCRIV.class,
+        KoloRIV.class,
+        MapRIV.class,
+        MTJRIV.class
     });
   }
 

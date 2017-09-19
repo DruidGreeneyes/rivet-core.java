@@ -1,115 +1,41 @@
 package com.github.druidgreeneyes.rivet.core.labels;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.tuple.MutablePair;
-
-import com.github.druidgreeneyes.rivet.core.exceptions.SizeMismatchException;
 import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 public class RIVs {
-  private RIVs() {
+  private RIVs() {}
+
+  @FunctionalInterface
+  public interface IntBiFunction<T> {
+    T apply(int a, int b);
   }
 
-  public static RIV addRIVs(final RIV rivA,
-                            final RIV rivB) throws SizeMismatchException {
-    return rivA.add(rivB);
-  }
-
-  public static double dotProduct(final RIV rivA, final RIV rivB) {
-    double sum = 0;
-    for (final VectorElement p : rivA.points())
-      sum += p.value() * rivB.get(p.index());
-    return sum;
-  }
-
-  public static double dotProduct2(final RIV rivA, final RIV rivB) {
-    return getMatchingValStream(rivA, rivB)
-                                           .mapToDouble(pair -> pair.left * pair.right)
-                                           .sum();
-  }
-
-  protected static boolean equals(final RIV riv, final Object other) {
-    if (riv == other)
-      return true;
-    else if (riv.getClass().equals(other.getClass()))
-      return riv.equals(riv.getClass().cast(other));
-    else if (ArrayUtils.contains(other.getClass()
-                                      .getInterfaces(),
-                                 RIV.class))
-      return riv.equals((RIV) other);
-    else
-      return false;
-  }
-
-  protected static RIV generateRIV(final int size,
-                                   final int k,
-                                   final CharSequence text,
-                                   final int point,
-                                   final int width,
-                                   final RIVConstructor rivConstructor) {
+  public static RIV generateRIV(final int size,
+                                final int k,
+                                final CharSequence text,
+                                final int point,
+                                final int width,
+                                final RIVConstructor rivConstructor) {
     return generateRIV(size,
                        k,
                        text.subSequence(Integer.max(0, point),
-                                        Integer.min(text.length(), point + width)),
+                                        Integer.min(text.length(),
+                                                    point + width)),
                        rivConstructor);
   }
 
-  protected static RIV generateRIV(final int size,
-                                   final int nnz,
-                                   final CharSequence token,
-                                   final RIVConstructor rivConstructor) {
+  public static RIV generateRIV(final int size,
+                                final int nnz,
+                                final CharSequence token,
+                                final RIVConstructor rivConstructor) {
     final long seed = makeSeed(token);
     final int[] indices = makeIndices(size, nnz, seed);
     final double[] vals = makeVals(nnz, seed);
     return rivConstructor.make(indices, vals, size);
-  }
-
-  static int[] getMatchingKeys(final RIV rivA, final RIV rivB) {
-    final int[] keys = rivA.keyArr();
-    final int[] keysB = rivB.keyArr();
-    for (int i = 0; i < keys.length; i++)
-      if (!ArrayUtils.contains(keysB, keys[i]))
-                                                keys[i] = -1;
-    return ArrayUtils.removeAllOccurences(keys, -1);
-  }
-
-  private static IntStream getMatchingKeyStream(final RIV rivA,
-                                                final RIV rivB) {
-    return rivA.keyStream()
-               .filter(rivB::contains);
-  }
-
-  static double[][] getMatchingVals(final RIV rivA, final RIV rivB) {
-    final int[] keys = getMatchingKeys(rivA, rivB);
-    final double[][] vals = new double[keys.length][2];
-    for (int i = 0; i < keys.length; i++) {
-      vals[i][0] = rivA.get(keys[i]);
-      vals[i][1] = rivB.get(keys[i]);
-    }
-    return vals;
-  }
-
-  private static Stream<MutablePair<Double, Double>> getMatchingValStream(
-                                                                          final RIV rivA,
-                                                                          final RIV rivB) {
-    return getMatchingKeyStream(rivA,
-                                rivB).mapToObj(i -> MutablePair.of(rivA.get(i),
-                                                                   rivB.get(i)));
-  }
-
-  protected static int hashcode(final RIV riv) {
-    int sum = 0;
-    final double[] vals = riv.valArr();
-    for (int i = 0; i < vals.length; i++)
-      sum += vals[i] * (31 ^ vals.length - 1 - i);
-    return sum;
   }
 
   /**
@@ -125,10 +51,17 @@ public class RIVs {
                .toArray();
   }
 
-  public static Function<CharSequence, RIV> makeRIVGenerator(final int size,
-                                                             final int nnz,
-                                                             final RIVConstructor rivConstructor) {
+  public static Function<CharSequence, RIV> generator(final int size,
+                                                      final int nnz,
+                                                      final RIVConstructor rivConstructor) {
     return (token) -> generateRIV(size, nnz, token, rivConstructor);
+  }
+
+  public static IntBiFunction<RIV>
+         generator(final int size, final int nnz, final CharSequence text,
+                   final RIVConstructor rivConstructor) {
+    return (start, width) -> generateRIV(size, nnz, text, start, width,
+                                         rivConstructor);
   }
 
   /**
@@ -157,7 +90,8 @@ public class RIVs {
     return Util.shuffleDoubleArray(l, seed);
   }
 
-  protected static int[] permuteKeys(final int[] keys, final int[] permutation, final int times) {
+  protected static int[] permuteKeys(final int[] keys, final int[] permutation,
+                                     final int times) {
     for (int i = 0; i < times; i++)
       for (int c = 0; c < keys.length; c++)
         keys[c] = permutation[keys[c]];
@@ -178,29 +112,11 @@ public class RIVs {
     return riv.permute(permutations, times);
   }
 
-  public static double similarity(final RIV rivA, final RIV rivB) {
-    final double mag = rivA.magnitude() * rivB.magnitude();
-    return mag == 0
-                    ? 0
-                    : dotProduct(rivA, rivB) / mag;
+  @Deprecated
+  protected static boolean equals(final RIV a, final RIV b) {
+    for (int i = 0; i < a.size(); i++)
+      if (a.get(i) != b.get(i))
+        return false;
+    return true;
   }
-
-  public static RIV sumRIVs(final RIV zeroValue, final RIV... rivs)
-                                                                    throws SizeMismatchException {
-    return sumRIVs(zeroValue, Arrays.stream(rivs));
-  }
-
-  public static RIV sumRIVs(final RIV zeroValue, final Stream<RIV> rivs)
-                                                                         throws SizeMismatchException {
-    return rivs.reduce(zeroValue, RIV::destructiveAdd);
-  }
-
-  protected static String toString(final RIV riv) {
-    final StringBuilder sb = new StringBuilder();
-    for (final VectorElement point : riv.points())
-      sb.append(point.toString() + " ");
-    sb.append(riv.size());
-    return sb.toString();
-  }
-
 }
