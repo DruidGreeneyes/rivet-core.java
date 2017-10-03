@@ -21,27 +21,22 @@ import com.github.druidgreeneyes.rivet.core.util.Util;
 import com.github.druidgreeneyes.rivet.core.vectorpermutations.Permutations;
 
 /**
- * Implementation of RIV that uses ConcurrentHashMap<Integer, Double> to store
- * data. Has proven to be significantly faster than array-based representations
- * of RIVs when doing vector arithmetic.
+ * Implementation of RIV that uses ConcurrentHashMap<Integer, Double> to store data. Has proven to
+ * be significantly faster than array-based representations of RIVs when doing vector arithmetic.
  *
  * @author josh
  */
 public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
-  /**
-   * CEREAL
-   */
+  /** CEREAL */
   private static final long serialVersionUID = 350977843775988038L;
 
-  /**
-   * The dimensionality of this riv.
-   */
+  /** The dimensionality of this riv. */
   private final int size;
+
   private final ConcurrentHashMap<Integer, MutableDouble> data;
 
-  public MapRIV(final ConcurrentHashMap<Integer, MutableDouble> points,
-                final int size) {
+  public MapRIV(final ConcurrentHashMap<Integer, MutableDouble> points, final int size) {
     this(size);
     points.forEach((i, v) -> _addPoint(i, v));
   }
@@ -54,10 +49,8 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
   public MapRIV(final int[] keys, final double[] vals, final int size) {
     this(size);
     final int l = keys.length;
-    if (l != vals.length)
-      throw new SizeMismatchException("Different quantity keys than values!");
-    for (int i = 0; i < l; i++)
-      data.put(keys[i], new MutableDouble(vals[i]));
+    if (l != vals.length) throw new SizeMismatchException("Different quantity keys than values!");
+    for (int i = 0; i < l; i++) data.put(keys[i], new MutableDouble(vals[i]));
   }
 
   public MapRIV(final MapRIV riv) {
@@ -71,25 +64,29 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   private void _addPoint(final Integer index, final MutableDouble value) {
-    data.compute(index, (i, v) -> {
-      if (v == null) v = new MutableDouble();
-      v.add(value);
-      return v;
-    });
+    data.compute(
+        index,
+        (i, v) -> {
+          if (v == null) v = new MutableDouble();
+          v.add(value);
+          return v;
+        });
   }
 
   private void addPoint(final int index, final double value) {
-    data.compute(index, (i, v) -> {
-      if (v == null) v = new MutableDouble();
-      v.add(value);
-      return v;
-    });
+    data.compute(
+        index,
+        (i, v) -> {
+          if (v == null) v = new MutableDouble();
+          v.add(value);
+          return v;
+        });
   }
 
   private void assertValidIndex(final int index) {
     if (index > size || index < 0)
-      throw new IndexOutOfBoundsException("Index " + index
-                                          + " is outside the bounds of this vector.");
+      throw new IndexOutOfBoundsException(
+          "Index " + index + " is outside the bounds of this vector.");
   }
 
   @Override
@@ -107,8 +104,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
     return data.size();
   }
 
-  public MapRIV
-         destructiveAdd(final MapRIV other) {
+  public MapRIV destructiveAdd(final MapRIV other) {
     other.data.forEach(this::_addPoint);
     return this;
   }
@@ -121,33 +117,34 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public MapRIV destructiveAdd(final RIV... rivs) {
-    for (final RIV riv : rivs)
-      destructiveAdd(riv);
+    for (final RIV riv : rivs) destructiveAdd(riv);
     return this;
   }
 
   @Override
   public MapRIV destructiveDiv(final double scalar) {
-    data.replaceAll((k, v) -> {
-      v.setValue(v.getValue() / scalar);
-      return v;
-    });
+    data.replaceAll(
+        (k, v) -> {
+          v.setValue(v.getValue() / scalar);
+          return v;
+        });
     return this;
   }
 
   /**
-   * An optimized, destructive, element-wise multiplier; do not use when you'll
-   * have to reference the original structure later.
+   * An optimized, destructive, element-wise multiplier; do not use when you'll have to reference
+   * the original structure later.
    *
    * @param scalar
    * @return multiplies every element in this by scalar, then returns this.
    */
   @Override
   public MapRIV destructiveMult(final double scalar) {
-    data.replaceAll((k, v) -> {
-      v.setValue(v.getValue() * scalar);
-      return v;
-    });
+    data.replaceAll(
+        (k, v) -> {
+          v.setValue(v.getValue() * scalar);
+          return v;
+        });
     return this;
   }
 
@@ -158,8 +155,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
     return this;
   }
 
-  public MapRIV
-         destructiveSub(final MapRIV other) throws SizeMismatchException {
+  public MapRIV destructiveSub(final MapRIV other) throws SizeMismatchException {
     other.data.forEach((BiConsumer<Integer, MutableDouble>) this::subtractPoint);
     return this;
   }
@@ -179,15 +175,13 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public MapRIV destructiveSub(final RIV... rivs) {
-    for (final RIV riv : rivs)
-      destructiveSub(riv);
+    for (final RIV riv : rivs) destructiveSub(riv);
     return this;
   }
 
   @Override
   public boolean equals(final RIV other) {
-    if (other instanceof MapRIV)
-      return equals((MapRIV) other);
+    if (other instanceof MapRIV) return equals((MapRIV) other);
     else
       // return RIVs.equals(this, other);
       return equals((AbstractRIV) other);
@@ -231,27 +225,21 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public MapRIV permute(final Permutations permutations, final int times) {
-    if (times == 0)
-      return this;
+    if (times == 0) return this;
     else
-      return new MapRIV(times > 0 ? RIVs.permuteKeys(keyArr(),
-                                                     permutations.permute,
-                                                     times)
-                                  : RIVs.permuteKeys(keyArr(),
-                                                     permutations.inverse,
-                                                     -times),
-                        valArr(),
-                        size);
+      return new MapRIV(
+          times > 0
+              ? RIVs.permuteKeys(keyArr(), permutations.permute, times)
+              : RIVs.permuteKeys(keyArr(), permutations.inverse, -times),
+          valArr(),
+          size);
   }
 
   @Override
   public VectorElement[] points() {
     final VectorElement[] points = new VectorElement[count()];
     final AtomicInteger c = new AtomicInteger();
-    data.forEach(10000,
-                 (a,
-                  b) -> points[c.getAndIncrement()] = VectorElement.elt(a,
-                                                                        b.getValue()));
+    data.forEach(10000, (a, b) -> points[c.getAndIncrement()] = VectorElement.elt(a, b.getValue()));
     Arrays.sort(points);
     return points;
   }
@@ -263,7 +251,9 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
 
   @Override
   public double put(final int index, final double value) {
-    return data.put(index, new MutableDouble(value)).getValue();
+    MutableDouble d = data.put(index, new MutableDouble(value));
+    if (null == d) return 0;
+    else return d.getValue();
   }
 
   @Override
@@ -281,14 +271,11 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    * @Override public MapRIV normalize() { return divide(magnitude()); }
    */
 
-  /**
-   * @return all index/value pairs in this, as a stream
-   */
+  /** @return all index/value pairs in this, as a stream */
   public Stream<Entry<Integer, Double>> stream() {
-    return data.entrySet().stream()
-               .map(e -> new AbstractMap.SimpleImmutableEntry<>(e.getKey(),
-                                                                e.getValue()
-                                                                 .getValue()));
+    return data.entrySet()
+        .stream()
+        .map(e -> new AbstractMap.SimpleImmutableEntry<>(e.getKey(), e.getValue().getValue()));
   }
 
   /*
@@ -299,11 +286,9 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
    */
 
   /**
-   * An optimized version of subtract() for use when adding MapRIVs to
-   * eachother.
+   * An optimized version of subtract() for use when adding MapRIVs to eachother.
    *
-   * @param other
-   *          : A MapRIV of the same size as this one.
+   * @param other : A MapRIV of the same size as this one.
    * @return this - other
    * @throws SizeMismatchException
    */
@@ -321,10 +306,12 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   private void subtractPoint(final Integer index, final MutableDouble value) {
-    data.compute(index, (i, v) -> {
-      v.subtract(value);
-      return v;
-    });
+    data.compute(
+        index,
+        (i, v) -> {
+          v.subtract(value);
+          return v;
+        });
   }
 
   @Override
@@ -332,8 +319,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
     // "0|1 1|3 4|2 5"
     // "I|V I|V I|V Size"
     final StringBuilder sb = new StringBuilder();
-    for (final VectorElement point : points())
-      sb.append(point.toString() + " ");
+    for (final VectorElement point : points()) sb.append(point.toString() + " ");
     sb.append(size);
     return sb.toString();
   }
@@ -356,9 +342,7 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
   }
 
   /**
-   * @param rivString
-   *          : A string representation of a RIV, generally got by calling
-   *          RIV.toString().
+   * @param rivString : A string representation of a RIV, generally got by calling RIV.toString().
    * @return a MapRIV
    */
   public static MapRIV fromString(final String rivString) {
@@ -369,27 +353,23 @@ public final class MapRIV extends AbstractRIV implements RIV, Serializable {
     final ConcurrentHashMap<Integer, MutableDouble> elts = new ConcurrentHashMap<>();
     for (final String s : pointStrings) {
       final String[] elt = s.split("\\|");
-      if (elt.length != 2)
-        throw new IndexOutOfBoundsException("Wrong number of partitions: " + s);
-      else
-        elts.put(Integer.parseInt(elt[0]),
-                 new MutableDouble(Double.parseDouble(elt[1])));
+      if (elt.length != 2) throw new IndexOutOfBoundsException("Wrong number of partitions: " + s);
+      else elts.put(Integer.parseInt(elt[0]), new MutableDouble(Double.parseDouble(elt[1])));
     }
     return new MapRIV(elts, size).destructiveRemoveZeros();
   }
 
-  public static RIV generate(final int size, final int nnz,
-                             final CharSequence token) {
+  public static RIV generate(final int size, final int nnz, final CharSequence token) {
     return RIVs.generateRIV(size, nnz, token, MapRIV::new);
   }
 
-  public static RIV generate(final int size,
-                             final int nnz,
-                             final CharSequence text,
-                             final int tokenStart,
-                             final int tokenWidth) {
-    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth,
-                            MapRIV::new);
+  public static RIV generate(
+      final int size,
+      final int nnz,
+      final CharSequence text,
+      final int tokenStart,
+      final int tokenWidth) {
+    return RIVs.generateRIV(size, nnz, text, tokenStart, tokenWidth, MapRIV::new);
   }
 
   public static RIVConstructor getConstructor() {
